@@ -14,7 +14,7 @@ namespace ERwin_CA
 {
     class ExcelOps
     {
-        public Excel.ApplicationClass ExApp;
+        public static Excel.ApplicationClass ExApp = null;
         public ExcelOps()
         {
             ExApp = new Excel.ApplicationClass();
@@ -25,12 +25,12 @@ namespace ERwin_CA
         /// </summary>
         /// <param name="fileName">Path and file name to convert.</param>
         /// <returns>True if successfull, False otherwise.</returns>
-        public bool ConvertXLSXtoXLS(string fileName = null)
+        public static bool ConvertXLSXtoXLS(string fileName = null)
         {
             if (string.IsNullOrEmpty(fileName))
-            {
                 return false;
-            }
+            if (ExApp == null)
+                return false;
             FileInfo fileInfo = new FileInfo(fileName);
             if (fileInfo.Exists && (fileInfo.Extension == ".xlsx"))
             {
@@ -81,7 +81,7 @@ namespace ERwin_CA
         /// </summary>
         /// <param name="fileName">Path and file name to convert.</param>
         /// <returns>True if successfull, False otherwise.</returns>
-        public bool ConvertXLStoXLSX(string fileName = null)
+        public static bool ConvertXLStoXLSX(string fileName = null)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -95,19 +95,20 @@ namespace ERwin_CA
                 try
                 {
                     Excel.Worksheet ExWS = new Excel.Worksheet();
-
+                    if (ExApp == null)
+                        ExApp = new Excel.ApplicationClass();
                     ExWB = ExApp.Workbooks.Open(fileName, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-                    fileName = Path.ChangeExtension(fileName, ".xls");
+                    fileName = Path.ChangeExtension(fileName, ".xlsx");
                     ExApp.DisplayAlerts = false;
                     FileInfo FileToSaveInfo = new FileInfo(fileName);
                     if (FileToSaveInfo.Exists)
                     {
                         FileToSaveInfo.Delete();
                     }
-                    ExWB.SaveAs(fileName, Excel.XlFileFormat.xlOpenXMLStrictWorkbook,
+                    ExWB.SaveAs(fileName, Excel.XlFileFormat.xlOpenXMLWorkbook,//.xlOpenXMLStrictWorkbook,
                                 Type.Missing, Type.Missing,
                                 Type.Missing, Type.Missing,
                                 Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing,
@@ -117,7 +118,7 @@ namespace ERwin_CA
                     ExApp.DisplayAlerts = true;
                     Marshal.FinalReleaseComObject(ExWB);
                     Marshal.FinalReleaseComObject(ExWS);
-                    Marshal.FinalReleaseComObject(ExApp);
+                    //Marshal.FinalReleaseComObject(ExApp);
                 }
                 catch (Exception exp)
                 {
@@ -136,8 +137,20 @@ namespace ERwin_CA
         public static bool FileValidation(string file)
         {
             //SCAPI.Application testAPP = new SCAPI.Application();
-            string testoLog = String.Empty;
+            string testoLog = string.Empty;
             FileInfo fileDaAprire = new FileInfo(file);
+            if (fileDaAprire.Extension == ".xls")
+            {
+                if (!ConvertXLStoXLSX(file))
+                {
+                    Logger.PrintLC(fileDaAprire.Name + ": non convertito. Il file non prosegue nell'elaborazione.");
+                    return false;
+                }
+                file = Path.ChangeExtension(file, ".xlsx");
+                fileDaAprire = new FileInfo(file);
+            }
+                
+           // if (file.EndsWith(".xls"))
             ExcelPackage p = new ExcelPackage(fileDaAprire);
             //using (ExcelPackage p = new ExcelPackage(fileDaAprire))
             //{
@@ -163,12 +176,8 @@ namespace ERwin_CA
                         if (ConfigFile._TABELLE.ContainsKey(value))
                         {
                             columns += 1;
-                            //int position = ConfigFile._TABELLE[value];
                             if (ConfigFile._TABELLE[value] != columnsPosition)
-                            {
-                                //columnsFound = false;
                                 return false;
-                            }
                             dd.Add(worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text);
                         }
                         else
@@ -190,16 +199,15 @@ namespace ERwin_CA
                     //p.Save();
                 }
             }
-            //ws.Dispose();
             WB.Dispose();
             p.Dispose();
             
             if (sheetFound != true || columnsFound != true)
             {
-                Logger.PrintL(fileDaAprire.Name + ": file NON idoneo all'elaborazione.");
+                Logger.PrintLC(fileDaAprire.Name + ": file NON idoneo all'elaborazione.");
                 return false;
             }
-            Logger.PrintL(fileDaAprire.Name + ": file IDONEO all'elaborazione.");
+            Logger.PrintLC(fileDaAprire.Name + ": file IDONEO all'elaborazione.");
             return true;
         }
     }

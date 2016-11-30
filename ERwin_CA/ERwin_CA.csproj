@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigFile.cs" />
+    <Compile Include="ConnMng.cs" />
     <Compile Include="DirOps.cs" />
     <Compile Include="ExcelOps.cs" />
     <Compile Include="FileOps.cs" />

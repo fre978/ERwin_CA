@@ -20,21 +20,21 @@ namespace ERwin_CA
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
             //Timer.SetFirstTime(DateTime.Now);
+            Logger.PrintFile(@"C:\ROOTtest\test.txt", "Tutto OK.", true);
             Logger.PrintL("AVVIO ESECUZIONE");
             ExcelOps Accesso = new ExcelOps();
             //string[] testFiles = DirOps.GetFilesToProcess(@"C:\ROOTtest\", "*.mpp|*.txt|*.zip|*.xls|.xlsx");
 
-            FileInfo fileDaAprire = new FileInfo(ConfigFile.FILETEST);
+            //FileInfo fileDaAprire = new FileInfo(ConfigFile.FILETEST);
+            
             //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
             //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
             //testBool = ExcelOps.FileValidation(nomeFile);
-            string[] ElencoExcel = DirOps.GetFilesToProcess(@"C:\ERWIN\CODICE\Extra\", "*.xlsx");
+            string[] ElencoExcel = DirOps.GetFilesToProcess(@"C:\ERWIN\CODICE\Extra\XLS\", "*.xls|*.xlsx");
             foreach(var file in ElencoExcel)
             {
                 if (!ExcelOps.FileValidation(file))
-                {
-                    Console.WriteLine("File {0} not valid for execution.", file);
-                }
+                    Logger.PrintC("File " + file + " not valid for processing.");
             }
             
             //nomeFile = "";
@@ -65,7 +65,7 @@ namespace ERwin_CA
             }
             Logger.PrintL("TERMINE ESECUZIONE");
             Timer.SetSecondTime(DateTime.Now);
-            Logger.PrintL("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()));
+            Logger.PrintL("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);
         }
     }
 }

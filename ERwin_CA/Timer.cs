@@ -7,6 +7,9 @@ using System.IO;
 
 namespace ERwin_CA
 {
+    /// <summary>
+    /// Manage time measurement.
+    /// </summary>
     static class Timer
     {
         private static DateTime StartTime;

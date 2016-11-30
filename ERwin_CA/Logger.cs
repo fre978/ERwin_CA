@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ERwin_CA
-{
+{/// <summary>
+/// Manage the logging system.
+/// </summary>
     static class Logger
     {
         private static string FileName;
@@ -32,16 +34,38 @@ namespace ERwin_CA
             using ( StreamWriter StrWr = File.AppendText(FileNameStream))
             {
                 StrWr.WriteLine(line);
+                StrWr.Close();
             }
         }
+        public static void PrintC(string text)
+        {
+            string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
+            Console.WriteLine(line);
+        }
+
         public static void PrintLC(string text)
         {
             string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
-
+            Console.WriteLine(line);
             using (StreamWriter StrWr = File.AppendText(FileNameStream))
             {
                 StrWr.WriteLine(line);
+                StrWr.Close();
             }
+        }
+
+        public static void PrintFile(string fileName, string text, bool timestamp = false)
+        {
+            string line = (timestamp ? (Timer.GetTimestampPrecision(DateTime.Now) + "    ") : "") +
+                        text;
+            FileInfo file = new FileInfo(fileName);
+            DirectoryInfo dir = new DirectoryInfo(file.DirectoryName);
+            if (dir.Exists)
+                using (StreamWriter StrWr = File.AppendText(fileName))
+                {
+                    StrWr.WriteLine(line);
+                    StrWr.Close();
+                }
         }
     }
 }
