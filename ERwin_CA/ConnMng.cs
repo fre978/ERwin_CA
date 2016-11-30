@@ -21,6 +21,7 @@ namespace ERwin_CA
         public SCAPI.ModelObjects erColumn;
         public SCAPI.ModelObjects erTable;
         public SCAPI.ModelObject scItem;
+        public long trID = 0;
 
         public void openModelConnection(string ERw)
         {
@@ -36,9 +37,27 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Errore di connessione: " + exp.Message);
+                Logger.PrintLC("Connection opening error: " + exp.Message);
                 return;
             }
+        }
+
+        public long openTransaction()
+        {
+            if (scSession != null)
+                try
+                {
+                    long id = scSession.BeginTransaction();
+                    return id;
+                }
+                catch (Exception exp)
+                {
+                    Logger.PrintLC("Starting Transaction error: " + exp.Message);
+                    return -1;
+                }
+            else
+                Logger.PrintLC("Starting Transaction error: missing SESSION.");
+            return -1;
         }
 
     }
