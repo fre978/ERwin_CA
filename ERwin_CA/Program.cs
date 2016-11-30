@@ -18,13 +18,25 @@ namespace ERwin_CA
         object testOBJ = new SCAPI.ModelObjects();
         static void Main(string[] args)
         {
+            Logger.Instantiate(ConfigFile.LOG_FILE);
+            //Timer.SetFirstTime(DateTime.Now);
+            Logger.PrintL("AVVIO ESECUZIONE");
+            ExcelOps Accesso = new ExcelOps();
             //string[] testFiles = DirOps.GetFilesToProcess(@"C:\ROOTtest\", "*.mpp|*.txt|*.zip|*.xls|.xlsx");
 
             FileInfo fileDaAprire = new FileInfo(ConfigFile.FILETEST);
-            string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
-            ExcelOps Accesso = new ExcelOps();
-            bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
-            testBool = ExcelOps.FileValidation(nomeFile = nomeFile.Replace("xls","xlsx"));
+            //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
+            //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
+            //testBool = ExcelOps.FileValidation(nomeFile);
+            string[] ElencoExcel = DirOps.GetFilesToProcess(@"C:\ERWIN\CODICE\Extra\", "*.xlsx");
+            foreach(var file in ElencoExcel)
+            {
+                if (!ExcelOps.FileValidation(file))
+                {
+                    Console.WriteLine("File {0} not valid for execution.", file);
+                }
+            }
+            
             //nomeFile = "";
             //SCAPI.Application testAPP = new SCAPI.Application();
             if (fileDaAprire.Exists)
@@ -51,7 +63,9 @@ namespace ERwin_CA
                     }
                 }
             }
-            
+            Logger.PrintL("TERMINE ESECUZIONE");
+            Timer.SetSecondTime(DateTime.Now);
+            Logger.PrintL("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()));
         }
     }
 }

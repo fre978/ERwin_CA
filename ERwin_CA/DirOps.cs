@@ -26,7 +26,7 @@ namespace ERwin_CA
                     foreach (string sFile in AllFiles)
                     {
                         FileOps.RemoveAttributes(sFile);
-                        File.Delete(sFile);
+                        //File.Delete(sFile);
                     }
                 }
                 catch (UnauthorizedAccessException)

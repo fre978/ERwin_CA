@@ -13,7 +13,9 @@ namespace ERwin_CA
 
         }
 
-        public static string FOGLIO01 = "Censimento Tabelle";
+        public static string LOG_FILE = @"C:\ERWIN\Log.txt";
+
+        public static string TABELLE = "Censimento Tabelle";
         public static string COLONNA_01 = "SSA";
         public static int HEADER_RIGA = 3;
         public static int HEADER_COLONNA_MIN = 1;
