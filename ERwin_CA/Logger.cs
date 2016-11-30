@@ -13,7 +13,7 @@ namespace ERwin_CA
         private static FileInfo FileInfos;
         //private static StreamWriter StrWr;
         private static string FileNameStream;
-        public static void Instantiate(string fileName)
+        public static void Initialize(string fileName)
         {
             Timer.SetFirstTime(DateTime.Now);
             FileName = fileName;

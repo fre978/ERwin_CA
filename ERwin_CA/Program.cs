@@ -18,7 +18,7 @@ namespace ERwin_CA
         object testOBJ = new SCAPI.ModelObjects();
         static void Main(string[] args)
         {
-            Logger.Instantiate(ConfigFile.LOG_FILE);
+            Logger.Initialize(ConfigFile.LOG_FILE);
             //Timer.SetFirstTime(DateTime.Now);
             Logger.PrintL("AVVIO ESECUZIONE");
             ExcelOps Accesso = new ExcelOps();
