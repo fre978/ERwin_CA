@@ -19,7 +19,6 @@ namespace ERwin_CA
         static void Main(string[] args)
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
-            Logger.PrintC("Test");
             //Timer.SetFirstTime(DateTime.Now);
             Logger.PrintFile(@"C:\ROOTtest\test.txt", "Tutto OK.", true);
             Logger.PrintL("AVVIO ESECUZIONE");

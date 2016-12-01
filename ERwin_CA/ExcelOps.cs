@@ -126,10 +126,6 @@ namespace ERwin_CA
                     Logger.PrintC("Error: " + exp.Message);
                     return false;
                 }
-                finally
-                {
-
-                }
             }
             else
                 return false;
@@ -145,7 +141,7 @@ namespace ERwin_CA
             {
                 if (!ConvertXLStoXLSX(file))
                 {
-                    Logger.PrintLC(fileDaAprire.Name + ": non convertito. Il file non prosegue nell'elaborazione.");
+                    Logger.PrintLC(fileDaAprire.Name + ": could not be converted.");
                     return false;
                 }
                 file = Path.ChangeExtension(file, ".xlsx");
@@ -184,7 +180,7 @@ namespace ERwin_CA
                         }
                         else
                         {
-                            testoLog = fileDaAprire.Name + ": file NON idoneo all'elaborazione.";
+                            testoLog = fileDaAprire.Name + ": file could not be elaborated.";
                             Logger.PrintL(testoLog);
                             return false;
                         }

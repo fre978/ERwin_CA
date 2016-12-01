@@ -41,9 +41,6 @@ namespace ERwin_CA
         {
             string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
             Console.WriteLine(line);
-            /*TEST CARICAMENTO LIBRERIA*/
-            VBClassLibrary.VBCon Classe = new VBClassLibrary.VBCon();
-            Classe.VBWriteLine("Scritto tramite libreria VB: " + text);
         }
 
         public static void PrintLC(string text)
