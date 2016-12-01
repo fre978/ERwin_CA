@@ -20,7 +20,7 @@ namespace ERwin_CA
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
             //Timer.SetFirstTime(DateTime.Now);
-            Logger.PrintFile(@"C:\ROOTtest\test.txt", "Tutto OK.", true);
+            Logger.PrintF(@"C:\ROOTtest\test.txt", "Tutto OK.", true);
             Logger.PrintL("AVVIO ESECUZIONE");
             ExcelOps Accesso = new ExcelOps();
             //string[] testFiles = DirOps.GetFilesToProcess(@"C:\ROOTtest\", "*.mpp|*.txt|*.zip|*.xls|.xlsx");

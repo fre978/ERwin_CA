@@ -54,7 +54,7 @@ namespace ERwin_CA
             }
         }
 
-        public static void PrintFile(string fileName, string text, bool timestamp = false)
+        public static void PrintF(string fileName, string text, bool timestamp = false)
         {
             string line = (timestamp ? (Timer.GetTimestampPrecision(DateTime.Now) + "    ") : "") +
                         text;
