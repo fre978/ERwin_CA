@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VBClassLibrary;
 
 namespace ERwin_CA
 {
@@ -47,8 +48,8 @@ namespace ERwin_CA
             if (scSession != null)
                 try
                 {
-                    long id = scSession.BeginTransaction();
-                    return id;
+                    trID = scSession.BeginTransaction();
+                    return trID;
                 }
                 catch (Exception exp)
                 {
@@ -60,5 +61,21 @@ namespace ERwin_CA
             return -1;
         }
 
+        public static bool AssignToObjModel(ref SCAPI.ModelObject model, string property, string value)
+        {
+            VBCon VBcon = new VBCon();
+            if (VBcon.AssignToObjModel(ref model, property, value))
+                return true;
+            else
+                return false;
+        }
+        public static bool AssignToObjModel(ref SCAPI.ModelObject model, string property, int value)
+        {
+            VBCon VBcon = new VBCon();
+            if (VBcon.AssignToObjModel(ref model, property, value))
+                return true;
+            else
+                return false;
+        }
     }
 }

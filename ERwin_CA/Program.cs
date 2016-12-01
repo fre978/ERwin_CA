@@ -19,6 +19,7 @@ namespace ERwin_CA
         static void Main(string[] args)
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
+            Logger.PrintC("Test");
             //Timer.SetFirstTime(DateTime.Now);
             Logger.PrintFile(@"C:\ROOTtest\test.txt", "Tutto OK.", true);
             Logger.PrintL("AVVIO ESECUZIONE");
@@ -32,10 +33,9 @@ namespace ERwin_CA
             //testBool = ExcelOps.FileValidation(nomeFile);
             string[] ElencoExcel = DirOps.GetFilesToProcess(@"C:\ERWIN\CODICE\Extra\XLS\", "*.xls|*.xlsx");
             foreach(var file in ElencoExcel)
-            {
                 if (!ExcelOps.FileValidation(file))
                     Logger.PrintC("File " + file + " not valid for processing.");
-            }
+
             
             //nomeFile = "";
             //SCAPI.Application testAPP = new SCAPI.Application();

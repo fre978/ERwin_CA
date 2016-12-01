@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERwin_CA", "ERwin_CA\ERwin_CA.csproj", "{04B7F4E7-99DB-4DF6-BE04-7F972C0DB3DC}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBClassLibrary", "VBClassLibrary\VBClassLibrary.vbproj", "{2E708B36-0582-46F6-BB94-8A257A7B3AF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{04B7F4E7-99DB-4DF6-BE04-7F972C0DB3DC}.Release|x64.Build.0 = Release|x64
 		{04B7F4E7-99DB-4DF6-BE04-7F972C0DB3DC}.Release|x86.ActiveCfg = Release|x86
 		{04B7F4E7-99DB-4DF6-BE04-7F972C0DB3DC}.Release|x86.Build.0 = Release|x86
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Debug|x64.Build.0 = Debug|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Debug|x86.Build.0 = Debug|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Release|x64.ActiveCfg = Release|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Release|x64.Build.0 = Release|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Release|x86.ActiveCfg = Release|Any CPU
+		{2E708B36-0582-46F6-BB94-8A257A7B3AF2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

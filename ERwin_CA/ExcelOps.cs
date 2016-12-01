@@ -66,6 +66,7 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
+                    Logger.PrintC("Error: " + exp.Message);
                     return false;
                 }
                 finally
@@ -122,6 +123,7 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
+                    Logger.PrintC("Error: " + exp.Message);
                     return false;
                 }
                 finally
