@@ -22,6 +22,7 @@
             model.Properties(prop).Value = value
             Return True
         Else
+            model.Properties(prop).Value = value
             Return False
         End If
     End Function
@@ -39,6 +40,7 @@
             model.Properties(prop).Value = value
             Return True
         Else
+            model.Properties(prop).Value = value
             Return False
         End If
     End Function

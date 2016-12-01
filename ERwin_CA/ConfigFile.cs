@@ -13,6 +13,7 @@ namespace ERwin_CA
 
         }
 
+        public static string xx { get; set; } = "ll";
         public static string LOG_FILE = @"C:\ERWIN\Log.txt";
 
         public static string TABELLE = "Censimento Tabelle";
