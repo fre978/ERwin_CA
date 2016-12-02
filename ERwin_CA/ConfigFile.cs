@@ -42,16 +42,16 @@ namespace ERwin_CA
 
         public static Dictionary<string, string> _TAB_NAME = new Dictionary<string, string>()
         {
-            {"SSA", "ENTITY.PHYSICAL.SSA" },
+            {"SSA", "Entity.Physical.SSA" },
             {"Nome host", "DB2_Database.Physical.NOME.HOST" },
             {"Nome Database", "Name" },
             {"Schema", "Name_Qualifier" },
             {"Nome Tabella", "Physical_Name" },
             {"Descrizione Tabella", "Comment" },
-            {"Tipologia Informazione", "ENTITY.PHYSICAL.TIPOLOGIA_INFORMAZIONE" },
-            {"Perimetro Tabella", "ENTITY.PHYSICAL.PERIMETRO_TABELLA" },
-            {"Granularità Tabella", "ENTITY.PHYSICAL.GRANULARITA_TABELLA" },
-            {"Flag BFD", "ENTITY.PHYSICAL.FLAG_BFD" }
+            {"Tipologia Informazione", "Entity.Physical.TIPOLOGIA_INFORMAZIONE" },
+            {"Perimetro Tabella", "Entity.Physical.PERIMETRO_TABELLA" },
+            {"Granularità Tabella", "Entitiy.Physical.GRANULARITA_TABELLA" },
+            {"Flag BFD", "Entity.Physical.FLAG_BFD" }
         };
 
         public static string FILETEST = @"C:\ERWIN\CODICE\Extra\Test.xlsx";

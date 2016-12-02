@@ -18,13 +18,17 @@
     ''' <returns></returns>
     Public Function AssignToObjModel(ByRef model As SCAPI.ModelObject,
                                      prop As String, value As String) As Boolean
-        If model.Properties.HasProperty(prop) Then
-            model.Properties(prop).Value = value
-            Return True
-        Else
-            model.Properties(prop).Value = value
+        Try
+            If model.Properties.HasProperty(prop) Then
+                model.Properties(prop).Value = value
+                Return True
+            Else
+                model.Properties(prop).Value = value
+                Return True
+            End If
+        Catch
             Return False
-        End If
+        End Try
     End Function
 
     ''' <summary>
@@ -41,7 +45,7 @@
             Return True
         Else
             model.Properties(prop).Value = value
-            Return False
+            Return True
         End If
     End Function
 

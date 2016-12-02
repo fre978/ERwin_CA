@@ -42,8 +42,9 @@ namespace ERwin_CA
                     Logger.PrintC("File " + file + " not valid for processing.");
                 }
             }
-                
 
+
+            MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
 
             
             //nomeFile = "";
