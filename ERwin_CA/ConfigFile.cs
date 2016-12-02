@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace ERwin_CA
 {
-    public class ConfigFile : IDisposable
+    public static class ConfigFile //: IDisposable
     {
-        void IDisposable.Dispose()
-        {
+        //void IDisposable.Dispose()
+        //{
 
-        }
+        //}
 
         public static string xx { get; set; } = "ll";
         public static string LOG_FILE = @"C:\ERWIN\Log.txt";
+        public static string ERWIN_FILE = @"C:\ERWIN\Log.txt";
 
-        public static string TABELLE = "Censimento Tabelle";
+        public const string TABELLE = "Censimento Tabelle";
         public static string COLONNA_01 = "SSA";
         public static int HEADER_RIGA = 3;
         public static int HEADER_COLONNA_MIN = 1;

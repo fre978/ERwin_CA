@@ -123,8 +123,9 @@ namespace ERwin_CA
                 CommitTransaction(trID);
 
                 scSession.CommitTransaction(trID);
-                scPersistenceUnit.Save();
-                scSession.Close();
+                //scPersistenceUnit.Save();
+                //scSession.Close();
+
                 //SSA
                 if (!string.IsNullOrWhiteSpace(entity.SSA))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["SSA"], entity.SSA))
@@ -152,7 +153,7 @@ namespace ERwin_CA
                         Logger.PrintLC("Added Schema to " + scItem.Name);
                     else
                         Logger.PrintLC("Error adding Schema to " + scItem.Name);
-                CommitTransaction(trID);
+                CommitAndSave(trID);
             }
             return scItem;
         }

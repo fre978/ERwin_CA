@@ -9,6 +9,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using ERwin_CA.T;
 
 namespace ERwin_CA
 {
@@ -19,6 +20,7 @@ namespace ERwin_CA
         {
             ExApp = new Excel.ApplicationClass();
         }
+
         /// <summary>
         /// Converts a Open Office (xlsx) file to the proprietary MS old format (xls).
         /// -A.Amato, 2016 11
@@ -123,7 +125,7 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintC("Error: " + exp.Message);
+                    Logger.PrintLC("File " + fileInfo.Name + " could not be converted. Error: " + exp.Message);
                     return false;
                 }
             }
@@ -140,10 +142,7 @@ namespace ERwin_CA
             if (fileDaAprire.Extension == ".xls")
             {
                 if (!ConvertXLStoXLSX(file))
-                {
-                    Logger.PrintLC(fileDaAprire.Name + ": could not be converted.");
                     return false;
-                }
                 file = Path.ChangeExtension(file, ".xlsx");
                 fileDaAprire = new FileInfo(file);
             }
@@ -181,7 +180,7 @@ namespace ERwin_CA
                         else
                         {
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintL(testoLog);
+                            Logger.PrintLC(testoLog);
                             return false;
                         }
                     }
@@ -207,6 +206,92 @@ namespace ERwin_CA
             }
             Logger.PrintLC(fileDaAprire.Name + ": file IDONEO all'elaborazione.");
             return true;
+        }
+
+        public static List<EntityT> ReadXFile(FileInfo fileDaAprire, string sheet = ConfigFile.TABELLE)
+        {
+            string file = fileDaAprire.FullName;
+            List<EntityT> listaFile = new List<EntityT>();
+
+            if (!File.Exists(file))
+            {
+                Logger.PrintLC("File " + fileDaAprire.Name + " doesn't exist.");
+                return listaFile = null;
+            }
+            FileOps.RemoveAttributes(file);
+
+            if (fileDaAprire.Extension == ".xls")
+            {
+                if (!ConvertXLStoXLSX(file))
+                    return listaFile = null;
+                file = Path.ChangeExtension(file, ".xlsx");
+                fileDaAprire = new FileInfo(file);
+            }
+
+            ExcelPackage p = null;
+            ExcelWorkbook WB = null;
+            ExcelWorksheets ws = null;
+            try
+            {
+                p = new ExcelPackage(fileDaAprire);
+                WB = p.Workbook;
+                ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
+            }
+            catch(Exception exp)
+            {
+                Logger.PrintLC("Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName);
+                return listaFile = null;
+            }
+            
+            bool FilesEnd = false;
+            int EmptyRow = 0;
+            int columns = 0;
+            foreach (var worksheet in ws)
+            {
+                if (worksheet.Name == sheet)
+                {
+                    FilesEnd = false;
+                    for (int RowPos = ConfigFile.HEADER_RIGA + 1;
+                            FilesEnd != true;
+                            RowPos++)
+                    {
+                        string value = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            EmptyRow = 0;
+                            EntityT ValRiga = new EntityT(value);
+                            ValRiga.TableName = value;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
+                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text))
+                                ValRiga.HostName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text))
+                                ValRiga.DatabaseName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Schema"]].Text))
+                                ValRiga.Schema = worksheet.Cells[RowPos, ConfigFile._TABELLE["Schema"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Descrizione Tabella"]].Text))
+                                ValRiga.TableDescr = worksheet.Cells[RowPos, ConfigFile._TABELLE["Descrizione Tabella"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Tipologia Informazione"]].Text))
+                                ValRiga.InfoType = worksheet.Cells[RowPos, ConfigFile._TABELLE["Tipologia Informazione"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Perimetro Tabella"]].Text))
+                                ValRiga.TableLimit = worksheet.Cells[RowPos, ConfigFile._TABELLE["Perimetro Tabella"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text))
+                                ValRiga.TableGranularity = worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
+                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                            listaFile.Add(ValRiga);
+                        }
+                        else
+                        {
+                            EmptyRow += 1;
+                            if (EmptyRow >= 3)
+                                FilesEnd = true;
+                        }
+                    }
+                    return listaFile;
+                }
+            }
+            return listaFile = null;
         }
     }
 }
