@@ -25,53 +25,69 @@ namespace ERwin_CA
             //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
             //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
             //testBool = ExcelOps.FileValidation(nomeFile);
-            string[] ElencoExcel = DirOps.GetFilesToProcess(@"C:\ERWIN\CODICE\Extra\XLS\", "*.xls|*.xlsx");
-            ConnMng connessione = new ConnMng();
-            connessione.openModelConnection(ConfigFile.ERWIN_FILE);
-            connessione.openTransaction();
-            connessione.SetRootObject();
-            connessione.SetRootCollection();
-            foreach(var file in ElencoExcel)
+            string[] ElencoExcel = DirOps.GetFilesToProcess(@"D:\TEST\TestFiles\", "*.xls");
+
+            //####################################
+            //Ciclo MAIN
+            foreach (var file in ElencoExcel)
             {
+                string TemplateFile = null;
                 if (ExcelOps.FileValidation(file))
                 {
+                    FileT fileT = Parser.ParseFileName(file);
+                    string destERFile = null;
+                    if (fileT != null)
+                    {
+                        switch (fileT.TipoDBMS)
+                        {
+                            case ConfigFile.DB2_NAME:
+                                TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
+                                break;
+                            case ConfigFile.ORACLE:
+                                TemplateFile = ConfigFile.ERWIN_TEMPLATE_ORACLE;
+                                break;
+                            default:
+                                TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
+                                break;
+                        }
+                        FileInfo origin = new FileInfo(file);
+                        string fileName = Path.GetFileNameWithoutExtension(file);
+                        destERFile = Path.Combine(ConfigFile.FOLDERDESTINATION, fileName + Path.GetExtension(TemplateFile));
+                        if (!FileOps.CopyFile(TemplateFile, destERFile))
+                            continue;
+                    }
+                    else
+                        continue;
+
+                    ConnMng connessione = new ConnMng();
+                    if (!connessione.openModelConnection(destERFile))
+                        continue;
+
+                    connessione.SetRootObject();
+                    connessione.SetRootCollection();
+
                     FileInfo fInfo = new FileInfo(file);
                     List<EntityT> DatiFile = ExcelOps.ReadXFile(fInfo);
                     foreach(var dati in DatiFile)
-                        connessione.CreateEntity(dati);
+                        connessione.CreateEntity(dati, TemplateFile);
+
                     Logger.PrintC("File " + file + " not valid for processing.");
+
+                    //Chiusura delle Sessioni aperte in elaborazione
+                    //SCAPI.Sessions cc = connessione.scERwin.Sessions;
+                    //foreach (SCAPI.Session ses in cc)
+                    //    ses.Close();
+                    connessione.CloseModelConnection();
+                    //connessione = null;
+
+                    //Chiusura di tutti i file EXCEL aperti in elaborazione
                 }
             }
-                
+            //####################################
 
+        FINE_PROGRAMMA:
+            MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
 
-            
-            //nomeFile = "";
-            //SCAPI.Application testAPP = new SCAPI.Application();
-            //if (fileDaAprire.Exists)
-            //{
-            //    using (ExcelPackage p = new ExcelPackage(fileDaAprire))
-            //    {
-            //        {
-            //            //ExcelWorkbook WB = p.Workbook;
-            //            //p.SaveAs(@"C:\nome.xls", FileFormat: Microsoft.Office.Interop.Excel.XlFileFormat.xlOpenXMLWorkbook);
-            //            ////WB.Worksheets
-            //            //ExcelWorksheets ws = p.Workbook.Worksheets; //.Add(wsName + wsNumber.ToString());
-            //            //foreach (var worksheet in ws)
-            //            //{
-            //            //    if (worksheet.Name == ConfigFile.FOGLIO01)
-            //            //    {
-
-            //            //    }
-            //            //}
-            //            //ws.Cells[1, 1].Value = wsName;
-            //            //ws.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            //            //ws.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
-            //            //ws.Cells[1, 1].Style.Font.Bold = true;
-            //            //p.Save();
-            //        }
-            //    }
-            //}
             Logger.PrintL("TERMINE ESECUZIONE");
             Timer.SetSecondTime(DateTime.Now);
             Logger.PrintL("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);

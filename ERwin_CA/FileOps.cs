@@ -29,9 +29,42 @@ namespace ERwin_CA
                     // Make the file RW
                     attributes = RemoveAttribute(attributes, attribute);
                     File.SetAttributes(filePath, attributes);
-                    Console.WriteLine("The {0} file is no longer RO.", filePath);
+                    Logger.PrintLC(filePath + " is no longer RO.");
                 }
             }
         }
+
+        public static bool CopyFile(string originFile, string destinationFile)
+        {
+            if (File.Exists(originFile))
+            {
+                FileInfo fileOriginInfo = new FileInfo(originFile);
+                FileInfo fileDestinationInfo = new FileInfo(destinationFile);
+                try
+                {
+                    if (!Directory.Exists(fileDestinationInfo.DirectoryName))
+                    {
+                        Directory.CreateDirectory(fileDestinationInfo.DirectoryName);
+                    }
+                    RemoveAttributes(originFile);
+                    File.Copy(originFile, destinationFile, true);
+                    Logger.PrintLC(originFile + " copied to " + fileDestinationInfo.DirectoryName + " with the name: " + fileDestinationInfo.Name);
+                    return true;
+                }
+                catch(Exception exp)
+                {
+                    Logger.PrintLC("Could not copy file " + fileOriginInfo.FullName + " - Error: " + exp.Message);
+                    return false;
+                }
+            }
+            else
+            {
+                Logger.PrintLC("Error recovering " + originFile + ". File doesn't exist.");
+                return false;
+            }
+                
+        }
+
+
     }
 }

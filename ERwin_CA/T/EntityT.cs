@@ -23,13 +23,14 @@ namespace ERwin_CA.T
         public string Area { get; set; }
         public string TableType { get; set; }
         public string History { get; set; }
+        public string DB_TYPE { get; set; }
 
 
-        public EntityT(string tName, string ssa = null, string hName = null,
+        public EntityT( string tName, string ssa = null, string hName = null,
                         string dbName = null, string schema = null, string tableDescr = null,
                         string infoType = null, string tableLimit = null, 
                         string tableGranularity = null, string flagBFD = null, string acronym = null,
-                        string area = null, string tableType = null, string history = null)
+                        string area = null, string tableType = null, string history = null, string db_type = null)
         {
             TableName = tName;
             SSA = ssa;
@@ -41,6 +42,7 @@ namespace ERwin_CA.T
             TableLimit = tableLimit;
             TableGranularity = tableGranularity;
             FlagBFD = flagBFD;
+            DB_TYPE = db_type;
             //Seconda release
             Acronym = acronym;
             Area = area;

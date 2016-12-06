@@ -13,9 +13,22 @@ namespace ERwin_CA
 
         //}
 
-        public static string xx { get; set; } = "ll";
-        public static string LOG_FILE = @"C:\ERWIN\Log.txt";
-        public static string ERWIN_FILE = @"C:\ERWIN\Log.txt";
+        // SEZIONE DATABASE
+        public const string ERWIN_TEMPLATE_DB2 = @"D:\TEST\Template_DB2_LF.erwin";
+        public const string ERWIN_TEMPLATE_ORACLE = @"D:\TEST\Template_Oracle_LF.erwin";
+        public const string DB2_NAME = "DB2";
+        public const string ORACLE = "Oracle";
+
+        // SEZIONE FILE
+        public static string LOG_FILE = @"D:\TEST\Log.txt";
+        public static string ERWIN_FILE = @"D:\ERwin\Template_DB2_LF - Copia.erwin";
+        public static string FILETEST = @"C:\ERWIN\CODICE\Extra\Test.xlsx";
+        
+        // SEZIONE CARTELLE
+        public static string FOLDERDESTINATION = @"D:\TEST\Destinazione";
+
+        // SEZIONE GENERALE
+        public static char[] DELIMITER_NAME_FILE = { '_', '.' };
 
         public const string TABELLE = "Censimento Tabelle";
         public static string COLONNA_01 = "SSA";
@@ -42,19 +55,19 @@ namespace ERwin_CA
 
         public static Dictionary<string, string> _TAB_NAME = new Dictionary<string, string>()
         {
-            {"SSA", "ENTITY.PHYSICAL.SSA" },
-            {"Nome host", "DB2_Database.Physical.NOME.HOST" },
+            {"SSA", "Entity.Physical.SSA" },
+            {"Nome host", "DB2_Database.Physical.NOME_HOST" },
             {"Nome Database", "Name" },
-            {"Schema", "Name_Qualifier" },
+            //{"Schema", "Name_Qualifier" },
+            {"Schema", "Schema_Ref" },
             {"Nome Tabella", "Physical_Name" },
             {"Descrizione Tabella", "Comment" },
-            {"Tipologia Informazione", "ENTITY.PHYSICAL.TIPOLOGIA_INFORMAZIONE" },
-            {"Perimetro Tabella", "ENTITY.PHYSICAL.PERIMETRO_TABELLA" },
-            {"Granularità Tabella", "ENTITY.PHYSICAL.GRANULARITA_TABELLA" },
-            {"Flag BFD", "ENTITY.PHYSICAL.FLAG_BFD" }
+            {"Tipologia Informazione", "Entity.Physical.TIPOLOGIA_INFORMAZIONE" },
+            {"Perimetro Tabella", "Entity.Physical.PERIMETRO_TABELLA" },
+            {"Granularità Tabella", "Entity.Physical.GRANULARITA_TABELLA" },
+            {"Flag BFD", "Entity.Physical.FLAG_BFD" }
         };
 
-        public static string FILETEST = @"C:\ERWIN\CODICE\Extra\Test.xlsx";
 
     }
 }

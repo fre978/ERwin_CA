@@ -100,6 +100,8 @@ namespace ERwin_CA
                     Excel.Worksheet ExWS = new Excel.Worksheet();
                     if (ExApp == null)
                         ExApp = new Excel.ApplicationClass();
+
+                    FileOps.RemoveAttributes(fileName);
                     ExWB = ExApp.Workbooks.Open(fileName, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing,
@@ -198,7 +200,8 @@ namespace ERwin_CA
             }
             WB.Dispose();
             p.Dispose();
-            
+            //MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
+
             if (sheetFound != true || columnsFound != true)
             {
                 Logger.PrintLC(fileDaAprire.Name + ": file NON idoneo all'elaborazione.");
@@ -259,7 +262,7 @@ namespace ERwin_CA
                         if (!string.IsNullOrWhiteSpace(value))
                         {
                             EmptyRow = 0;
-                            EntityT ValRiga = new EntityT(value);
+                            EntityT ValRiga = new EntityT(tName: value);
                             ValRiga.TableName = value;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
                                 ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;
@@ -278,13 +281,13 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text))
                                 ValRiga.TableGranularity = worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                                ValRiga.FlagBFD = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
                             listaFile.Add(ValRiga);
                         }
                         else
                         {
                             EmptyRow += 1;
-                            if (EmptyRow >= 3)
+                            if (EmptyRow >= 10)
                                 FilesEnd = true;
                         }
                     }
