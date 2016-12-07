@@ -259,15 +259,14 @@ namespace ERwin_CA
                     else
                         goto ERROR;
                 }
-
             }
 
             ERROR:
             WB.Dispose();
             p.Dispose();
             //MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
-            string fileError = Path.GetFileNameWithoutExtension(file) + "_KO.txt";
-            string fileCorrect = Path.GetFileNameWithoutExtension(file) + "_OK.txt";
+            string fileError = Path.Combine(fileDaAprire.DirectoryName, Path.GetFileNameWithoutExtension(file) + "_KO.txt");
+            string fileCorrect = Path.Combine(fileDaAprire.DirectoryName, Path.GetFileNameWithoutExtension(file) + "_OK.txt");
             if (File.Exists(fileError))
             {
                 FileOps.RemoveAttributes(fileError);
