@@ -71,6 +71,7 @@ namespace ERwin_CA
             {"Flag BFD", "Entity.Physical.FLAG_BFD" }
         };
 
+
         // SEZIONE DICTIONARY ATTRIBUTI
         public static Dictionary<string, int> _ATTRIBUTI = new Dictionary<string, int>()
         {
