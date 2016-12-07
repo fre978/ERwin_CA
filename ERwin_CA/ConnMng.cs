@@ -133,12 +133,12 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Could not get the Root Collection: " + exp.Message);
+                    Logger.PrintLC("Could not get the Root Collection: " + exp.Message, 2);
                     return false;
                 }
             else
             {
-                Logger.PrintLC("Could not get Root Collection because Session is missing.");
+                Logger.PrintLC("Could not get Root Collection because Session is missing.", 2);
                 return false;
             }
         }
@@ -148,12 +148,12 @@ namespace ERwin_CA
             SCAPI.ModelObject ret = null;
             if (string.IsNullOrWhiteSpace(db))
             {
-                Logger.PrintLC("There was no DB associated to " + entity.TableName);
+                Logger.PrintLC("There was no DB associated to " + entity.TableName, 3);
                 return ret;
             }
             if (!((entity.FlagBFD == "S") || (entity.FlagBFD == "N")))
             {
-                Logger.PrintLC("Property FlagBFD of " + entity.TableName + " is not valid. Table will be skipped.");
+                Logger.PrintLC("Property FlagBFD of " + entity.TableName + " is not valid. Table will be skipped.", 3);
                 return ret;
             }
 
@@ -168,17 +168,17 @@ namespace ERwin_CA
                 if (!string.IsNullOrWhiteSpace(entity.TableName))
                 {
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Tabella"], entity.TableName))
-                        Logger.PrintLC("Added Table Physical Name (" + scItem.Name + ") to " + scItem.ObjectId);
+                        Logger.PrintLC("Added Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
                     else
                     {
-                        Logger.PrintLC("Error adding Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId);
+                        Logger.PrintLC("Error adding Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
                         return scItem;
                     }
                     if (con.AssignToObjModel(ref scItem, "Name", entity.TableName))
-                        Logger.PrintLC("Added Table Name to " + scItem.Name);
+                        Logger.PrintLC("Added Table Name to " + scItem.Name, 3);
                     else
                     {
-                        Logger.PrintLC("Error adding Table Name to " + scItem.Name);
+                        Logger.PrintLC("Error adding Table Name to " + scItem.Name, 3);
                         return scItem;
                     }
                 }
@@ -186,50 +186,50 @@ namespace ERwin_CA
                 //SSA
                 if (!string.IsNullOrWhiteSpace(entity.SSA))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["SSA"], entity.SSA))
-                        Logger.PrintLC("Added SSA to " + scItem.Name);
+                        Logger.PrintLC("Added SSA to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding SSA to " + scItem.Name);
+                        Logger.PrintLC("Error adding SSA to " + scItem.Name, 3);
                 
                 //Table Description
                 if (!string.IsNullOrWhiteSpace(entity.TableDescr))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Descrizione Tabella"], entity.TableDescr))
-                        Logger.PrintLC("Added Table Description to " + scItem.Name);
+                        Logger.PrintLC("Added Table Description to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding Table Description to " + scItem.Name);
+                        Logger.PrintLC("Error adding Table Description to " + scItem.Name, 3);
                 if (!string.IsNullOrWhiteSpace(entity.TableDescr))
                     if (con.AssignToObjModel(ref scItem, "Definition", entity.TableDescr))
-                        Logger.PrintLC("Added Table Definition to " + scItem.Name);
+                        Logger.PrintLC("Added Table Definition to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding Table Definition to " + scItem.Name);
+                        Logger.PrintLC("Error adding Table Definition to " + scItem.Name, 3);
 
 
                 //Info Type
                 if (!string.IsNullOrWhiteSpace(entity.InfoType))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Tipologia Informazione"], entity.InfoType))
-                        Logger.PrintLC("Added Information Type to " + scItem.Name);
+                        Logger.PrintLC("Added Information Type to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding Information Type to " + scItem.Name);
+                        Logger.PrintLC("Error adding Information Type to " + scItem.Name, 3);
 
                 //Table Limit
                 if (!string.IsNullOrWhiteSpace(entity.TableLimit))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Perimetro Tabella"], entity.TableLimit))
-                        Logger.PrintLC("Added Table Limit to " + scItem.Name);
+                        Logger.PrintLC("Added Table Limit to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding Table Limit to " + scItem.Name);
+                        Logger.PrintLC("Error adding Table Limit to " + scItem.Name, 3);
 
                 //Table Granularity
                 if (!string.IsNullOrWhiteSpace(entity.TableGranularity))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Granularità Tabella"], entity.TableGranularity))
-                        Logger.PrintLC("Added Table Granularity to " + scItem.Name);
+                        Logger.PrintLC("Added Table Granularity to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding Table Granularity to " + scItem.Name);
+                        Logger.PrintLC("Error adding Table Granularity to " + scItem.Name, 3);
 
                 //Flag BFD
                 if (!string.IsNullOrWhiteSpace(entity.FlagBFD))
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Flag BFD"], entity.FlagBFD))
-                        Logger.PrintLC("Added Flag BFD to " + scItem.Name);
+                        Logger.PrintLC("Added Flag BFD to " + scItem.Name, 3);
                     else
-                        Logger.PrintLC("Error adding Flag BFD to " + scItem.Name);
+                        Logger.PrintLC("Error adding Flag BFD to " + scItem.Name, 3);
 
 
                 //FileOps.RemoveAttributes(fileERwin);
@@ -244,15 +244,15 @@ namespace ERwin_CA
                     {
                         scDB = erRootObjCol.Add("DB2_Database");
                         if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome Database"], entity.DatabaseName))
-                            Logger.PrintLC("Added Database Name to " + scDB.Name);
+                            Logger.PrintLC("Added Database Name to " + scDB.Name, 3);
                         else
-                            Logger.PrintLC("Error adding Database Name to " + scDB.Name);
+                            Logger.PrintLC("Error adding Database Name to " + scDB.Name, 3);
 
                         if (!string.IsNullOrWhiteSpace(entity.HostName))
                             if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host"], entity.HostName))
-                                Logger.PrintLC("Added Host Name to " + scDB.Name);
+                                Logger.PrintLC("Added Host Name to " + scDB.Name, 3);
                             else
-                                Logger.PrintLC("Error adding Host Name to " + scDB.Name);
+                                Logger.PrintLC("Error adding Host Name to " + scDB.Name, 3);
                         DatabaseN.Add(entity.DatabaseName);
                     }
                 //##################################################
@@ -264,17 +264,17 @@ namespace ERwin_CA
                     {
                         scSchema = erRootObjCol.Add("Schema");
                         if (con.AssignToObjModel(ref scSchema, "Name", entity.Schema))
-                            Logger.PrintLC("Created Schema Name to " + scSchema.Name);
+                            Logger.PrintLC("Created Schema Name to " + scSchema.Name, 3);
                         else
-                            Logger.PrintLC("Error creating Schema Name to " + scSchema.Name);
+                            Logger.PrintLC("Error creating Schema Name to " + scSchema.Name, 3);
                         SchemaN.Add(entity.Schema);
                     }
                     //Schema
                     if (!string.IsNullOrWhiteSpace(entity.Schema))
                         if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Schema"], entity.Schema))
-                            Logger.PrintLC("Added Schema to " + scItem.Name);
+                            Logger.PrintLC("Added Schema to " + scItem.Name, 3);
                         else
-                            Logger.PrintLC("Error adding Schema to " + scItem.Name);
+                            Logger.PrintLC("Error adding Schema to " + scItem.Name, 3);
                 }
                 //##################################################
 
@@ -299,18 +299,18 @@ namespace ERwin_CA
             {
                 if (!scSession.CommitTransaction(id))
                 {
-                    Logger.PrintLC("Could not Commit for ID: " + id);
+                    Logger.PrintLC("Could not Commit for ID: " + id, 3);
                     return false;
                 }
                 else
                 {
-                    Logger.PrintLC("Committed successfully: " + id);
+                    Logger.PrintLC("Committed successfully: " + id, 3);
                     return true;
                 }
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Could NOT Commit.");
+                Logger.PrintLC("Could NOT Commit.", 3);
                 return false;
             }
         }
@@ -322,18 +322,18 @@ namespace ERwin_CA
                 FileOps.RemoveAttributes(fileERwin);
                 if (!scPersistenceUnit.Save())
                 {
-                    Logger.PrintLC("Could NOT save Persistence: " + scPersistenceUnit.ObjectId);
+                    Logger.PrintLC("Could NOT save Persistence: " + scPersistenceUnit.ObjectId, 2);
                     return false;
                 }
                 else
                 {
-                    Logger.PrintLC("Persistence SAVED: " + scPersistenceUnit.ObjectId);
+                    Logger.PrintLC("Persistence SAVED: " + scPersistenceUnit.ObjectId, 2);
                     return true;
                 }
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Persistence NOT saved.");
+                Logger.PrintLC("Persistence NOT saved.", 2);
                 return false;
             }
         }

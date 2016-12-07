@@ -29,7 +29,7 @@ namespace ERwin_CA
                     // Make the file RW
                     attributes = RemoveAttribute(attributes, attribute);
                     File.SetAttributes(filePath, attributes);
-                    Logger.PrintLC(filePath + " is no longer RO.");
+                    Logger.PrintLC(filePath + " is no longer RO.", 2);
                 }
             }
         }
@@ -50,18 +50,20 @@ namespace ERwin_CA
                     if (File.Exists(destinationFile))
                         RemoveAttributes(destinationFile);
                     File.Copy(originFile, destinationFile, true);
-                    Logger.PrintLC(originFile + " copied to " + fileDestinationInfo.DirectoryName + " with the name: " + fileDestinationInfo.Name);
+                    Logger.PrintLC(originFile + " copied to " + 
+                                   fileDestinationInfo.DirectoryName + " with the name: " + 
+                                   fileDestinationInfo.Name, 2);
                     return true;
                 }
                 catch(Exception exp)
                 {
-                    Logger.PrintLC("Could not copy file " + fileOriginInfo.FullName + " - Error: " + exp.Message);
+                    Logger.PrintLC("Could not copy file " + fileOriginInfo.FullName + " - Error: " + exp.Message, 2);
                     return false;
                 }
             }
             else
             {
-                Logger.PrintLC("Error recovering " + originFile + ". File doesn't exist.");
+                Logger.PrintLC("Error recovering " + originFile + ". File doesn't exist.", 2);
                 return false;
             }
                 

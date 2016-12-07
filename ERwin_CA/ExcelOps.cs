@@ -121,13 +121,14 @@ namespace ERwin_CA
                                 Type.Missing, Type.Missing);
                     ExWB.Close();
                     ExApp.DisplayAlerts = true;
+                    Logger.PrintLC("File " + fileInfo.Name + " converted successfully to XLSX", 3);
                     Marshal.FinalReleaseComObject(ExWB);
                     Marshal.FinalReleaseComObject(ExWS);
                     //Marshal.FinalReleaseComObject(ExApp);
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("File " + fileInfo.Name + " could not be converted. Error: " + exp.Message);
+                    Logger.PrintLC("File " + fileInfo.Name + " could not be converted to XLSX. Error: " + exp.Message, 3);
                     return false;
                 }
             }
@@ -279,7 +280,7 @@ namespace ERwin_CA
             }
             if (sheetFound != true || columnsFound != true)
             {
-                Logger.PrintLC(fileDaAprire.Name + ": file NON idoneo all'elaborazione.");
+                Logger.PrintLC(fileDaAprire.Name + ": file NON idoneo all'elaborazione.", 2);
                 Logger.PrintF(fileError, "File columns not formatted correctly.", true);
                 return false;
             }
@@ -288,14 +289,20 @@ namespace ERwin_CA
             return true;
         }
 
-        public static List<EntityT> ReadXFile(FileInfo fileDaAprire, string sheet = ConfigFile.TABELLE)
+        /// <summary>
+        /// Reads and processes Table data from excel's 'TABELLE' sheet
+        /// </summary>
+        /// <param name="fileDaAprire"></param>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
+        public static List<EntityT> ReadXFileEntity(FileInfo fileDaAprire, string sheet = ConfigFile.TABELLE)
         {
             string file = fileDaAprire.FullName;
             List<EntityT> listaFile = new List<EntityT>();
 
             if (!File.Exists(file))
             {
-                Logger.PrintLC("File " + fileDaAprire.Name + " doesn't exist.");
+                Logger.PrintLC("Reading Tables. File " + fileDaAprire.Name + " doesn't exist.", 3);
                 return listaFile = null;
             }
             FileOps.RemoveAttributes(file);
@@ -319,7 +326,7 @@ namespace ERwin_CA
             }
             catch(Exception exp)
             {
-                Logger.PrintLC("Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName);
+                Logger.PrintLC("Reading Tables. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 3);
                 return listaFile = null;
             }
             
@@ -335,12 +342,13 @@ namespace ERwin_CA
                             FilesEnd != true;
                             RowPos++)
                     {
-                        string value = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
-                        if (!string.IsNullOrWhiteSpace(value))
+                        string nome = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
+                        string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                        if (!string.IsNullOrWhiteSpace(nome) && (string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))) 
                         {
                             EmptyRow = 0;
-                            EntityT ValRiga = new EntityT(tName: value);
-                            ValRiga.TableName = value;
+                            EntityT ValRiga = new EntityT(tName: nome);
+                            ValRiga.TableName = nome;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
                                 ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text))
@@ -360,6 +368,112 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
                                 ValRiga.FlagBFD = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
                             listaFile.Add(ValRiga);
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "OK";
+
+                        }
+                        else
+                        {
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "Valore di NOME TABELLO e/o FLAG BFD non conformi.";
+
+                            EmptyRow += 1;
+                            if (EmptyRow >= 10)
+                            {
+                                FilesEnd = true;
+                            }
+                        }
+                    }
+                    p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    return listaFile;
+                }
+            }
+            return listaFile = null;
+        }
+
+        /// <summary>
+        /// Reads and processes Attributes data from excel's 'ATTRIBUTI' sheet
+        /// </summary>
+        /// <param name="fileDaAprire"></param>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
+        public static List<AttributeT> ReadXFileAttribute(FileInfo fileDaAprire, string sheet = ConfigFile.ATTRIBUTI)
+        {
+            string file = fileDaAprire.FullName;
+            List<AttributeT> listaFile = new List<AttributeT>();
+
+            if (!File.Exists(file))
+            {
+                Logger.PrintLC("Reading Attributes. File " + fileDaAprire.Name + " doesn't exist.", 2);
+                return listaFile = null;
+            }
+            FileOps.RemoveAttributes(file);
+
+            if (fileDaAprire.Extension == ".xls")
+            {
+                if (!ConvertXLStoXLSX(file))
+                    return listaFile = null;
+                file = Path.ChangeExtension(file, ".xlsx");
+                fileDaAprire = new FileInfo(file);
+            }
+
+            ExcelPackage p = null;
+            ExcelWorkbook WB = null;
+            ExcelWorksheets ws = null;
+            try
+            {
+                p = new ExcelPackage(fileDaAprire);
+                WB = p.Workbook;
+                ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
+            }
+            catch (Exception exp)
+            {
+                Logger.PrintLC("Reading Attributes. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 2);
+                return listaFile = null;
+            }
+
+            bool FilesEnd = false;
+            int EmptyRow = 0;
+            int columns = 0;
+            foreach (var worksheet in ws)
+            {
+                if (worksheet.Name == sheet)
+                {
+                    FilesEnd = false;
+                    for (int RowPos = ConfigFile.HEADER_RIGA + 1;
+                            FilesEnd != true;
+                            RowPos++)
+                    {
+                        string value = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            EmptyRow = 0;
+                            AttributeT ValRiga = new AttributeT(nomeTabellaLegacy: value);
+                            //ValRiga.TableName = value;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
+                            //    ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text))
+                            //    ValRiga.HostName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text))
+                            //    ValRiga.DatabaseName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Schema"]].Text))
+                            //    ValRiga.Schema = worksheet.Cells[RowPos, ConfigFile._TABELLE["Schema"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Descrizione Tabella"]].Text))
+                            //    ValRiga.TableDescr = worksheet.Cells[RowPos, ConfigFile._TABELLE["Descrizione Tabella"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Tipologia Informazione"]].Text))
+                            //    ValRiga.InfoType = worksheet.Cells[RowPos, ConfigFile._TABELLE["Tipologia Informazione"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Perimetro Tabella"]].Text))
+                            //    ValRiga.TableLimit = worksheet.Cells[RowPos, ConfigFile._TABELLE["Perimetro Tabella"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text))
+                            //    ValRiga.TableGranularity = worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text;
+                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
+                            //    ValRiga.FlagBFD = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                            listaFile.Add(ValRiga);
                         }
                         else
                         {
@@ -373,5 +487,8 @@ namespace ERwin_CA
             }
             return listaFile = null;
         }
+
+
+
     }
 }

@@ -67,11 +67,11 @@ namespace ERwin_CA
                     connessione.SetRootCollection();
 
                     FileInfo fInfo = new FileInfo(file);
-                    List<EntityT> DatiFile = ExcelOps.ReadXFile(fInfo);
+                    List<EntityT> DatiFile = ExcelOps.ReadXFileEntity(fInfo);
                     foreach(var dati in DatiFile)
                         connessione.CreateEntity(dati, TemplateFile);
 
-                    Logger.PrintLC("File " + file + " not valid for processing.");
+                    //Logger.PrintLC("File " + file + " not valid for processing.");
 
                     //Chiusura delle Sessioni aperte in elaborazione
                     //SCAPI.Sessions cc = connessione.scERwin.Sessions;
@@ -88,9 +88,9 @@ namespace ERwin_CA
         FINE_PROGRAMMA:
             MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
 
-            Logger.PrintL("TERMINE ESECUZIONE");
+            Logger.PrintLC("TERMINE ESECUZIONE");
             Timer.SetSecondTime(DateTime.Now);
-            Logger.PrintL("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);
+            Logger.PrintLC("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);
         }
     }
 }
