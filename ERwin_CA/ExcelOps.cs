@@ -380,7 +380,7 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "Valore di NOME TABELLO e/o FLAG BFD non conformi.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "Valore di NOME TABELLA e/o FLAG BFD non conformi.";
 
                             EmptyRow += 1;
                             if (EmptyRow >= 10)

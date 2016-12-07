@@ -25,7 +25,7 @@ namespace ERwin_CA
             //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
             //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
             //testBool = ExcelOps.FileValidation(nomeFile);
-            string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.FILETEST, "*.xls");
+            string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls");
 
             //####################################
             //Ciclo MAIN

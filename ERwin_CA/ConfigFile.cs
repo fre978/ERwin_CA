@@ -22,7 +22,7 @@ namespace ERwin_CA
         // SEZIONE FILE
         public static string LOG_FILE = @"D:\TEST\Log.txt";
         public static string ERWIN_FILE = @"D:\ERwin\Template_DB2_LF - Copia.erwin";
-        public static string FILETEST = @"D:\TEST\TestFiles\";
+        public static string ROOT = @"D:\TEST\TestFiles\";
         
         // SEZIONE CARTELLE
         public static string FOLDERDESTINATION = @"D:\TEST\Destinazione";

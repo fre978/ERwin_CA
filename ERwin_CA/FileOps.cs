@@ -9,6 +9,20 @@ namespace ERwin_CA
 {
     class FileOps
     {
+        public static string[] GetTrueFilesToProcess(string[] list)
+        {
+            if (list != null)
+            {
+                List<string> nlist = list.ToList();
+                //list = list.Where(x => !list.Contains(ConfigFile.FOLDERDESTINATION, IEqualityComparer));
+                nlist = from c in nlist
+                       where !c.Contains(ConfigFile.FOLDERDESTINATION)
+                       select c;
+            }
+            return list;
+        }
+
+
         private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
         {
             return attributes & ~attributesToRemove;
