@@ -35,9 +35,14 @@ namespace ERwin_CA
         public const string RELAZIONI = "Relazioni-ModelloDatiLegacy";
         public static string COLONNA_01 = "SSA";
         public static int HEADER_RIGA = 3;
-        public static int HEADER_COLONNA_MIN = 1;
-        public static int HEADER_COLONNA_MAX = 10;
-        public static int HEADER_MAX_COLONNE = 10;
+
+        public static int HEADER_COLONNA_MIN_TABELLE = 1;
+        public static int HEADER_COLONNA_MAX_TABELLE = 10;
+        public static int HEADER_MAX_COLONNE_TABELLE = 10;
+
+        public static int HEADER_COLONNA_MIN_ATTRIBUTI = 1;
+        public static int HEADER_COLONNA_MAX_ATTRIBUTI = 18;
+        public static int HEADER_MAX_COLONNE_ATTRIBUTI = 18;
 
         public static int SSA;
 
@@ -84,15 +89,15 @@ namespace ERwin_CA
             {"Datatype", 7 },
             {"Lunghezza", 8 },
             {"Decimali", 9 },
-            {"Chiave", 11 },
-            {"Unique", 12 },
-            {"Chiave Logica", 13 },
-            {"Mandatory Flag", 14 },
-            {"Dominio", 15 },
-            {"Provenienza Dominio", 16 },
-            {"Note", 17 },
-            {"Storica", 18 },
-            {"Dato Sensibile", 19 }
+            {"Chiave", 10 },
+            {"Unique", 11 },
+            {"Chiave Logica", 12 },
+            {"Mandatory Flag", 13 },
+            {"Dominio", 14 },
+            {"Provenienza Dominio", 15 },
+            {"Note", 16 },
+            {"Storica", 17 },
+            {"Dato Sensibile", 18 }
         };
 
         public static Dictionary<string, string> _ATT_NAME = new Dictionary<string, string>()

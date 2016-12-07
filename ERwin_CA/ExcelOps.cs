@@ -167,8 +167,8 @@ namespace ERwin_CA
                 {
                     sheetFound = true;
                     List<string> dd = new List<string>();
-                    for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN; 
-                            columnsPosition <= ConfigFile.HEADER_COLONNA_MAX; 
+                    for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_TABELLE; 
+                            columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_TABELLE; 
                             columnsPosition++)
                     {   
                         string value = worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text;
@@ -186,7 +186,7 @@ namespace ERwin_CA
                             return false;
                         }
                     }
-                    if (columns == ConfigFile.HEADER_MAX_COLONNE)
+                    if (columns == ConfigFile.HEADER_MAX_COLONNE_TABELLE)
                         columnsFound = true;
                     else
                         return false;
@@ -197,6 +197,14 @@ namespace ERwin_CA
                     //worksheet.Cells[1, 1].Style.Font.Bold = true;
                     //p.Save();
                 }
+
+                // SEZIONE ATTRIBUTI
+                if (worksheet.Name == ConfigFile.ATTRIBUTI)
+                {
+
+                }
+                
+
             }
             WB.Dispose();
             p.Dispose();
