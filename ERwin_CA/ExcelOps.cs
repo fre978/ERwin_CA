@@ -186,7 +186,7 @@ namespace ERwin_CA
                         {
                             //worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Value = "";
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintLC(testoLog);
+                            Logger.PrintLC(testoLog, 2);
                             goto ERROR;
                         }
                     }
@@ -220,7 +220,7 @@ namespace ERwin_CA
                         else
                         {
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintLC(testoLog);
+                            Logger.PrintLC(testoLog, 2);
                             goto ERROR;
                         }
                     }
@@ -250,7 +250,7 @@ namespace ERwin_CA
                         else
                         {
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintLC(testoLog);
+                            Logger.PrintLC(testoLog, 2);
                             goto ERROR;
                         }
                     }
@@ -283,7 +283,7 @@ namespace ERwin_CA
                 Logger.PrintF(fileError, "File columns not formatted correctly.", true);
                 return false;
             }
-            Logger.PrintLC(fileDaAprire.Name + ": file IDONEO all'elaborazione.");
+            Logger.PrintLC(fileDaAprire.Name + ": file IDONEO all'elaborazione.", 2);
             Logger.PrintF(fileCorrect, "File columns formatted correctly.", true);
             return true;
         }
