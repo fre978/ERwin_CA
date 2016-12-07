@@ -47,6 +47,8 @@ namespace ERwin_CA
                         Directory.CreateDirectory(fileDestinationInfo.DirectoryName);
                     }
                     RemoveAttributes(originFile);
+                    if (File.Exists(destinationFile))
+                        RemoveAttributes(destinationFile);
                     File.Copy(originFile, destinationFile, true);
                     Logger.PrintLC(originFile + " copied to " + fileDestinationInfo.DirectoryName + " with the name: " + fileDestinationInfo.Name);
                     return true;

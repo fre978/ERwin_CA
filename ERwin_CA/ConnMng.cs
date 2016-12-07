@@ -33,7 +33,7 @@ namespace ERwin_CA
                 return false;
             if (!File.Exists(ERw))
             {
-                Logger.PrintLC("Could not find file: " + ERw);
+                Logger.PrintLC("Could not find file: " + ERw, 2);
                 return false;
             }
             
@@ -42,20 +42,20 @@ namespace ERwin_CA
                 DatabaseN = new List<string>();
                 SchemaN = new List<string> { "SYSADM", "SYSFUN", "SYSIBM", "SYSPROC", "SYSTOOLS" };
                 fileERwin = ERw;
+                FileOps.RemoveAttributes(ERw);
                 fileInfoERwin = new FileInfo(fileERwin);
                 scERwin = new SCAPI.Application();
 
-                FileOps.RemoveAttributes(ERw);
                 scPersistenceUnit = scERwin.PersistenceUnits.Add(ERw, "RDO=No");
 
                 scSession = scERwin.Sessions.Add();
                 scSession.Open(scPersistenceUnit);
-                Logger.PrintLC("Connection opened.");
+                Logger.PrintLC("Connection opened.",2);
                 return true;
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Connection opening error: " + exp.Message);
+                Logger.PrintLC("Connection opening error: " + exp.Message, 2);
                 return false;
             }
         }
@@ -74,11 +74,11 @@ namespace ERwin_CA
 
                 scPersistenceUnit = null;
                 //scSession.Close();
-                Logger.PrintLC("Session closed successfully.");
+                Logger.PrintLC("Session closed successfully.", 2);
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Could not close the Session.");
+                Logger.PrintLC("Could not close the Session.", 2);
             }
         }
 
@@ -90,16 +90,16 @@ namespace ERwin_CA
                 try
                 {
                     trID = scSession.BeginTransaction();
-                    Logger.PrintLC("Transaction began successfully.");
+                    Logger.PrintLC("Transaction began successfully.", 3);
                     return trID;
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Starting Transaction error: " + exp.Message);
+                    Logger.PrintLC("Starting Transaction error: " + exp.Message, 3);
                     return -1;
                 }
             else
-                Logger.PrintLC("Starting Transaction error: missing SESSION.");
+                Logger.PrintLC("Starting Transaction error: missing SESSION.", 3);
             return -1;
         }
 
@@ -109,16 +109,16 @@ namespace ERwin_CA
                 try
                 {
                     erRootObj = scSession.ModelObjects.Root;
-                    Logger.PrintLC("Root has been successful.");
+                    Logger.PrintLC("Root has been successful.", 2);
                     return true;
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Setting Root's Session error: " + exp.Message);
+                    Logger.PrintLC("Setting Root's Session error: " + exp.Message, 2);
                     return false;
                 }
             else
-                Logger.PrintLC("Could not determine Root because Session is missing.");
+                Logger.PrintLC("Could not determine Root because Session is missing.", 2);
             return false;
         }
 
@@ -128,7 +128,7 @@ namespace ERwin_CA
                 try
                 {
                     erRootObjCol = scSession.ModelObjects.Collect(erRootObj);
-                    Logger.PrintLC("Root Collection has been successful.");
+                    Logger.PrintLC("Root Collection has been successful.", 2);
                     return true;
                 }
                 catch (Exception exp)
@@ -168,17 +168,17 @@ namespace ERwin_CA
                 if (!string.IsNullOrWhiteSpace(entity.TableName))
                 {
                     if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Tabella"], entity.TableName))
-                        Logger.PrintLC("Added Table Physical Name to " + scItem.ObjectId);
+                        Logger.PrintLC("Added Table Physical Name (" + scItem.Name + ") to " + scItem.ObjectId);
                     else
                     {
-                        Logger.PrintLC("Error adding Table Physical Name to " + scItem.ObjectId);
+                        Logger.PrintLC("Error adding Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId);
                         return scItem;
                     }
                     if (con.AssignToObjModel(ref scItem, "Name", entity.TableName))
-                        Logger.PrintLC("Added Table Name to " + scItem.ObjectId);
+                        Logger.PrintLC("Added Table Name to " + scItem.Name);
                     else
                     {
-                        Logger.PrintLC("Error adding Table Name to " + scItem.ObjectId);
+                        Logger.PrintLC("Error adding Table Name to " + scItem.Name);
                         return scItem;
                     }
                 }

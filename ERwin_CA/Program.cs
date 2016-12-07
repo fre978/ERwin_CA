@@ -19,13 +19,13 @@ namespace ERwin_CA
         static void Main(string[] args)
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
-            Logger.PrintL("AVVIO ESECUZIONE");
+            Logger.PrintLC("AVVIO ESECUZIONE", 1);
             ExcelOps Accesso = new ExcelOps();
             
             //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
             //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
             //testBool = ExcelOps.FileValidation(nomeFile);
-            string[] ElencoExcel = DirOps.GetFilesToProcess(@"D:\TEST\TestFiles\", "*.xls");
+            string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.FILETEST, "*.xls");
 
             //####################################
             //Ciclo MAIN
@@ -71,7 +71,7 @@ namespace ERwin_CA
                     foreach(var dati in DatiFile)
                         connessione.CreateEntity(dati, TemplateFile);
 
-                    Logger.PrintC("File " + file + " not valid for processing.");
+                    Logger.PrintLC("File " + file + " not valid for processing.");
 
                     //Chiusura delle Sessioni aperte in elaborazione
                     //SCAPI.Sessions cc = connessione.scERwin.Sessions;
