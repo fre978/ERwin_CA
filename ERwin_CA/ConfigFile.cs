@@ -44,6 +44,10 @@ namespace ERwin_CA
         public static int HEADER_COLONNA_MAX_ATTRIBUTI = 18;
         public static int HEADER_MAX_COLONNE_ATTRIBUTI = 18;
 
+        public static int HEADER_COLONNA_MIN_RELAZIONI = 1;
+        public static int HEADER_COLONNA_MAX_RELAZIONI = 9;
+        public static int HEADER_MAX_COLONNE_RELAZIONI = 9;
+
         public static int SSA;
 
         // SEZIONE DICTIONARY TABELLE
@@ -75,7 +79,7 @@ namespace ERwin_CA
             {"Granularità Tabella", "Entity.Physical.GRANULARITA_TABELLA" },
             {"Flag BFD", "Entity.Physical.FLAG_BFD" }
         };
-
+        // ##############################
 
         // SEZIONE DICTIONARY ATTRIBUTI
         public static Dictionary<string, int> _ATTRIBUTI = new Dictionary<string, int>()
@@ -123,8 +127,24 @@ namespace ERwin_CA
             {"Storica", "Entity.Physical.STORICA" },
             {"Dato Sensibile", "Attribute.Physical.DATO_SENSIBILE" }
         };
+        // ##############################
 
 
+        // SEZIONE RELAZIONI
+        public static Dictionary<string, int> _RELAZIONI = new Dictionary<string, int>()
+        {
+            {"Identificativo relazione", 1 },
+            {"Tabella Padre", 2 },
+            {"Tabella Figlia", 3 },
+            {"Cardinalità", 4 },
+            {"Campo Padre", 5 },
+            {"Campo Figlio", 6 },
+            {"Identificativa", 7 },
+            {"Eccezioni", 8 },
+            {"Tipo Relazione", 9 },
+        };
+
+        // ##############################
 
     }
 }

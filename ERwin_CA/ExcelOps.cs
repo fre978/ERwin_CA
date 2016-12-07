@@ -163,10 +163,13 @@ namespace ERwin_CA
             int columns = 0;
             foreach (var worksheet in ws)
             {
+                // SEZIONE TABELLE
                 if (worksheet.Name == ConfigFile.TABELLE)
                 {
+                    columns = 0;
                     sheetFound = true;
-                    List<string> dd = new List<string>();
+                    columnsFound = false;
+                    //List<string> dd = new List<string>();
                     for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_TABELLE; 
                             columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_TABELLE; 
                             columnsPosition++)
@@ -176,22 +179,21 @@ namespace ERwin_CA
                         {
                             columns += 1;
                             if (ConfigFile._TABELLE[value] != columnsPosition)
-                                return false;
-                            dd.Add(worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text);
+                                goto ERROR;
+                            //dd.Add(worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text);
                         }
                         else
                         {
+                            //worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Value = "";
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
                             Logger.PrintLC(testoLog);
-                            return false;
+                            goto ERROR;
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_TABELLE)
                         columnsFound = true;
                     else
-                        return false;
-
-                    p.Dispose();
+                        goto ERROR;
                     //worksheet.Cell[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     //worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
                     //worksheet.Cells[1, 1].Style.Font.Bold = true;
@@ -201,21 +203,89 @@ namespace ERwin_CA
                 // SEZIONE ATTRIBUTI
                 if (worksheet.Name == ConfigFile.ATTRIBUTI)
                 {
-
+                    columns = 0;
+                    columnsFound = false;
+                    sheetFound = true;
+                    for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_ATTRIBUTI;
+                            columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI;
+                            columnsPosition++)
+                    {
+                        string value = worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text;
+                        if (ConfigFile._ATTRIBUTI.ContainsKey(value))
+                        {
+                            columns += 1;
+                            if (ConfigFile._ATTRIBUTI[value] != columnsPosition)
+                                goto ERROR;
+                        }
+                        else
+                        {
+                            testoLog = fileDaAprire.Name + ": file could not be elaborated.";
+                            Logger.PrintLC(testoLog);
+                            goto ERROR;
+                        }
+                    }
+                    if (columns == ConfigFile.HEADER_MAX_COLONNE_ATTRIBUTI)
+                        columnsFound = true;
+                    else
+                        goto ERROR;
                 }
-                
+
+                // SEZIONE RELAZIONI
+                if (worksheet.Name == ConfigFile.RELAZIONI)
+                {
+                    columns = 0;
+                    columnsFound = false;
+                    sheetFound = true;
+                    for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_RELAZIONI;
+                            columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_RELAZIONI;
+                            columnsPosition++)
+                    {
+                        string value = worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text;
+                        if (ConfigFile._RELAZIONI.ContainsKey(value))
+                        {
+                            columns += 1;
+                            if (ConfigFile._RELAZIONI[value] != columnsPosition)
+                                goto ERROR;
+                        }
+                        else
+                        {
+                            testoLog = fileDaAprire.Name + ": file could not be elaborated.";
+                            Logger.PrintLC(testoLog);
+                            goto ERROR;
+                        }
+                    }
+                    if (columns == ConfigFile.HEADER_MAX_COLONNE_RELAZIONI)
+                        columnsFound = true;
+                    else
+                        goto ERROR;
+                }
 
             }
+
+            ERROR:
             WB.Dispose();
             p.Dispose();
             //MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
-
+            string fileError = Path.GetFileNameWithoutExtension(file) + "_KO.txt";
+            string fileCorrect = Path.GetFileNameWithoutExtension(file) + "_OK.txt";
+            if (File.Exists(fileError))
+            {
+                FileOps.RemoveAttributes(fileError);
+                File.Delete(fileError);
+            }
+            if (File.Exists(fileCorrect))
+            {
+                FileOps.RemoveAttributes(fileCorrect);
+                File.Delete(fileCorrect);
+            }
             if (sheetFound != true || columnsFound != true)
             {
                 Logger.PrintLC(fileDaAprire.Name + ": file NON idoneo all'elaborazione.");
+                Logger.PrintF(fileError, "File columns not formatted correctly.", true);
                 return false;
             }
             Logger.PrintLC(fileDaAprire.Name + ": file IDONEO all'elaborazione.");
+            Logger.PrintF(fileCorrect, "File columns formatted correctly.", true);
             return true;
         }
 
