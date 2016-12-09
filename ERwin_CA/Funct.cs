@@ -14,11 +14,11 @@ namespace ERwin_CA
             {
                 try
                 {
-                    string[] a = value.Split("(");
+                    string[] a = value.Split('(');
                     string primo = a[0];
-                    string[] b = a.Split(",");
+                    string[] b = a[1].Split(',');
                     string secondo = b[0];
-                    string[] c = (b[1]).Split(")");
+                    string[] c = (b[1]).Split(')');
                     string terzo = c[0];
                     return new string[] { primo, secondo, terzo };
                 }
@@ -31,9 +31,9 @@ namespace ERwin_CA
             {
                 try
                 {
-                    string[] a = value.Split("(");
+                    string[] a = value.Split('(');
                     string primo = a[0];
-                    string[] b = a[1].Split(")");
+                    string[] b = a[1].Split(')');
                     string secondo = b[0];
                     return new string[] { primo, secondo };
                 }
@@ -44,8 +44,8 @@ namespace ERwin_CA
             }
             else
             {
-                string[] a = new string[] { value };
-                return a;
+                string primo = value;
+                return new string[] { primo };
             }
         }
     }

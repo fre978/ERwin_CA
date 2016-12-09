@@ -65,7 +65,11 @@ namespace ERwin_CA
                         List<EntityT> DatiFile = ExcelOps.ReadXFileEntity(fInfo);
                         foreach (var dati in DatiFile)
                             connessione.CreateEntity(dati, TemplateFile);
-
+                        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                        if (File.Exists(fInfo.FullName))
+                        {
+                            List<AttributeT> AttrFile = ExcelOps.ReadXFileAttribute(fInfo);
+                        }
                         connessione.CloseModelConnection();
                     }
                 }

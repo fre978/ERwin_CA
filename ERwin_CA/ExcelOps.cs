@@ -468,7 +468,7 @@ namespace ERwin_CA
                     {
                         bool incorrect = false;
                         string nomeTabella = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text;
-                        string nomeCampo = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome Campo Legacy"]].Text;
+                        string nomeCampo = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome  Campo Legacy"]].Text;
                         string dataType = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Datatype"]].Text;
                         string chiave = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Chiave"]].Text;
                         string unique = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Unique"]].Text;
@@ -484,87 +484,78 @@ namespace ERwin_CA
                         if (string.IsNullOrWhiteSpace(nomeTabella))
                         {
                             incorrect = true;
-                            error = error + "NOME TABELLA LEGACY mancante.";
+                            error += "NOME TABELLA LEGACY mancante.";
                         }
                         //Check Nome Campo Legacy
                         if (string.IsNullOrWhiteSpace(nomeCampo))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "NOME CAMPO LEGACY mancante.";
                         }
                         //Check DataType
                         if (string.IsNullOrWhiteSpace(dataType))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "DATATYPE mancante.";
                         }
                         //Check Chiave
                         if (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "CHIAVE non conforme.";
                         }
                         //Check Unique
                         if (!(string.Equals(unique, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(unique, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "UNIQUE non conforme.";
                         }
                         //Check Chiave Logica
                         if (!(string.Equals(chiaveLogica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiaveLogica, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "CHIAVE LOGICA non conforme.";
                         }
                         //Check Mandatory Flag
                         if (!(string.Equals(mandatoryFlag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(mandatoryFlag, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "MANDATORY FLAG non conforme.";
                         }
                         //Check Dominio
                         if (!(string.Equals(dominio, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(dominio, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "DOMINIO non conforme.";
                         }
                         //Check Storica
                         if (!(string.Equals(storica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(storica, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "STORICA non conforme.";
                         }
                         //Check Dato Sensibile
                         if (!(string.Equals(datoSensibile, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(datoSensibile, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
-                            string cell = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(cell))
-                                error = cell + " ";
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
                             error += "DATO SENSIBILE non conforme.";
                         }
 
@@ -592,42 +583,29 @@ namespace ERwin_CA
                             //Assegnazione valori opzionali
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["SSA"]].Text))
                                 ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["SSA"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Area"]].Text))
+                                ValRiga.Area = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Area"]].Text;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Definizione Campo"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Definizione Campo"]].Text;
+                                ValRiga.DefinizioneCampo = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Definizione Campo"]].Text;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Tipologia Tabella \n(dal DOC. LEGACY) \nEs: Dominio,Storica,\nDati"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Tipologia Tabella \n(dal DOC. LEGACY) \nEs: Dominio,Storica,\nDati"]].Text;
+                                ValRiga.TipologiaTabella = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Tipologia Tabella \n(dal DOC. LEGACY) \nEs: Dominio,Storica,\nDati"]].Text;
+                            int t;  //Funzionale all'assegnazione di 'Lunghezza' e 'Decimali'
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Lunghezza"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Lunghezza"]].Text;
+                                if (int.TryParse(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Lunghezza"]].Text, out t))
+                                    ValRiga.Lunghezza = t;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Decimali"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Decimali"]].Text;
-                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Provenienza Dominio"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Provenienza Dominio"]].Text;
+                                if(int.TryParse(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Decimali"]].Text, out t))
+                                    ValRiga.Decimali = t;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Provenienza dominio "]].Text))
+                                ValRiga.ProvenienzaDominio = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Provenienza dominio "]].Text;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Note"]].Text))
-                                ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Note"]].Text;
-
-
-
-
-                            //ValRiga.TableName = value;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
-                            //    ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text))
-                            //    ValRiga.HostName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome host"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text))
-                            //    ValRiga.DatabaseName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Schema"]].Text))
-                            //    ValRiga.Schema = worksheet.Cells[RowPos, ConfigFile._TABELLE["Schema"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Descrizione Tabella"]].Text))
-                            //    ValRiga.TableDescr = worksheet.Cells[RowPos, ConfigFile._TABELLE["Descrizione Tabella"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Tipologia Informazione"]].Text))
-                            //    ValRiga.InfoType = worksheet.Cells[RowPos, ConfigFile._TABELLE["Tipologia Informazione"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Perimetro Tabella"]].Text))
-                            //    ValRiga.TableLimit = worksheet.Cells[RowPos, ConfigFile._TABELLE["Perimetro Tabella"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text))
-                            //    ValRiga.TableGranularity = worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text;
-                            //if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
-                            //    ValRiga.FlagBFD = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                                ValRiga.Note = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Note"]].Text;
                             listaFile.Add(ValRiga);
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Value = "OK";
+
                         }
                         else
                         {
@@ -637,10 +615,19 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Value = "KO";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 2].Value = error;
                             EmptyRow += 1;
+                            int prossime = 0;
+                            for(int i =1; i < 10; i++)
+                            {
+                                if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text))
+                                    prossime++;
+                            }
+                            if (prossime == 9)
+                                FilesEnd = true;
                             if (EmptyRow >= 10)
                                 FilesEnd = true;
                         }
                     }
+                    p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     return listaFile;
                 }
             }

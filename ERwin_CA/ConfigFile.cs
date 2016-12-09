@@ -100,7 +100,7 @@ namespace ERwin_CA
             {"SSA", 1 },
             {"Area", 2 },
             {"Nome Tabella Legacy", 3 },
-            {"Nome  Campo Legacy", 4 },
+            {"Nome  Campo Legacy", 4 }, //ATTENZIONE doppio spazio tra 'Nome' e 'Campo'
             {"Definizione Campo", 5 },
             {"Tipologia Tabella \n(dal DOC. LEGACY) \nEs: Dominio,Storica,\nDati", 6 },
             {"Datatype", 7 },
@@ -111,7 +111,7 @@ namespace ERwin_CA
             {"Chiave Logica", 12 },
             {"Mandatory Flag", 13 },
             {"Dominio", 14 },
-            {"Provenienza dominio ", 15 },
+            {"Provenienza dominio ", 15 }, //ATTENZIONE minuscole e spazio finale
             {"Note", 16 },
             {"Storica", 17 },
             {"Dato Sensibile", 18 }
