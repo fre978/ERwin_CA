@@ -34,6 +34,14 @@ namespace ERwin_CA
 
         // SEZIONE GENERALE
         public static char[] DELIMITER_NAME_FILE = { '_', '.' };
+        public static string[] DATATYPE_DB2 = {"char", "char()", "varchar()", "clob", "clob()",
+                                               "date", "time", "timestamp", "timestamp()",
+                                               "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint",
+                                               "blob", "blob()", "binary", "binary()"};
+        public static string[] DATATYPE_ORACLE = {"char", "char()", "varchar()", "clob", "clob()", "varchar2()",
+                                                  "date", "timestamp", "timestamp()",
+                                                  "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "number", "number()", "number(,)",
+                                                  "blob"};
 
         public const string TABELLE =   "Censimento Tabelle";
         public const string ATTRIBUTI = "Censimento Attributi";

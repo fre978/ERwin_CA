@@ -93,6 +93,7 @@
     <Compile Include="DirOps.cs" />
     <Compile Include="ExcelOps.cs" />
     <Compile Include="FileOps.cs" />
+    <Compile Include="Funct.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MngProcesses.cs" />
     <Compile Include="Parser.cs" />
