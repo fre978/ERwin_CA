@@ -615,6 +615,8 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Value = "KO";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 2].Value = error;
                             EmptyRow += 1;
+                            //******************************************
+                            // VERIFICHE DA SPOSTARE IN TESTA
                             int prossime = 0;
                             for(int i =1; i < 10; i++)
                             {
@@ -623,6 +625,7 @@ namespace ERwin_CA
                             }
                             if (prossime == 9)
                                 FilesEnd = true;
+                            //******************************************
                             if (EmptyRow >= 10)
                                 FilesEnd = true;
                         }
