@@ -13,9 +13,13 @@ namespace ERwin_CA
 
         //}
 
+        // SEZIONE ESECUZIONE
+        public static int LOG_LEVEL = 3;
+
         // SEZIONE DATABASE
         public const string ERWIN_TEMPLATE_DB2 = @"D:\TEST\Template_DB2_LF.erwin";
         public const string ERWIN_TEMPLATE_ORACLE = @"D:\TEST\Template_Oracle_LF.erwin";
+        public static List<string> DBS = new List<string> { "DB2", "ORACLE" };
         public const string DB2_NAME = "DB2";
         public const string ORACLE = "Oracle";
 
@@ -25,7 +29,8 @@ namespace ERwin_CA
         public static string ROOT = @"D:\TEST\";
         
         // SEZIONE CARTELLE
-        public static string FOLDERDESTINATION = @"D:\TEST\Destinazione";
+        public static string FOLDERDESTINATION_GENERAL = @"D:\TEST\Destinazione";
+        public static string FOLDERDESTINATION;
 
         // SEZIONE GENERALE
         public static char[] DELIMITER_NAME_FILE = { '_', '.' };

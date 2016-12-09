@@ -20,9 +20,15 @@ namespace ERwin_CA
 
             if (length != 5)
             {
-                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>");
+                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>", 2);
                 return file = null;
             }
+            if (!ConfigFile.DBS.Contains(fileComponents[3].ToUpper()))
+            {
+                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>", 2);
+                return file = null;
+            }
+
             try
             {
                 file.SSA = fileComponents[0];
@@ -33,9 +39,10 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                Logger.PrintLC(fileName + "produced an error while parsing its name: " + exp.Message);
+                Logger.PrintLC(fileName + "produced an error while parsing its name: " + exp.Message, 2);
                 return file = null;
             }
+
             return file;
         }
     }

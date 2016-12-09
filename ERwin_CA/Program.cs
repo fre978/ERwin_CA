@@ -19,70 +19,24 @@ namespace ERwin_CA
         static void Main(string[] args)
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
-            Logger.PrintLC("AVVIO ESECUZIONE", 1);
+            ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, Timer.GetTimestampFolder(DateTime.Now));
+            Logger.PrintLC("AVVIO ESECUZIONE");
             ExcelOps Accesso = new ExcelOps();
-            
-            //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
-            //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
-            //testBool = ExcelOps.FileValidation(nomeFile);
-            string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
-            List<string> gg = FileOps.GetTrueFilesToProcess(ElencoExcel);
-            //####################################
-            //Ciclo MAIN
-            foreach (var file in gg)
+
+            int result = MngProcesses.StartProcess();
+            switch (result)
             {
-                string TemplateFile = null;
-                if (ExcelOps.FileValidation(file))
-                {
-                    FileT fileT = Parser.ParseFileName(file);
-                    string destERFile = null;
-                    if (fileT != null)
-                    {
-                        switch (fileT.TipoDBMS)
-                        {
-                            case ConfigFile.DB2_NAME:
-                                TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
-                                break;
-                            case ConfigFile.ORACLE:
-                                TemplateFile = ConfigFile.ERWIN_TEMPLATE_ORACLE;
-                                break;
-                            default:
-                                TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
-                                break;
-                        }
-                        FileInfo origin = new FileInfo(file);
-                        string fileName = Path.GetFileNameWithoutExtension(file);
-                        destERFile = Path.Combine(ConfigFile.FOLDERDESTINATION, fileName + Path.GetExtension(TemplateFile));
-                        if (!FileOps.CopyFile(TemplateFile, destERFile))
-                            continue;
-                    }
-                    else
-                        continue;
-
-                    ConnMng connessione = new ConnMng();
-                    if (!connessione.openModelConnection(destERFile))
-                        continue;
-
-                    connessione.SetRootObject();
-                    connessione.SetRootCollection();
-
-                    FileInfo fInfo = new FileInfo(file);
-                    List<EntityT> DatiFile = ExcelOps.ReadXFileEntity(fInfo);
-                    foreach(var dati in DatiFile)
-                        connessione.CreateEntity(dati, TemplateFile);
-
-                    //Logger.PrintLC("File " + file + " not valid for processing.");
-
-                    //Chiusura delle Sessioni aperte in elaborazione
-                    //SCAPI.Sessions cc = connessione.scERwin.Sessions;
-                    //foreach (SCAPI.Session ses in cc)
-                    //    ses.Close();
-                    connessione.CloseModelConnection();
-                    //connessione = null;
-
-                    //Chiusura di tutti i file EXCEL aperti in elaborazione
-                }
+                case 0:
+                    break;
+                case 1:
+                    break;
+                case 6:
+                    Logger.PrintLC("Program stopped abruptly with this error: ");
+                    break;
+                default:
+                    break;
             }
+
             //####################################
 
         FINE_PROGRAMMA:

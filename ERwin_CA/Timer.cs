@@ -14,10 +14,12 @@ namespace ERwin_CA
     {
         private static DateTime StartTime;
         private static DateTime EndTime;
+
         public static void SetFirstTime(this DateTime value)
         {
             StartTime = value;
         }
+
         public static DateTime GetFirstTime()
         {
             return StartTime;
@@ -27,6 +29,7 @@ namespace ERwin_CA
         {
             EndTime = value;
         }
+
         public static DateTime GetSecondTime()
         {
             return EndTime;
@@ -66,9 +69,16 @@ namespace ERwin_CA
         {
             return value.ToString("yyyyMMdd_HH:mm");
         }
+
         public static String GetTimestampDay(this DateTime value)
         {
             return value.ToString("yyyyMMdd");
         }
+
+        public static String GetTimestampFolder(this DateTime value)
+        {
+            return value.ToString("yyyyMMdd_HHmm");
+        }
+
     }
 }

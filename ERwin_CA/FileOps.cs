@@ -17,7 +17,7 @@ namespace ERwin_CA
                 //List<string> nlist = list.ToList();
                 //list = list.Where(x => !list.Contains(ConfigFile.FOLDERDESTINATION, IEqualityComparer));
                 nlist = (from c in list
-                         where !c.Contains(ConfigFile.FOLDERDESTINATION)
+                         where !c.Contains(ConfigFile.FOLDERDESTINATION_GENERAL)
                          select c).ToList();
             }
             nlist = CleanDuplicates(nlist);

@@ -231,12 +231,6 @@ namespace ERwin_CA
                     else
                         Logger.PrintLC("Error adding Flag BFD to " + scItem.Name, 3);
 
-
-                //FileOps.RemoveAttributes(fileERwin);
-                //scSession.CommitTransaction(trID);
-                //scPersistenceUnit.Save();
-                //scSession.Close();
-
                 //##################################################
                 //## Controllo esistenza DB ed eventuale aggiunta ##
                 if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
@@ -256,6 +250,7 @@ namespace ERwin_CA
                         DatabaseN.Add(entity.DatabaseName);
                     }
                 //##################################################
+
                 //##################################################
                 //## Controllo esistenza SCHEMA ed eventuale aggiunta ##
                 if (!string.IsNullOrWhiteSpace(entity.Schema))
@@ -284,6 +279,16 @@ namespace ERwin_CA
         }
 
 
+        public bool CreateAttributes()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Commits and saves the state of 'id'
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public bool CommitAndSave(object id)
         {
             if (!CommitTransaction(id))
@@ -293,6 +298,11 @@ namespace ERwin_CA
             return true;
         }
 
+        /// <summary>
+        /// Commits the Transaction of 'id'
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public bool CommitTransaction(object id)
         {
             try
@@ -315,6 +325,10 @@ namespace ERwin_CA
             }
         }
 
+        /// <summary>
+        /// Save the Persistence on 'this' Connection
+        /// </summary>
+        /// <returns></returns>
         public bool SavePersistence()
         {
             try

@@ -45,19 +45,22 @@ namespace ERwin_CA
 
         public static void PrintLC(string text, int level = 1)
         {
-            string line = Timer.GetTimestampPrecision(DateTime.Now);
-            if (!(level >= 0 && level <= 6))
-                level = 1;
-            for (int x = 0; x < level; x++)
+            if (!(level > ConfigFile.LOG_LEVEL))
             {
-                line = line + "\t";
-            }
-            line = line + text;
-            Console.WriteLine(line);
-            using (StreamWriter StrWr = File.AppendText(FileNameStream))
-            {
-                StrWr.WriteLine(line);
-                StrWr.Close();
+                string line = Timer.GetTimestampPrecision(DateTime.Now);
+                if (!(level >= 0 && level <= 6))
+                    level = 1;
+                for (int x = 0; x < level; x++)
+                {
+                    line = line + "    ";
+                }
+                line = line + text;
+                Console.WriteLine(line);
+                using (StreamWriter StrWr = File.AppendText(FileNameStream))
+                {
+                    StrWr.WriteLine(line);
+                    StrWr.Close();
+                }
             }
         }
 
