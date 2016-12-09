@@ -342,12 +342,36 @@ namespace ERwin_CA
                             FilesEnd != true;
                             RowPos++)
                     {
+                        bool incorrect = false;
                         string nome = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
                         string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
-                        if (!string.IsNullOrWhiteSpace(nome) && (string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))) 
+                        if (string.IsNullOrWhiteSpace(nome))
                         {
+                            incorrect = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "Valore di NOME TABELLA non conforme.";
+                        }
+                        if (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            incorrect = true;
+                            string error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error = error + " ";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = error + "Valore di FLAG BFD non conforme.";
+                        }
+                        
+                        if (incorrect == false)
+                        { 
                             EmptyRow = 0;
-                            EntityT ValRiga = new EntityT(tName: nome);
+                            EntityT ValRiga = new EntityT(RowPos, tName: nome);
                             ValRiga.TableName = nome;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
                                 ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;
@@ -372,16 +396,9 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "OK";
-
                         }
                         else
                         {
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "Valore di NOME TABELLA e/o FLAG BFD non conformi.";
-
                             EmptyRow += 1;
                             if (EmptyRow >= 10)
                             {
