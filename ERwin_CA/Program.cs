@@ -25,11 +25,11 @@ namespace ERwin_CA
             //string nomeFile = @"C:\ERWIN\CODICE\Extra\" + fileDaAprire.Name.ToString();
             //bool testBool = Accesso.ConvertXLStoXLSX(nomeFile);
             //testBool = ExcelOps.FileValidation(nomeFile);
-            string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls");
-
+            string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
+            List<string> gg = FileOps.GetTrueFilesToProcess(ElencoExcel);
             //####################################
             //Ciclo MAIN
-            foreach (var file in ElencoExcel)
+            foreach (var file in gg)
             {
                 string TemplateFile = null;
                 if (ExcelOps.FileValidation(file))

@@ -9,19 +9,44 @@ namespace ERwin_CA
 {
     class FileOps
     {
-        public static string[] GetTrueFilesToProcess(string[] list)
+        public static List<string> GetTrueFilesToProcess(string[] list)
         {
+            List<string> nlist = new List<string>();
             if (list != null)
             {
-                List<string> nlist = list.ToList();
+                //List<string> nlist = list.ToList();
                 //list = list.Where(x => !list.Contains(ConfigFile.FOLDERDESTINATION, IEqualityComparer));
-                nlist = from c in nlist
-                       where !c.Contains(ConfigFile.FOLDERDESTINATION)
-                       select c;
+                nlist = (from c in list
+                         where !c.Contains(ConfigFile.FOLDERDESTINATION)
+                         select c).ToList();
             }
-            return list;
+            nlist = CleanDuplicates(nlist);
+            return nlist;
         }
 
+        public static List<string> CleanDuplicates(List<string> list)
+        {
+            List<string> nlist = new List<string>();
+            if (list != null)
+            {
+                //foreach(var x in list)
+                //{
+                //    nlist.Add(Path.GetDirectoryName(x) + Path.GetFileNameWithoutExtension(x));
+                //}
+                //nlist = nlist.Distinct().ToList();
+
+                foreach(var x in list)
+                {
+                    string XLS = Path.Combine(Path.GetDirectoryName(x), Path.GetFileNameWithoutExtension(x) + ".xls");
+                    string XLSX = Path.Combine(Path.GetDirectoryName(x), Path.GetFileNameWithoutExtension(x) + ".xlsx");
+                    if (!nlist.Contains(XLS) && !nlist.Contains(XLSX))
+                    {
+                        nlist.Add(x);
+                    }
+                }
+            }
+            return nlist;
+        }
 
         private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
         {
