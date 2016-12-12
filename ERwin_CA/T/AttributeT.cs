@@ -9,6 +9,7 @@ namespace ERwin_CA.T
     class AttributeT
     {
         public int Row { get; set; }
+        public string DB { get; set; }
         public string SSA { get; set; }
         public string Area { get; set; }
         public string NomeTabellaLegacy { get; set; }
@@ -28,7 +29,7 @@ namespace ERwin_CA.T
         public string Storica { get; set; }
         public string DatoSensibile { get; set; }
 
-        public AttributeT(int row, string nomeTabellaLegacy, string ssa = null, string area = null,
+        public AttributeT(int row, string db, string nomeTabellaLegacy, string ssa = null, string area = null,
                           string nomeCampoLegacy = null, string definizioneCampo = null, string tipologiaTabella = null,
                           string dataType = null, int? lunghezza = null, int? decimali = null,
                           int? chiave = null, string unique = null, string chiaveLogica= null,
@@ -36,6 +37,7 @@ namespace ERwin_CA.T
                           string note = null, string storica = null, string datoSensibile = null )
         {
             Row = row;
+            DB = db;
             NomeTabellaLegacy = nomeTabellaLegacy;
             SSA = ssa;
             Area = area;

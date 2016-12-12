@@ -430,7 +430,7 @@ namespace ERwin_CA
         /// <param name="fileDaAprire"></param>
         /// <param name="sheet"></param>
         /// <returns></returns>
-        public static List<AttributeT> ReadXFileAttribute(FileInfo fileDaAprire, string sheet = ConfigFile.ATTRIBUTI)
+        public static List<AttributeT> ReadXFileAttribute(FileInfo fileDaAprire, string db, string sheet = ConfigFile.ATTRIBUTI)
         {
             string file = fileDaAprire.FullName;
             List<AttributeT> listaFile = new List<AttributeT>();
@@ -514,8 +514,18 @@ namespace ERwin_CA
                                 error += " ";
                             error += "DATATYPE mancante.";
                         }
-                        //Check Chiave
-                        if (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase)))
+                        else
+                        {
+                            if (!Funct.ParseDataType(dataType, db))
+                            {
+                                incorrect = true;
+                                if (!string.IsNullOrWhiteSpace(error))
+                                    error += " ";
+                                error += "DATATYPE non conforme.";
+                            }
+                        }
+                            //Check Chiave
+                            if (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase)))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -574,7 +584,7 @@ namespace ERwin_CA
                         if (incorrect == false)
                         {
                             EmptyRow = 0;
-                            AttributeT ValRiga = new AttributeT(row: RowPos, nomeTabellaLegacy: nomeTabella);
+                            AttributeT ValRiga = new AttributeT(row: RowPos, db: db, nomeTabellaLegacy: nomeTabella);
                             // Assegnazione valori checkati
                             ValRiga.NomeTabellaLegacy = nomeTabella;
                             ValRiga.NomeCampoLegacy = nomeCampo;

@@ -14,7 +14,7 @@ namespace ERwin_CA
         //}
 
         // SEZIONE ESECUZIONE
-        public static int LOG_LEVEL = 3;
+        public static int LOG_LEVEL = 4;
 
         // SEZIONE DATABASE
         public const string ERWIN_TEMPLATE_DB2 = @"D:\TEST\Template_DB2_LF.erwin";
@@ -22,6 +22,7 @@ namespace ERwin_CA
         public static List<string> DBS = new List<string> { "DB2", "ORACLE" };
         public const string DB2_NAME = "DB2";
         public const string ORACLE = "Oracle";
+        public const string SQLSERVER = "SqlServer";
 
         // SEZIONE FILE
         public static string LOG_FILE = @"D:\TEST\Log.txt";

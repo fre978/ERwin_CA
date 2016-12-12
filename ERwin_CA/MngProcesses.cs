@@ -70,7 +70,7 @@ namespace ERwin_CA
                         List<AttributeT> AttrFile = null;
                         if (File.Exists(fInfo.FullName))
                         {
-                            AttrFile = ExcelOps.ReadXFileAttribute(fInfo);
+                            AttrFile = ExcelOps.ReadXFileAttribute(fInfo, fileT.TipoDBMS);
                         }
                         //Aggiornamento dati struttura
                         if (!connessione.SetRootObject())

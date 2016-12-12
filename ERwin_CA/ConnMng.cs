@@ -293,23 +293,29 @@ namespace ERwin_CA
             
             if (erRootObjCol != null)
             {
-                OpenTransaction();
+                object localID = OpenTransaction();
 
                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                 //scItem = erRootObjCol.Add("Entity");
                 VBCon con = new VBCon();
                 erEntityObjectPE = null;
+                //#######################################
+                //Check di esecuzione TEMPORANEO
+                int a;
+                if (entity.NomeTabellaLegacy == "tab_ord")
+                    a = 0;
+                //#######################################
                 if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
                 {
-                    Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.");
+                    Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.", 3);
                     return ret = null;
                 }
 
                 if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
-                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly");
+                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly", 3);
                 else
                 {
-                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.");
+                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.", 3);
                     return ret = null;
                 }
                 //Area
@@ -343,45 +349,40 @@ namespace ERwin_CA
                         if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                         {
                             if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], entity.NomeCampoLegacy))
-                                Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 3);
+                                Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 4);
                             else
-                                Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
                             //Physical Name
                             if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy))
-                                Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
                             else
-                                Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
                         }
                         //Datatype
                         if(!string.IsNullOrWhiteSpace(entity.DataType))
                             if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Datatype"], entity.DataType))
-                                Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 4);
                             else
-                                Logger.PrintLC("Error adding Datatype to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Error adding Datatype to " + erAttributeObjectPE.Name, 4);
                         //Chiave
                         if(entity.Chiave == 0 || entity.Chiave == 100)
                             if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], (int)entity.Chiave))
-                                Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 4);
                             else
-                                Logger.PrintLC("Error adding Chiave to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Error adding Chiave to " + erAttributeObjectPE.Name, 4);
                         //Mandatory Flag
                         if (entity.MandatoryFlag == 1 || entity.MandatoryFlag == 0)
                             if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Mandatory Flag"], (int)entity.MandatoryFlag))
-                                Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 4);
                             else
-                                Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 3);
+                                Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 4);
                     }
                 CommitAndSave(trID);
             }
-            return scItem;
+            return erEntityObjectPE;
         }
 
 
-
-        public bool CreateAttributes()
-        {
-            return true;
-        }
 
         /// <summary>
         /// Commits and saves the state of 'id'
