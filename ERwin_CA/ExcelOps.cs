@@ -348,12 +348,12 @@ namespace ERwin_CA
                         if (string.IsNullOrWhiteSpace(nome))
                         {
                             incorrect = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = "Valore di NOME TABELLA mancante.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "Valore di NOME TABELLA mancante.";
                         }
                         if (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase)))
                         {
@@ -361,11 +361,11 @@ namespace ERwin_CA
                             string error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
                             if (!string.IsNullOrWhiteSpace(error))
                                 error = error + " ";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Value = error + "Valore di FLAG BFD non conforme.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = error + "Valore di FLAG BFD non conforme.";
                         }
                         
                         if (incorrect == false)
@@ -392,10 +392,10 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
                                 ValRiga.FlagBFD = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
                             listaFile.Add(ValRiga);
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Style.Font.Bold = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 1].Value = "OK";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "OK";
                         }
                         else
                         {
@@ -467,7 +467,6 @@ namespace ERwin_CA
 
             bool FilesEnd = false;
             int EmptyRow = 0;
-            int columns = 0;
             foreach (var worksheet in ws)
             {
                 if (worksheet.Name == sheet)
@@ -489,7 +488,7 @@ namespace ERwin_CA
                         string storica = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Storica"]].Text;
                         string datoSensibile = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Dato Sensibile"]].Text;
 
-                        worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 2].Value = "";
+                        worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET2].Value = "";
 
                         string error = "";
                         //Check Nome Tabella Legacy
@@ -614,19 +613,22 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Note"]].Text))
                                 ValRiga.Note = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Note"]].Text;
                             listaFile.Add(ValRiga);
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Font.Bold = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Value = "OK";
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1).Width = 10;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Value = "OK";
 
                         }
                         else
                         {
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Style.Font.Bold = true;
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 2].Value = error;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1).Width = 10;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET2).Width = 50;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET2].Value = error;
                             EmptyRow += 1;
                             if (EmptyRow >= 10)
                                 FilesEnd = true;

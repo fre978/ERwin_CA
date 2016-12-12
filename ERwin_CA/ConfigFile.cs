@@ -29,7 +29,7 @@ namespace ERwin_CA
         public static string ROOT = @"D:\TEST\";
         
         // SEZIONE CARTELLE
-        public static string FOLDERDESTINATION_GENERAL = @"D:\TEST\Destinazione";
+        public static string FOLDERDESTINATION_GENERAL = @"D:\TEST\Output";
         public static string FOLDERDESTINATION;
 
         // SEZIONE GENERALE
@@ -64,6 +64,8 @@ namespace ERwin_CA
         public static int SSA;
 
         // SEZIONE DICTIONARY TABELLE
+        public static int TABELLE_EXCEL_COL_OFFSET1 = 1;
+        public static int TABELLE_EXCEL_COL_OFFSET2 = 2;
         public static Dictionary<string, int> _TABELLE = new Dictionary<string, int>()
         {
             {"SSA", 1 },
@@ -95,6 +97,8 @@ namespace ERwin_CA
         // ##############################
 
         // SEZIONE DICTIONARY ATTRIBUTI
+        public static int ATTRIBUTI_EXCEL_COL_OFFSET1 = 7;
+        public static int ATTRIBUTI_EXCEL_COL_OFFSET2 = 8;
         public static Dictionary<string, int> _ATTRIBUTI = new Dictionary<string, int>()
         {
             {"SSA", 1 },
