@@ -38,17 +38,28 @@
     ''' <param name="prop"></param>
     ''' <param name="value"></param>
     ''' <returns></returns>
-    Public Function AssignToObjModel(ByRef model As SCAPI.ModelObject,
+    Public Function AssignToObjModelInt(ByRef model As SCAPI.ModelObject,
                                      prop As String, value As Integer) As Boolean
-        If model.Properties.HasProperty(prop) Then
+        Try
             model.Properties(prop).Value = value
             Return True
-        Else
-            model.Properties(prop).Value = value
-            Return True
-        End If
+        Catch ex As Exception
+            Return False
+        End Try
+        Return False
     End Function
 
+    Public Function RetriveEntity(ByRef model As SCAPI.ModelObject,
+                                  collection As SCAPI.ModelObjects,
+                                  entityName As String) As Boolean
+        Try
+            model = collection.Item(entityName, "Entity")
+            '            model.Properties.Add()
+            Return True
+        Catch
+            Return False
+        End Try
+    End Function
 
 
 End Class

@@ -52,10 +52,11 @@ namespace ERwin_CA
                         }
                         else
                             continue;
-
+                        //Apertura connessione per il file attuale
                         ConnMng connessione = new ConnMng();
                         if (!connessione.openModelConnection(destERFile))
                             continue;
+                        //Aggiornamento della struttura dati per il file attuale
                         if (!connessione.SetRootObject())
                             continue;
                         if (!connessione.SetRootCollection())
@@ -66,10 +67,21 @@ namespace ERwin_CA
                         foreach (var dati in DatiFile)
                             connessione.CreateEntity(dati, TemplateFile);
                         fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                        List<AttributeT> AttrFile = null;
                         if (File.Exists(fInfo.FullName))
                         {
-                            List<AttributeT> AttrFile = ExcelOps.ReadXFileAttribute(fInfo);
+                            AttrFile = ExcelOps.ReadXFileAttribute(fInfo);
                         }
+                        //Aggiornamento dati struttura
+                        if (!connessione.SetRootObject())
+                            continue;
+                        if (!connessione.SetRootCollection())
+                            continue;
+                        //############################
+                        foreach (var dati in AttrFile)
+                            connessione.CreateAttributePassOne(dati, TemplateFile);
+
+                        //Chiusura connessione per il file attuale.
                         connessione.CloseModelConnection();
                     }
                 }

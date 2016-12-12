@@ -18,6 +18,10 @@ namespace ERwin_CA
         public SCAPI.ModelObjects erRootObjCol { get; set; }
         public SCAPI.ModelObjects erColumn { get; set; }
         public SCAPI.ModelObjects erTable { get; set; }
+        public SCAPI.ModelObjects erObjectCollection { get; set; }
+        public SCAPI.ModelObject erEntityObjectPE;
+        public SCAPI.ModelObjects erAttributeObjCol { get; set; } //utilizzato nella creazione degli Attributi.
+        public SCAPI.ModelObject erAttributeObjectPE;
         public SCAPI.ModelObject scItem;
         public SCAPI.ModelObject scDB;
         public SCAPI.ModelObject scSchema;
@@ -277,141 +281,204 @@ namespace ERwin_CA
             return scItem;
         }
 
-/*
+
         public SCAPI.ModelObject CreateAttributePassOne(AttributeT entity, string db)
         {
             SCAPI.ModelObject ret = null;
             if (string.IsNullOrWhiteSpace(db))
             {
-                Logger.PrintLC("There was no DB associated to " + entity.TableName, 3);
+                Logger.PrintLC("There was no DB associated to " + entity.NomeTabellaLegacy, 3);
                 return ret;
             }
-            if (!((entity.FlagBFD == "S") || (entity.FlagBFD == "N")))
-            {
-                Logger.PrintLC("Property FlagBFD of " + entity.TableName + " is not valid. Table will be skipped.", 3);
-                return ret;
-            }
-
+            
             if (erRootObjCol != null)
             {
                 OpenTransaction();
-                scItem = erRootObjCol.Add("Entity");
-                VBCon con = new VBCon();
 
+                erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+                //scItem = erRootObjCol.Add("Entity");
+                VBCon con = new VBCon();
+                erEntityObjectPE = null;
+                if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
+                {
+                    Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.");
+                    return ret = null;
+                }
+
+                if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
+                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly");
+                else
+                {
+                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.");
+                    return ret = null;
+                }
+                //Area
+                if (!string.IsNullOrWhiteSpace(entity.Area))
+                    if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Area"], entity.Area))
+                        Logger.PrintLC("Added Area to " + erEntityObjectPE.Name, 3);
+                    else
+                        Logger.PrintLC("Error adding Area to " + erEntityObjectPE.Name, 3);
+                //Tipologia Tabella
+                if (!string.IsNullOrWhiteSpace(entity.TipologiaTabella))
+                    if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Tipologia Tabella"], entity.TipologiaTabella))
+                        Logger.PrintLC("Added Tipologia Tabella to " + erEntityObjectPE.Name, 3);
+                    else
+                        Logger.PrintLC("Error adding Tipologia Tabella to " + erEntityObjectPE.Name, 3);
+
+                if (!string.IsNullOrWhiteSpace(entity.Storica))
+                    if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Storica"], entity.Storica))
+                        Logger.PrintLC("Added Storica to " + erEntityObjectPE.Name, 3);
+                    else
+                        Logger.PrintLC("Error adding Storica to " + erEntityObjectPE.Name, 3);
+
+                erAttributeObjCol = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Attribute");
+                if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
+                    if (con.RetriveEntity(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
+                        Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.");
+                    else
+                    {
+                        erAttributeObjectPE = erAttributeObjCol.Add("Attribute");
+                        //Name
+                        if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy name"], entity.NomeCampoLegacy))
+                            Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 3);
+                        else
+                            Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 3);
+                        //Physical Name
+                        if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy))
+                            Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 3);
+                        else
+                            Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 3);
+                        //Datatype
+                        if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Datatype"], entity.DataType))
+                            Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 3);
+                        else
+                            Logger.PrintLC("Error adding Datatype to " + erAttributeObjectPE.Name, 3);
+                        //Chiave
+                        if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], (int)entity.Chiave))
+                            Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 3);
+                        else
+                            Logger.PrintLC("Error adding Chiave to " + erAttributeObjectPE.Name, 3);
+                        if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Mandatory Flag"], (int)entity.MandatoryFlag))
+                            Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 3);
+                        else
+                            Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 3);
+                    }
                 //Controlli proprietà essenziali
                 //Nome tabella
-                if (!string.IsNullOrWhiteSpace(entity.TableName))
-                {
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Tabella"], entity.TableName))
-                        Logger.PrintLC("Added Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
-                    else
-                    {
-                        Logger.PrintLC("Error adding Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
-                        return scItem;
-                    }
-                    if (con.AssignToObjModel(ref scItem, "Name", entity.TableName))
-                        Logger.PrintLC("Added Table Name to " + scItem.Name, 3);
-                    else
-                    {
-                        Logger.PrintLC("Error adding Table Name to " + scItem.Name, 3);
-                        return scItem;
-                    }
-                }
 
-                //SSA
-                if (!string.IsNullOrWhiteSpace(entity.SSA))
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["SSA"], entity.SSA))
-                        Logger.PrintLC("Added SSA to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding SSA to " + scItem.Name, 3);
+                //if (!string.IsNullOrWhiteSpace(entity.TableName))
+                //{
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Tabella"], entity.TableName))
+                //        Logger.PrintLC("Added Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
+                //    else
+                //    {
+                //        Logger.PrintLC("Error adding Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
+                //        return scItem;
+                //    }
+                //    if (con.AssignToObjModel(ref scItem, "Name", entity.TableName))
+                //        Logger.PrintLC("Added Table Name to " + scItem.Name, 3);
+                //    else
+                //    {
+                //        Logger.PrintLC("Error adding Table Name to " + scItem.Name, 3);
+                //        return scItem;
+                //    }
+                //}
 
-                //Table Description
-                if (!string.IsNullOrWhiteSpace(entity.TableDescr))
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Descrizione Tabella"], entity.TableDescr))
-                        Logger.PrintLC("Added Table Description to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding Table Description to " + scItem.Name, 3);
-                if (!string.IsNullOrWhiteSpace(entity.TableDescr))
-                    if (con.AssignToObjModel(ref scItem, "Definition", entity.TableDescr))
-                        Logger.PrintLC("Added Table Definition to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding Table Definition to " + scItem.Name, 3);
+                ////SSA
+                //if (!string.IsNullOrWhiteSpace(entity.SSA))
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["SSA"], entity.SSA))
+                //        Logger.PrintLC("Added SSA to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding SSA to " + scItem.Name, 3);
+
+                ////Table Description
+                //if (!string.IsNullOrWhiteSpace(entity.TableDescr))
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Descrizione Tabella"], entity.TableDescr))
+                //        Logger.PrintLC("Added Table Description to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding Table Description to " + scItem.Name, 3);
+                //if (!string.IsNullOrWhiteSpace(entity.TableDescr))
+                //    if (con.AssignToObjModel(ref scItem, "Definition", entity.TableDescr))
+                //        Logger.PrintLC("Added Table Definition to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding Table Definition to " + scItem.Name, 3);
 
 
-                //Info Type
-                if (!string.IsNullOrWhiteSpace(entity.InfoType))
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Tipologia Informazione"], entity.InfoType))
-                        Logger.PrintLC("Added Information Type to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding Information Type to " + scItem.Name, 3);
+                ////Info Type
+                //if (!string.IsNullOrWhiteSpace(entity.InfoType))
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Tipologia Informazione"], entity.InfoType))
+                //        Logger.PrintLC("Added Information Type to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding Information Type to " + scItem.Name, 3);
 
-                //Table Limit
-                if (!string.IsNullOrWhiteSpace(entity.TableLimit))
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Perimetro Tabella"], entity.TableLimit))
-                        Logger.PrintLC("Added Table Limit to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding Table Limit to " + scItem.Name, 3);
+                ////Table Limit
+                //if (!string.IsNullOrWhiteSpace(entity.TableLimit))
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Perimetro Tabella"], entity.TableLimit))
+                //        Logger.PrintLC("Added Table Limit to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding Table Limit to " + scItem.Name, 3);
 
-                //Table Granularity
-                if (!string.IsNullOrWhiteSpace(entity.TableGranularity))
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Granularità Tabella"], entity.TableGranularity))
-                        Logger.PrintLC("Added Table Granularity to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding Table Granularity to " + scItem.Name, 3);
+                ////Table Granularity
+                //if (!string.IsNullOrWhiteSpace(entity.TableGranularity))
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Granularità Tabella"], entity.TableGranularity))
+                //        Logger.PrintLC("Added Table Granularity to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding Table Granularity to " + scItem.Name, 3);
 
-                //Flag BFD
-                if (!string.IsNullOrWhiteSpace(entity.FlagBFD))
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Flag BFD"], entity.FlagBFD))
-                        Logger.PrintLC("Added Flag BFD to " + scItem.Name, 3);
-                    else
-                        Logger.PrintLC("Error adding Flag BFD to " + scItem.Name, 3);
+                ////Flag BFD
+                //if (!string.IsNullOrWhiteSpace(entity.FlagBFD))
+                //    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Flag BFD"], entity.FlagBFD))
+                //        Logger.PrintLC("Added Flag BFD to " + scItem.Name, 3);
+                //    else
+                //        Logger.PrintLC("Error adding Flag BFD to " + scItem.Name, 3);
 
-                //##################################################
-                //## Controllo esistenza DB ed eventuale aggiunta ##
-                if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
-                    if (!DatabaseN.Contains(entity.DatabaseName))
-                    {
-                        scDB = erRootObjCol.Add("DB2_Database");
-                        if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome Database"], entity.DatabaseName))
-                            Logger.PrintLC("Added Database Name to " + scDB.Name, 3);
-                        else
-                            Logger.PrintLC("Error adding Database Name to " + scDB.Name, 3);
+                ////##################################################
+                ////## Controllo esistenza DB ed eventuale aggiunta ##
+                //if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
+                //    if (!DatabaseN.Contains(entity.DatabaseName))
+                //    {
+                //        scDB = erRootObjCol.Add("DB2_Database");
+                //        if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome Database"], entity.DatabaseName))
+                //            Logger.PrintLC("Added Database Name to " + scDB.Name, 3);
+                //        else
+                //            Logger.PrintLC("Error adding Database Name to " + scDB.Name, 3);
 
-                        if (!string.IsNullOrWhiteSpace(entity.HostName))
-                            if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host"], entity.HostName))
-                                Logger.PrintLC("Added Host Name to " + scDB.Name, 3);
-                            else
-                                Logger.PrintLC("Error adding Host Name to " + scDB.Name, 3);
-                        DatabaseN.Add(entity.DatabaseName);
-                    }
-                //##################################################
+                //        if (!string.IsNullOrWhiteSpace(entity.HostName))
+                //            if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host"], entity.HostName))
+                //                Logger.PrintLC("Added Host Name to " + scDB.Name, 3);
+                //            else
+                //                Logger.PrintLC("Error adding Host Name to " + scDB.Name, 3);
+                //        DatabaseN.Add(entity.DatabaseName);
+                //    }
+                ////##################################################
 
-                //##################################################
-                //## Controllo esistenza SCHEMA ed eventuale aggiunta ##
-                if (!string.IsNullOrWhiteSpace(entity.Schema))
-                {
-                    if (!SchemaN.Contains(entity.Schema))
-                    {
-                        scSchema = erRootObjCol.Add("Schema");
-                        if (con.AssignToObjModel(ref scSchema, "Name", entity.Schema))
-                            Logger.PrintLC("Created Schema Name to " + scSchema.Name, 3);
-                        else
-                            Logger.PrintLC("Error creating Schema Name to " + scSchema.Name, 3);
-                        SchemaN.Add(entity.Schema);
-                    }
-                    //Schema
-                    if (!string.IsNullOrWhiteSpace(entity.Schema))
-                        if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Schema"], entity.Schema))
-                            Logger.PrintLC("Added Schema to " + scItem.Name, 3);
-                        else
-                            Logger.PrintLC("Error adding Schema to " + scItem.Name, 3);
-                }
-                //##################################################
+                ////##################################################
+                ////## Controllo esistenza SCHEMA ed eventuale aggiunta ##
+                //if (!string.IsNullOrWhiteSpace(entity.Schema))
+                //{
+                //    if (!SchemaN.Contains(entity.Schema))
+                //    {
+                //        scSchema = erRootObjCol.Add("Schema");
+                //        if (con.AssignToObjModel(ref scSchema, "Name", entity.Schema))
+                //            Logger.PrintLC("Created Schema Name to " + scSchema.Name, 3);
+                //        else
+                //            Logger.PrintLC("Error creating Schema Name to " + scSchema.Name, 3);
+                //        SchemaN.Add(entity.Schema);
+                //    }
+                //    //Schema
+                //    if (!string.IsNullOrWhiteSpace(entity.Schema))
+                //        if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Schema"], entity.Schema))
+                //            Logger.PrintLC("Added Schema to " + scItem.Name, 3);
+                //        else
+                //            Logger.PrintLC("Error adding Schema to " + scItem.Name, 3);
+                //}
+                ////##################################################
+
                 CommitAndSave(trID);
             }
             return scItem;
         }
-*/
+
 
 
         public bool CreateAttributes()
