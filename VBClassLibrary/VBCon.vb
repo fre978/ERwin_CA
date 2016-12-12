@@ -61,5 +61,17 @@
         End Try
     End Function
 
+    Public Function RetriveAttribute(ByRef model As SCAPI.ModelObject,
+                                  collection As SCAPI.ModelObjects,
+                                  entityName As String) As Boolean
+        Try
+            model = collection.Item(entityName, "Attribute")
+            '            model.Properties.Add()
+            Return True
+        Catch
+            Return False
+        End Try
+    End Function
+
 
 End Class
