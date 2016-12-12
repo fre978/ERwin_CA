@@ -405,6 +405,17 @@ namespace ERwin_CA
                                 FilesEnd = true;
                             }
                         }
+                        //******************************************
+                        // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
+                        int prossime = 0;
+                        for (int i = 1; i < 11; i++)
+                        {
+                            if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._TABELLE["Nome Tabella"]].Text))
+                                prossime++;
+                        }
+                        if (prossime == 10)
+                            FilesEnd = true;
+                        //******************************************
                     }
                     p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     return listaFile;
@@ -479,12 +490,14 @@ namespace ERwin_CA
                         string datoSensibile = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Dato Sensibile"]].Text;
 
                         worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 2].Value = "";
+
                         string error = "";
                         //Check Nome Tabella Legacy
                         if (string.IsNullOrWhiteSpace(nomeTabella))
                         {
                             incorrect = true;
                             error += "NOME TABELLA LEGACY mancante.";
+
                         }
                         //Check Nome Campo Legacy
                         if (string.IsNullOrWhiteSpace(nomeCampo))
@@ -615,20 +628,21 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 1].Value = "KO";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + 2].Value = error;
                             EmptyRow += 1;
-                            //******************************************
-                            // VERIFICHE DA SPOSTARE IN TESTA
-                            int prossime = 0;
-                            for(int i =1; i < 10; i++)
-                            {
-                                if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text))
-                                    prossime++;
-                            }
-                            if (prossime == 9)
-                                FilesEnd = true;
-                            //******************************************
                             if (EmptyRow >= 10)
                                 FilesEnd = true;
                         }
+
+                        //******************************************
+                        // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
+                        int prossime = 0;
+                        for (int i = 1; i < 11; i++)
+                        {
+                            if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text))
+                                prossime++;
+                        }
+                        if (prossime == 10)
+                            FilesEnd = true;
+                        //******************************************
                     }
                     p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     return listaFile;
