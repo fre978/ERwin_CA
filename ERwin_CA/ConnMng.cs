@@ -176,6 +176,7 @@ namespace ERwin_CA
                     else
                     {
                         Logger.PrintLC("Error adding Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3);
+                        CommitAndSave(trID);
                         return scItem;
                     }
                     if (con.AssignToObjModel(ref scItem, "Name", entity.TableName))
@@ -183,6 +184,7 @@ namespace ERwin_CA
                     else
                     {
                         Logger.PrintLC("Error adding Table Name to " + scItem.Name, 3);
+                        CommitAndSave(trID);
                         return scItem;
                     }
                 }
@@ -293,9 +295,10 @@ namespace ERwin_CA
             
             if (erRootObjCol != null)
             {
-                object localID = OpenTransaction();
+                OpenTransaction();
 
                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+
                 //scItem = erRootObjCol.Add("Entity");
                 VBCon con = new VBCon();
                 erEntityObjectPE = null;
@@ -308,6 +311,7 @@ namespace ERwin_CA
                 if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
                 {
                     Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.", 3);
+                    CommitAndSave(trID);
                     return ret = null;
                 }
 
@@ -316,8 +320,10 @@ namespace ERwin_CA
                 else
                 {
                     Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.", 3);
+                    CommitAndSave(trID);
                     return ret = null;
                 }
+
                 //Area
                 if (!string.IsNullOrWhiteSpace(entity.Area))
                     if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Area"], entity.Area))
