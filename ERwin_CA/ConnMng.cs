@@ -299,15 +299,9 @@ namespace ERwin_CA
 
                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
 
-                //scItem = erRootObjCol.Add("Entity");
                 VBCon con = new VBCon();
                 erEntityObjectPE = null;
-                //#######################################
-                //Check di esecuzione TEMPORANEO
-                int a;
-                if (entity.NomeTabellaLegacy == "tab_ord")
-                    a = 0;
-                //#######################################
+
                 if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
                 {
                     Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.", 3);
@@ -347,7 +341,7 @@ namespace ERwin_CA
 
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                     if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
-                        Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.");
+                        Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.", 3);
                     else
                     {
                         erAttributeObjectPE = erAttributeObjCol.Add("Attribute");
@@ -382,12 +376,192 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 4);
                             else
                                 Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 4);
+
+
+                        //##############################################################
+                        if (!string.IsNullOrWhiteSpace(entity.DefinizioneCampo))
+                        {
+                            Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.", 3);
+                            //Definizione Campo (Comment)
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Definizione Campo"], entity.DefinizioneCampo))
+                                Logger.PrintLC("Added Definizione Campo (Comment) to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Definizione Campo (Comment) to " + erAttributeObjectPE.Name, 4);
+                            //Definizione Campo (Definition)
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Definizione Campo Def"], entity.DefinizioneCampo))
+                                Logger.PrintLC("Added Definizione Campo (Definition) to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Definizione Campo (Definition) to " + erAttributeObjectPE.Name, 4);
+                        }
+                        //Unique
+                        if (!string.IsNullOrWhiteSpace(entity.Unique))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Unique"], entity.Unique))
+                                Logger.PrintLC("Added Unique to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Unique to " + erAttributeObjectPE.Name, 4);
+                        //Chiave logica
+                        if (!string.IsNullOrWhiteSpace(entity.ChiaveLogica))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave Logica"], entity.ChiaveLogica))
+                                Logger.PrintLC("Added Chiave Logica to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Chiave Logica to " + erAttributeObjectPE.Name, 4);
+                        //Dominio
+                        if (!string.IsNullOrWhiteSpace(entity.Dominio))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Dominio"], entity.Dominio))
+                                Logger.PrintLC("Added Dominio to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Dominio to " + erAttributeObjectPE.Name, 4);
+                        //Provenienza Dominio
+                        if (!string.IsNullOrWhiteSpace(entity.ProvenienzaDominio))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Provenienza Dominio"], entity.ProvenienzaDominio))
+                                Logger.PrintLC("Added Provenienza Dominio to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Provenienza Dominio to " + erAttributeObjectPE.Name, 4);
+                        //Note
+                        if (!string.IsNullOrWhiteSpace(entity.Note))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Note"], entity.Note))
+                                Logger.PrintLC("Added Note to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Note to " + erAttributeObjectPE.Name, 4);
+                        //##############################################################
                     }
                 CommitAndSave(trID);
             }
             return erEntityObjectPE;
         }
 
+
+        public SCAPI.ModelObject CreateAttributePassTwo(AttributeT entity, string db)
+        {
+            SCAPI.ModelObject ret = null;
+            if (string.IsNullOrWhiteSpace(db))
+            {
+                Logger.PrintLC("There was no DB associated to " + entity.NomeTabellaLegacy, 3);
+                return ret;
+            }
+
+            if (erRootObjCol != null)
+            {
+                OpenTransaction();
+
+                erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+
+                VBCon con = new VBCon();
+                erEntityObjectPE = null;
+
+                if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
+                {
+                    Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.", 3);
+                    CommitAndSave(trID);
+                    return ret = null;
+                }
+
+                if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
+                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly", 3);
+                else
+                {
+                    Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.", 3);
+                    CommitAndSave(trID);
+                    return ret = null;
+                }
+
+                erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
+
+                if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
+                    if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
+                    {
+                        erAttributeObjectPE = erAttributeObjCol.Add("Attribute");
+
+                        //Definizione Campo
+                        if (!string.IsNullOrWhiteSpace(entity.DefinizioneCampo))
+                        {
+                            Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.", 3);
+                            //Definizione Campo (Comment)
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Definizione Campo"], entity.DefinizioneCampo))
+                                Logger.PrintLC("Added Definizione Campo (Comment) to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Definizione Campo (Comment) to " + erAttributeObjectPE.Name, 4);
+                            //Definizione Campo (Definition)
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Definizione Campo Def"], entity.DefinizioneCampo))
+                                Logger.PrintLC("Added Definizione Campo (Definition) to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Definizione Campo (Definition) to " + erAttributeObjectPE.Name, 4);
+                        }
+                        //Unique
+                        if (!string.IsNullOrWhiteSpace(entity.Unique))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Unique"], entity.Unique))
+                                Logger.PrintLC("Added Unique to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Unique to " + erAttributeObjectPE.Name, 4);
+
+                        //Chiave logica
+                        if (!string.IsNullOrWhiteSpace(entity.ChiaveLogica))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave Logica"], entity.ChiaveLogica))
+                                Logger.PrintLC("Added Chiave Logica to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Chiave Logica to " + erAttributeObjectPE.Name, 4);
+
+                        //Dominio
+                        if (!string.IsNullOrWhiteSpace(entity.Dominio))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Dominio"], entity.Dominio))
+                                Logger.PrintLC("Added Dominio to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Dominio to " + erAttributeObjectPE.Name, 4);
+
+                        //Provenienza Dominio
+                        if (!string.IsNullOrWhiteSpace(entity.ProvenienzaDominio))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Provenienza Dominio"], entity.ProvenienzaDominio))
+                                Logger.PrintLC("Added Provenienza Dominio to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Provenienza Dominio to " + erAttributeObjectPE.Name, 4);
+
+                        //Note
+                        if (!string.IsNullOrWhiteSpace(entity.Note))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Note"], entity.Note))
+                                Logger.PrintLC("Added Note to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Note to " + erAttributeObjectPE.Name, 4);
+
+                    }
+                    else
+                    {
+                        erAttributeObjectPE = erAttributeObjCol.Add("Attribute");
+                        //Name
+                        if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
+                        {
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], entity.NomeCampoLegacy))
+                                Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 4);
+                            else
+                                Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
+                            //Physical Name
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy))
+                                Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
+                        }
+                        //Datatype
+                        if (!string.IsNullOrWhiteSpace(entity.DataType))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Datatype"], entity.DataType))
+                                Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Datatype to " + erAttributeObjectPE.Name, 4);
+                        //Chiave
+                        if (entity.Chiave == 0 || entity.Chiave == 100)
+                            if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], (int)entity.Chiave))
+                                Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Chiave to " + erAttributeObjectPE.Name, 4);
+                        //Mandatory Flag
+                        if (entity.MandatoryFlag == 1 || entity.MandatoryFlag == 0)
+                            if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Mandatory Flag"], (int)entity.MandatoryFlag))
+                                Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 4);
+                            else
+                                Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 4);
+                    }
+                CommitAndSave(trID);
+            }
+            return erEntityObjectPE;
+        }
 
 
         /// <summary>

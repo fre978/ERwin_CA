@@ -295,7 +295,7 @@ namespace ERwin_CA
         /// <param name="fileDaAprire"></param>
         /// <param name="sheet"></param>
         /// <returns></returns>
-        public static List<EntityT> ReadXFileEntity(FileInfo fileDaAprire, string sheet = ConfigFile.TABELLE)
+        public static List<EntityT> ReadXFileEntity(FileInfo fileDaAprire, string db, string sheet = ConfigFile.TABELLE)
         {
             string file = fileDaAprire.FullName;
             List<EntityT> listaFile = new List<EntityT>();
@@ -371,7 +371,7 @@ namespace ERwin_CA
                         if (incorrect == false)
                         { 
                             EmptyRow = 0;
-                            EntityT ValRiga = new EntityT(row: RowPos, tName: nome);
+                            EntityT ValRiga = new EntityT(row: RowPos, db: db, tName: nome);
                             ValRiga.TableName = nome;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text))
                                 ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._TABELLE["SSA"]].Text;

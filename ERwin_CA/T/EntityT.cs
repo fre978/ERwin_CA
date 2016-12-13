@@ -9,6 +9,7 @@ namespace ERwin_CA.T
     class EntityT
     {
         public int Row { get; set; }
+        public string DB { get; set; }
         public string TableName { get; set; }
         public string SSA { get; set; }
         public string HostName { get; set; }
@@ -27,13 +28,14 @@ namespace ERwin_CA.T
         public string DB_TYPE { get; set; }
 
 
-        public EntityT( int row, string tName, string ssa = null, string hName = null,
+        public EntityT( int row, string db, string tName, string ssa = null, string hName = null,
                         string dbName = null, string schema = null, string tableDescr = null,
                         string infoType = null, string tableLimit = null, 
                         string tableGranularity = null, string flagBFD = null, string acronym = null,
                         string area = null, string tableType = null, string history = null, string db_type = null)
         {
             Row = row;
+            DB = db;
             TableName = tName;
             SSA = ssa;
             HostName = hName;

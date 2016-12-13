@@ -63,7 +63,7 @@ namespace ERwin_CA
                             continue;
 
                         FileInfo fInfo = new FileInfo(file);
-                        List<EntityT> DatiFile = ExcelOps.ReadXFileEntity(fInfo);
+                        List<EntityT> DatiFile = ExcelOps.ReadXFileEntity(fInfo, fileT.TipoDBMS);
                         foreach (var dati in DatiFile)
                             connessione.CreateEntity(dati, TemplateFile);
                         fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
@@ -72,6 +72,7 @@ namespace ERwin_CA
                         {
                             AttrFile = ExcelOps.ReadXFileAttribute(fInfo, fileT.TipoDBMS);
                         }
+                        //ATTRIBUTI - PASSAGGIO UNO
                         //Aggiornamento dati struttura
                         if (!connessione.SetRootObject())
                             continue;
@@ -80,6 +81,16 @@ namespace ERwin_CA
                         //############################
                         foreach (var dati in AttrFile)
                             connessione.CreateAttributePassOne(dati, TemplateFile);
+
+                        ////ATTRIBUTI - PASSAGGIO DUE
+                        ////Aggiornamento dati struttura
+                        //if (!connessione.SetRootObject())
+                        //    continue;
+                        //if (!connessione.SetRootCollection())
+                        //    continue;
+                        ////############################
+                        //foreach (var dati in AttrFile)
+                        //    connessione.CreateAttributePassTwo(dati, TemplateFile);
 
                         //Chiusura connessione per il file attuale.
                         connessione.CloseModelConnection();
