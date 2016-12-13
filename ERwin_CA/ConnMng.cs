@@ -336,7 +336,7 @@ namespace ERwin_CA
                         Logger.PrintLC("Added Tipologia Tabella to " + erEntityObjectPE.Name, 3);
                     else
                         Logger.PrintLC("Error adding Tipologia Tabella to " + erEntityObjectPE.Name, 3);
-
+                //Storica
                 if (!string.IsNullOrWhiteSpace(entity.Storica))
                     if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Storica"], entity.Storica))
                         Logger.PrintLC("Added Storica to " + erEntityObjectPE.Name, 3);
