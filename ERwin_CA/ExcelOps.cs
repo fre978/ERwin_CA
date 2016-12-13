@@ -664,6 +664,69 @@ namespace ERwin_CA
         }
 
 
+        public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, int row, int column, int priorityWrite, string text, string sheet = ConfigFile.ATTRIBUTI)
+        {
+            string file = fileDaAprire.FullName;
+            if (!File.Exists(file))
+            {
+                Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite);
+                return false;
+            }
+            FileOps.RemoveAttributes(file);
+            if (fileDaAprire.Extension == ".xls")
+            {
+                if (!ConvertXLStoXLSX(file))
+                    return false;
+                file = Path.ChangeExtension(file, ".xlsx");
+                fileDaAprire = new FileInfo(file);
+            }
+            ExcelPackage p = null;
+            ExcelWorkbook WB = null;
+            ExcelWorksheets ws = null;
+            try
+            {
+                p = new ExcelPackage(fileDaAprire);
+                WB = p.Workbook;
+                ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
+            }
+            catch (Exception exp)
+            {
+                Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite);
+                return false;
+            }
+
+            //bool FilesEnd = false;
+            //int EmptyRow = 0;
+            //int columns = 0;
+            foreach (var worksheet in ws)
+            {
+                if (worksheet.Name == sheet)
+                {
+                    try
+                    {
+                        worksheet.Cells[row, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        worksheet.Cells[row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                        worksheet.Cells[row, column].Style.Font.Bold = true;
+                        worksheet.Cells[row, column].Value = "KO";
+                        worksheet.Cells[row, column + 1].Value = text;
+                        p.SaveAs(fileDaAprire);
+                        return true;
+                    }
+                    catch(Exception exp)
+                    {
+                        Logger.PrintLC("Error while writing on file " +
+                                        fileDaAprire.Name +
+                                        ". Description: " +
+                                        exp.Message);
+                        return false;
+                    }
+                }
+            }
+            Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite);
+            return false;
+        }
+
+
 
     }
 }

@@ -82,15 +82,15 @@ namespace ERwin_CA
                         foreach (var dati in AttrFile)
                             connessione.CreateAttributePassOne(dati, TemplateFile);
 
-                        ////ATTRIBUTI - PASSAGGIO DUE
-                        ////Aggiornamento dati struttura
-                        //if (!connessione.SetRootObject())
-                        //    continue;
-                        //if (!connessione.SetRootCollection())
-                        //    continue;
-                        ////############################
-                        //foreach (var dati in AttrFile)
-                        //    connessione.CreateAttributePassTwo(dati, TemplateFile);
+                        //ATTRIBUTI - PASSAGGIO DUE
+                        //Aggiornamento dati struttura
+                        if (!connessione.SetRootObject())
+                            continue;
+                        if (!connessione.SetRootCollection())
+                            continue;
+                        //############################
+                        foreach (var dati in AttrFile)
+                            connessione.CreateAttributePassTwo(dati, TemplateFile);
 
                         //Chiusura connessione per il file attuale.
                         connessione.CloseModelConnection();
