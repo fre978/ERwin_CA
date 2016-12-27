@@ -465,7 +465,7 @@ namespace ERwin_CA
                     }
                     else
                     {
-                        ExcelOps.XLSXWriteErrorInCell()
+                        //ExcelOps.XLSXWriteErrorInCell()
                         Logger.PrintLC("Unexpected Error: searching for " + entity.NomeCampoLegacy + " finding none." , 4);
                     }
                 CommitAndSave(trID);
