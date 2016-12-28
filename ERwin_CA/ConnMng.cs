@@ -261,6 +261,7 @@ namespace ERwin_CA
                 //## Controllo esistenza SCHEMA ed eventuale aggiunta ##
                 if (!string.IsNullOrWhiteSpace(entity.Schema))
                 {
+
                     if (!SchemaN.Contains(entity.Schema))
                     {
                         scSchema = erRootObjCol.Add("Schema");
