@@ -425,6 +425,222 @@ namespace ERwin_CA
         }
 
         /// <summary>
+        /// Reads and processes Table data from excel's 'TABELLE' sheet
+        /// </summary>
+        /// <param name="fileDaAprire"></param>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
+        public static List<RelationT> ReadXFileRelation(FileInfo fileDaAprire, string db, string sheet = ConfigFile.RELAZIONI)
+        {
+            string file = fileDaAprire.FullName;
+            List<RelationT> listaFile = new List<RelationT>();
+
+            if (!File.Exists(file))
+            {
+                Logger.PrintLC("Reading Tables. File " + fileDaAprire.Name + " doesn't exist.", 3);
+                return listaFile = null;
+            }
+            FileOps.RemoveAttributes(file);
+
+            if (fileDaAprire.Extension == ".xls")
+            {
+                if (!ConvertXLStoXLSX(file))
+                    return listaFile = null;
+                file = Path.ChangeExtension(file, ".xlsx");
+                fileDaAprire = new FileInfo(file);
+            }
+
+            ExcelPackage p = null;
+            ExcelWorkbook WB = null;
+            ExcelWorksheets ws = null;
+            try
+            {
+                p = new ExcelPackage(fileDaAprire);
+                WB = p.Workbook;
+                ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
+            }
+            catch(Exception exp)
+            {
+                Logger.PrintLC("Reading Relation. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 3);
+                return listaFile = null;
+            }
+            
+            bool FilesEnd = false;
+            int EmptyRow = 0;
+            
+            foreach (var worksheet in ws)
+            {
+                if (worksheet.Name == sheet)
+                {
+                    FilesEnd = false;
+                    for (int RowPos = ConfigFile.HEADER_RIGA + 1;
+                            FilesEnd != true;
+                            RowPos++)
+                    {
+                        bool incorrect = false;
+                        string error = null;
+                        string identificativoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativo relazione"]].Text;
+                        string tabellaPadre = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tabella Padre"]].Text;
+                        string tabellaFiglia = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tabella Figlia"]].Text;
+                        string cardinalita = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Cardinalità"]].Text;
+                        string campoPadre = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Campo Padre"]].Text;
+                        string campoFiglio = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Campo Figlio"]].Text;
+                        string identificativa = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativa"]].Text;
+                        string eccezione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text;
+                        string tipoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tipo Relazione"]].Text;
+                        string note = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Text;
+
+
+                        if (string.IsNullOrWhiteSpace(identificativoRelazione))
+                        {
+                            incorrect = true;
+                            error += "IDENTIFICATIVO RELAZIONE mancante. ";
+                        }
+                        if (string.IsNullOrWhiteSpace(tabellaPadre))
+                        {
+                            incorrect = true;
+                            error += "TABELLA PADRE mancante. ";
+                        }
+                        if (string.IsNullOrWhiteSpace(tabellaFiglia))
+                        {
+                            incorrect = true;
+                            error += "TABELLA FIGLIA mancante. ";
+                        }
+                        if (string.IsNullOrWhiteSpace(cardinalita))
+                        {
+                            incorrect = true;
+                            error += "CARDINALITA mancante. ";
+                        }
+                        else
+                        {
+                            if (!(cardinalita.Equals("1:1") || cardinalita.Equals("1:n")))
+                            {
+                                incorrect = true;
+                                error += "CARDINALITA non conforme. ";
+                            }
+
+                        }
+                        if (string.IsNullOrWhiteSpace(campoPadre))
+                        {
+                            incorrect = true;
+                            error += "CAMPO PADRE mancante. ";
+                        }
+                        if (string.IsNullOrWhiteSpace(campoFiglio))
+                        {
+                            incorrect = true;
+                            error += "CAMPO FIGLIO mancante. ";
+                        }
+                        if (string.IsNullOrWhiteSpace(identificativa))
+                        {
+                            incorrect = true;
+                            error += "IDENTIFICATIVA mancante. ";
+                        }
+                        else
+                        {
+                            if (!(identificativa.ToUpper().Equals("S") || identificativa.ToUpper().Equals("N")))
+                            {
+                                incorrect = true;
+                                error += "IDENTIFICATIVA non conforme. ";
+                            }
+
+                        }
+                        if (string.IsNullOrWhiteSpace(tipoRelazione))
+                        {
+                            incorrect = true;
+                            error += "TIPO RELAZIONE mancante. ";
+                        }
+                        else
+                        {
+                            string upperTipoRelazione = tipoRelazione.ToUpper();
+                            if (!(upperTipoRelazione.Equals("L") || upperTipoRelazione.Equals("LOGICA") ||
+                                upperTipoRelazione.Equals("F") || upperTipoRelazione.Equals("FISICA")))
+                            {
+                                incorrect = true;
+                                error += "TIPO RELAZIONE non conforme";
+                            } 
+
+                        }
+
+                        if (incorrect == false)
+                        { 
+                            EmptyRow = 0;
+                            RelationT ValRiga = new RelationT(row: RowPos, db: db);
+                            ValRiga.IdentificativoRelazione = identificativoRelazione;
+                            ValRiga.TabellaPadre = tabellaPadre;
+                            ValRiga.TabellaFiglia = tabellaFiglia;
+                            if (cardinalita.Equals("1:1"))
+                                ValRiga.Cardinalita = -1;
+                            else
+                                ValRiga.Cardinalita = -3;
+                            ValRiga.CampoPadre = campoPadre;
+                            ValRiga.CampoFiglio = campoFiglio;
+                            if (identificativa.ToUpper().Equals("S"))
+                                ValRiga.Identificativa = 2;
+                            else
+                                ValRiga.Identificativa = 7;
+                            switch (tipoRelazione.ToUpper())
+                            {
+                                case "L":
+                                    ValRiga.TipoRelazione = true;
+                                    break;
+                                case "LOGICA":
+                                    ValRiga.TipoRelazione = true;
+                                    break;
+                                case "F":
+                                    ValRiga.TipoRelazione = false;
+                                    break;
+                                case "FISICA":
+                                    ValRiga.TipoRelazione = false;
+                                    break;
+
+                            }
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text))
+                                ValRiga.Eccezioni = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text;
+                            if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Text))
+                                ValRiga.Note = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Text;
+                            listaFile.Add(ValRiga);
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Value = "OK";
+                        }
+                        else
+                        {
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1).Width = 10;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET2).Width = 50;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET2].Value = error;
+                            EmptyRow += 1;
+                            if (EmptyRow >= 10)
+                                FilesEnd = true;
+                        }
+                        //******************************************
+                        // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
+                        int prossime = 0;
+                        for (int i = 1; i < 11; i++)
+                        {
+                            if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._TABELLE["Nome Tabella"]].Text))
+                                prossime++;
+                        }
+                        if (prossime == 10)
+                            FilesEnd = true;
+                        //******************************************
+                    }
+                    p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    return listaFile;
+                }
+            }
+            return listaFile = null;
+        }
+
+
+
+
+
+        /// <summary>
         /// Reads and processes Attributes data from excel's 'ATTRIBUTI' sheet
         /// </summary>
         /// <param name="fileDaAprire"></param>

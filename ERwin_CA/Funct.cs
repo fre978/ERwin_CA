@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ERwin_CA.T;
 
 namespace ERwin_CA
 {
@@ -74,6 +75,132 @@ namespace ERwin_CA
                 else
                     return false;
             }
+        }
+
+        public static GlobalRelationStrut CreaGlobalRelationStrut(List<RelationT> relazioni)
+        {
+            // crea struttura
+            GlobalRelationStrut GStrut = new GlobalRelationStrut();
+            GStrut = CreaGlobalRelationStrutGrezze(relazioni);
+            GStrut = CleanGlobalRelationStrut(GStrut);
+            
+            // verifica formale dei dati
+
+            return GStrut;
+        }
+
+        public static GlobalRelationStrut CreaGlobalRelationStrutGrezze(List<RelationT> relazioni)
+        {
+            GlobalRelationStrut Gstrut = new GlobalRelationStrut();
+            if (relazioni == null)
+                return Gstrut = null;
+
+            try
+            { 
+                foreach (var rel in relazioni)
+                {
+                    //IEnumerable<RelationStrut> ExistRelationStrut = Gstrut.GlobalRelazioni.Where(x => x.ID == rel.IdentificativoRelazione);
+                    bool trovato = false;
+                    foreach (var Rstrut in Gstrut.GlobalRelazioni)
+                        if (Rstrut.ID == rel.IdentificativoRelazione)
+                        {
+                            trovato = true;
+                            Rstrut.Relazioni.Add(rel);
+                            continue;
+                        }
+                    if (trovato == false)
+                    {
+                        RelationStrut RStrut = new RelationStrut();
+                        RStrut.ID = rel.IdentificativoRelazione;
+                        RStrut.Relazioni.Add(rel);
+                        Gstrut.GlobalRelazioni.Add(RStrut);
+                    }
+                }
+            }
+            catch (Exception exp)
+            {
+                Logger.PrintLC("Error filtering relations list. Error:" + exp.Message, 3);
+                return Gstrut = null;
+            }
+
+            return Gstrut;
+        }
+
+        public static GlobalRelationStrut CleanGlobalRelationStrut(GlobalRelationStrut GStrut)
+        {
+            List<RelationStrut> errorRelationStrut = new List<RelationStrut>();
+            //verifica tutte le strutture
+            foreach (RelationStrut RStrut in GStrut.GlobalRelazioni)
+            {
+                //verifica singola struttura
+                string tabellapadreverifica = null;
+                string tabellafigliaverifica = null;
+                int? cardinalitaverifica = null;
+                int? identificativaverifica = null;
+                bool? tiporelazioneverifica = null;
+                List<string> campopadreverifica = new List<string>();
+                List<string> campofiglioverifica = new List<string>();
+                
+                int contatore = 0;
+                bool errore = false;
+
+                if (RStrut.Relazioni.Count != 1)
+                {
+                    foreach (RelationT R in RStrut.Relazioni)
+                    {
+
+                        if (contatore == 0)
+                        {
+                            tabellapadreverifica = R.TabellaPadre;
+                            tabellafigliaverifica = R.TabellaFiglia;
+                            cardinalitaverifica = R.Cardinalita;
+                            identificativaverifica = R.Identificativa;
+                            tiporelazioneverifica = R.TipoRelazione;
+                            campopadreverifica.Add(R.CampoPadre);
+                            campofiglioverifica.Add(R.CampoFiglio);
+
+                        }
+                        else
+                        {
+                            if (tabellapadreverifica != R.TabellaPadre
+                                || tabellafigliaverifica != R.TabellaFiglia
+                                || cardinalitaverifica != R.Cardinalita
+                                || identificativaverifica != R.Identificativa
+                                || tiporelazioneverifica != R.TipoRelazione)
+                            {
+                                errore = true;
+                                //PUNTO IN CUI ANDARE A SCRIVERE SULL'EXCEL ALLA RIGA APPROPRIATA
+                                continue;
+                            }
+
+
+                            if (campopadreverifica.Contains(R.CampoPadre) || campofiglioverifica.Contains(R.CampoFiglio))
+                            {
+                                errore = true;
+                                //PUNTO IN CUI ANDARE A SCRIVERE SULL'EXCEL ALLA RIGA APPROPRIATA
+                                continue;
+                            }
+                            else
+                            {
+                                campopadreverifica.Add(R.CampoPadre);
+                                campofiglioverifica.Add(R.CampoFiglio);
+                            }
+
+                        }
+                        contatore += 1;
+
+                    }
+                    if (errore == true)
+                        errorRelationStrut.Add(RStrut);
+                }
+            }
+
+            foreach (var errore in errorRelationStrut)
+            {
+                GStrut.GlobalRelazioni.Remove(errore);
+            }
+
+            return GStrut;
         }
     }
 }

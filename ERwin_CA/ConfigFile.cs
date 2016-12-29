@@ -149,6 +149,8 @@ namespace ERwin_CA
 
 
         // SEZIONE RELAZIONI
+        public static int RELAZIONI_EXCEL_COL_OFFSET1 = 11;
+        public static int RELAZIONI_EXCEL_COL_OFFSET2 = 12;
         public static Dictionary<string, int> _RELAZIONI = new Dictionary<string, int>()
         {
             {"Identificativo relazione", 1 },
@@ -160,6 +162,7 @@ namespace ERwin_CA
             {"Identificativa", 7 },
             {"Eccezioni", 8 },
             {"Tipo Relazione", 9 },
+            {"Note", 10 },
         };
 
         // ##############################

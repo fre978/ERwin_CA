@@ -101,7 +101,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="T\AttributeT.cs" />
+    <Compile Include="T\GlobalRelationStrut.cs" />
+    <Compile Include="T\RelationStrut.cs" />
     <Compile Include="T\DatabaseT.cs" />
+    <Compile Include="T\RelationT.cs" />
     <Compile Include="T\EntityT.cs" />
     <Compile Include="T\FileT.cs" />
   </ItemGroup>

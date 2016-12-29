@@ -82,6 +82,18 @@ namespace ERwin_CA
                         foreach (var dati in AttrFile)
                             connessione.CreateAttributePassOne(dati, TemplateFile);
 
+
+                        List<RelationT> DatiFileRelation = ExcelOps.ReadXFileRelation(fInfo, fileT.TipoDBMS);
+                        GlobalRelationStrut globalRelationStrut = Funct.CreaGlobalRelationStrut(DatiFileRelation);
+                        foreach (var dati in globalRelationStrut.GlobalRelazioni)
+                            connessione.CreateRelation(dati, TemplateFile);
+                        //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                        //List<AttributeT> AttrFile = null;
+                        //if (File.Exists(fInfo.FullName))
+                        //{
+                        //    AttrFile = ExcelOps.ReadXFileAttribute(fInfo, fileT.TipoDBMS);
+                        //}
+
                         //ATTRIBUTI - PASSAGGIO DUE
                         //Aggiornamento dati struttura
                         if (!connessione.SetRootObject())

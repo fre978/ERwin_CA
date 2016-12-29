@@ -28,6 +28,11 @@ namespace ERwin_CA
                              ".txt";
             //StrWr = File.AppendText(FileNameStream);
         }
+
+        /// <summary>
+        /// Scrive sul file di log standard definito nel config file
+        /// </summary>
+        /// <param name="text"></param>
         public static void PrintL(string text)
         {
             string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
@@ -37,12 +42,21 @@ namespace ERwin_CA
                 StrWr.Close();
             }
         }
+
+        /// <summary>
+        /// Scrive sulla consolle
+        /// </summary>
+        /// <param name="text"></param>
         public static void PrintC(string text)
         {
             string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
             Console.WriteLine(line);
         }
-
+        /// <summary>
+        /// scrive sia su consolle che su file di log standard
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="level"></param>
         public static void PrintLC(string text, int level = 1)
         {
             if (!(level > ConfigFile.LOG_LEVEL))
@@ -63,7 +77,12 @@ namespace ERwin_CA
                 }
             }
         }
-
+        /// <summary>
+        /// scrive su un file definito dal richiamante con possibilità di aggiungere il timestamp
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="text"></param>
+        /// <param name="timestamp"></param>
         public static void PrintF(string fileName, string text, bool timestamp = false)
         {
             string line = (timestamp ? (Timer.GetTimestampPrecision(DateTime.Now) + "    ") : "") +

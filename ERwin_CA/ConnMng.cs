@@ -285,6 +285,106 @@ namespace ERwin_CA
             return scItem;
         }
 
+        public SCAPI.ModelObject CreateRelation(RelationStrut relation, string db)
+        {
+            //SCAPI.ModelObject ret = null;
+            //if (string.IsNullOrWhiteSpace(db))
+            //{
+            //    Logger.PrintLC("There was no DB associated to " + relation.IdentificativoRelazione, 3);
+            //    return ret;
+            //}
+
+            //if (erRootObjCol != null)
+            //{
+            //    OpenTransaction();
+
+            //    erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+
+            //    VBCon con = new VBCon();
+            //    relation.TabellaPadre
+
+            //    erEntityObjectPE = null;
+
+            //    if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
+            //    {
+            //        Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.", 3);
+            //        CommitAndSave(trID);
+            //        return ret = null;
+            //    }
+
+            //    if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
+            //        Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly", 3);
+            //    else
+            //    {
+            //        Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.", 3);
+            //        CommitAndSave(trID);
+            //        return ret = null;
+            //    }
+
+            //    //Area
+            //    if (!string.IsNullOrWhiteSpace(entity.Area))
+            //        if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Area"], entity.Area))
+            //            Logger.PrintLC("Added Area to " + erEntityObjectPE.Name, 3);
+            //        else
+            //            Logger.PrintLC("Error adding Area to " + erEntityObjectPE.Name, 3);
+            //    //Tipologia Tabella
+            //    if (!string.IsNullOrWhiteSpace(entity.TipologiaTabella))
+            //        if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Tipologia Tabella"], entity.TipologiaTabella))
+            //            Logger.PrintLC("Added Tipologia Tabella to " + erEntityObjectPE.Name, 3);
+            //        else
+            //            Logger.PrintLC("Error adding Tipologia Tabella to " + erEntityObjectPE.Name, 3);
+            //    //Storica
+            //    if (!string.IsNullOrWhiteSpace(entity.Storica))
+            //        if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Storica"], entity.Storica))
+            //            Logger.PrintLC("Added Storica to " + erEntityObjectPE.Name, 3);
+            //        else
+            //            Logger.PrintLC("Error adding Storica to " + erEntityObjectPE.Name, 3);
+
+            //    erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
+
+            //    if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
+            //        if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
+            //            Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.", 3);
+            //        else
+            //        {
+            //            erAttributeObjectPE = erAttributeObjCol.Add("Attribute");
+            //            //Name
+            //            if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
+            //            {
+            //                if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], entity.NomeCampoLegacy))
+            //                    Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 4);
+            //                else
+            //                    Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
+            //                //Physical Name
+            //                if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy))
+            //                    Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
+            //                else
+            //                    Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
+            //            }
+            //            //Datatype
+            //            if (!string.IsNullOrWhiteSpace(entity.DataType))
+            //                if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Datatype"], entity.DataType))
+            //                    Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 4);
+            //                else
+            //                    Logger.PrintLC("Error adding Datatype to " + erAttributeObjectPE.Name, 4);
+            //            //Chiave
+            //            if (entity.Chiave == 0 || entity.Chiave == 100)
+            //                if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], (int)entity.Chiave))
+            //                    Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 4);
+            //                else
+            //                    Logger.PrintLC("Error adding Chiave to " + erAttributeObjectPE.Name, 4);
+            //            //Mandatory Flag
+            //            if (entity.MandatoryFlag == 1 || entity.MandatoryFlag == 0)
+            //                if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Mandatory Flag"], (int)entity.MandatoryFlag))
+            //                    Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 4);
+            //                else
+            //                    Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 4);
+
+            //        }
+            //    CommitAndSave(trID);
+            //}
+            return new SCAPI.ModelObject();
+        }
 
         public SCAPI.ModelObject CreateAttributePassOne(AttributeT entity, string db)
         {
