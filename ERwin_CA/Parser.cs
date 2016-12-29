@@ -34,7 +34,7 @@ namespace ERwin_CA
                 file.SSA = fileComponents[0];
                 file.Acronimo = fileComponents[1];
                 file.NomeModello = fileComponents[2];
-                file.TipoDBMS = fileComponents[3];
+                file.TipoDBMS = fileComponents[3].ToUpper();
                 file.Estensione = fileComponents[4];
             }
             catch (Exception exp)

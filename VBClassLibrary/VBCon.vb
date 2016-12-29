@@ -31,6 +31,17 @@
         End Try
     End Function
 
+    Public Function RetrieveFromObjModel(model As SCAPI.ModelObject,
+                                     prop As String, ByRef value As String) As Boolean
+        Try
+            If model.Properties.HasProperty(prop) Then
+                value = model.Properties(prop).FormatAsString()
+            End If
+        Catch
+            Return False
+        End Try
+    End Function
+
     ''' <summary>
     ''' Assign an INTEGER value to a model
     ''' </summary>

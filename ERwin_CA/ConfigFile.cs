@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,10 @@ namespace ERwin_CA
         // SEZIONE DATABASE
         public const string ERWIN_TEMPLATE_DB2 = @"D:\TEST\Template_DB2_LF.erwin";
         public const string ERWIN_TEMPLATE_ORACLE = @"D:\TEST\Template_Oracle_LF.erwin";
-        public static List<string> DBS = new List<string> { "DB2", "ORACLE" };
+
+        private static string tempString = ConfigurationSettings.AppSettings["DBS"].ToUpper();
+        public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE" }; //Sempre Upper case
+
         public const string DB2_NAME = "DB2";
         public const string ORACLE = "Oracle";
         public const string SQLSERVER = "SqlServer";

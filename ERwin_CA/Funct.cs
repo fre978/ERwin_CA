@@ -132,20 +132,21 @@ namespace ERwin_CA
             //verifica tutte le strutture
             foreach (RelationStrut RStrut in GStrut.GlobalRelazioni)
             {
-                //verifica singola struttura
-                string tabellapadreverifica = null;
-                string tabellafigliaverifica = null;
-                int? cardinalitaverifica = null;
-                int? identificativaverifica = null;
-                bool? tiporelazioneverifica = null;
-                List<string> campopadreverifica = new List<string>();
-                List<string> campofiglioverifica = new List<string>();
-                
-                int contatore = 0;
-                bool errore = false;
-
                 if (RStrut.Relazioni.Count != 1)
                 {
+                    //verifica singola struttura
+                    string tabellapadreverifica = null;
+                    string tabellafigliaverifica = null;
+                    int? cardinalitaverifica = null;
+                    int? identificativaverifica = null;
+                    bool? tiporelazioneverifica = null;
+                    List<string> campopadreverifica = new List<string>();
+                    List<string> campofiglioverifica = new List<string>();
+                
+                    int contatore = 0;
+                    bool errore = false;
+
+                
                     foreach (RelationT R in RStrut.Relazioni)
                     {
 

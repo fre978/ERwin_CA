@@ -77,6 +77,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Librerie\EPPlus.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
