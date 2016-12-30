@@ -488,7 +488,7 @@ namespace ERwin_CA
                         string identificativa = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativa"]].Text;
                         string eccezione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text;
                         string tipoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tipo Relazione"]].Text;
-                        string note = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Value.ToString();
+                        string note = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Text;
 
 
                         if (string.IsNullOrWhiteSpace(identificativoRelazione))

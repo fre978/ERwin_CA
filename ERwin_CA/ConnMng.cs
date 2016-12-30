@@ -311,10 +311,10 @@ namespace ERwin_CA
                     foreach (var R in relation.Relazioni)
                     {
                         int countKey = 0;
-                        SCAPI.ModelObject tabellaPadre = new SCAPI.ModelObject();
-                        SCAPI.ModelObject tabellaFiglio = new SCAPI.ModelObject();
-                        SCAPI.ModelObject campoPadre = new SCAPI.ModelObject();
-                        SCAPI.ModelObject campoFiglio = new SCAPI.ModelObject();
+                        SCAPI.ModelObject tabellaPadre = null;
+                        SCAPI.ModelObject tabellaFiglio = null;
+                        SCAPI.ModelObject campoPadre = null;
+                        SCAPI.ModelObject campoFiglio = null;
                         
                         //cerchiamo la tabella padre
                         if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre))
@@ -480,7 +480,7 @@ namespace ERwin_CA
                     CommitAndSave(trID);
                     return ret;
                 }
-                catch
+                catch (Exception exc)
                 {
                     CommitAndSave(trID);
                     return ret;
