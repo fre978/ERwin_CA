@@ -19,24 +19,8 @@
     Public Function AssignToObjModel(ByRef model As SCAPI.ModelObject,
                                      prop As String, value As String) As Boolean
         Try
-            If model.Properties.HasProperty(prop) Then
-                model.Properties(prop).Value = value
-                Return True
-            Else
-                model.Properties(prop).Value = value
-                Return True
-            End If
-        Catch
-            Return False
-        End Try
-    End Function
-
-    Public Function RetrieveFromObjModel(model As SCAPI.ModelObject,
-                                     prop As String, ByRef value As String) As Boolean
-        Try
-            If model.Properties.HasProperty(prop) Then
-                value = model.Properties(prop).FormatAsString()
-            End If
+            model.Properties(prop).Value = value
+            Return True
         Catch
             Return False
         End Try
@@ -58,6 +42,27 @@
             Return False
         End Try
         Return False
+    End Function
+
+    ''' <summary>
+    ''' Read property of an object
+    ''' </summary>
+    ''' <param name="model"></param>
+    ''' <param name="prop"></param>
+    ''' <param name="value"></param>
+    ''' <returns></returns>
+    Public Function RetrieveFromObjModel(model As SCAPI.ModelObject,
+                                     prop As String, ByRef value As String) As Boolean
+        Try
+            If model.Properties.HasProperty(prop) Then
+                value = model.Properties(prop).Value
+                Return True
+            Else
+                Return False
+            End If
+        Catch
+            Return False
+        End Try
     End Function
 
     Public Function RetriveEntity(ByRef model As SCAPI.ModelObject,

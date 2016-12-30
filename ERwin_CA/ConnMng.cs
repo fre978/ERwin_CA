@@ -296,10 +296,11 @@ namespace ERwin_CA
 
             if (erRootObjCol != null)
             {
-                OpenTransaction();
+                
 
                 try
                 {
+                    OpenTransaction();
                     //collezione completa delle entity
                     erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
 
@@ -316,28 +317,26 @@ namespace ERwin_CA
                         SCAPI.ModelObject campoPadre = null;
                         SCAPI.ModelObject campoFiglio = null;
                         
+                        #region verificheErwin
                         //cerchiamo la tabella padre
                         if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre))
                         {
-                            Logger.PrintLC("Could not find table " + R.TabellaPadre + " inside relation ID " + relation.ID, 3);
+                            Logger.PrintLC("Relation ignored: Could not find table " + R.TabellaPadre + " inside relation ID " + relation.ID, 3);
                             CommitAndSave(trID);
                             return ret = null;
                         }
-
                         //cerchiamo la tabella figlia
                         if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia))
                         {
-                            Logger.PrintLC("Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID, 3);
+                            Logger.PrintLC("Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID, 3);
                             CommitAndSave(trID);
                             return ret = null;
                         }
-
-
                         //esistenza campo padre
                         SCAPI.ModelObjects erAttributesPadre = scSession.ModelObjects.Collect(tabellaPadre, "Attribute");
                         if (!con.RetriveAttribute(ref campoPadre, erAttributesPadre, R.CampoPadre))
                         {
-                            Logger.PrintLC("Could not find field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID, 3);
+                            Logger.PrintLC("Relation Ignored: Could not find field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID, 3);
                             CommitAndSave(trID);
                             return ret = null;
                         }
@@ -349,19 +348,16 @@ namespace ERwin_CA
                             {
                                 if (!con.RetrieveFromObjModel(attributo, "Type", ref isKey))
                                 {
-                                    Logger.PrintLC("Could not find attribute Type of field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID, 4);
+                                    Logger.PrintLC("Relation Ignored: Could not find attribute Type of field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID, 4);
                                     CommitAndSave(trID);
                                     return ret = null;
                                 }
                                 else
                                 {
-                                    
                                     if (isKey == "0")
                                     {
                                         countKey += 1;
                                     }
-                                    
-
                                 }
                             }
                             if (countKey != countRelazioni)
@@ -370,12 +366,9 @@ namespace ERwin_CA
                                 CommitAndSave(trID);
                                 return ret = null;
                             }
-
                         }
-
-
                         //esistenza campo figlio
-                        SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaPadre, "Attribute");
+                        SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
                         if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio))
                         {
                             Logger.PrintLC("Could not find field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID, 3);
@@ -387,95 +380,101 @@ namespace ERwin_CA
                             // if rel=identificativa is key
                             if (R.Identificativa == 2)
                             {
-
+                                string isKey = null;
+                                if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
+                                {
+                                    Logger.PrintLC("Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID, 4);
+                                    CommitAndSave(trID);
+                                    return ret = null;
+                                }
+                                else
+                                {
+                                    if (isKey != "0")
+                                    {
+                                        Logger.PrintLC("Relation Ignored: " + R.CampoFiglio + "expected Key inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID, 4);
+                                        CommitAndSave(trID);
+                                        return ret = null;
+                                    }
+                                }
                             }
                         }
+                        #endregion
+
+                        #region creazionerelazioni;
+
+                        //creare relazione su erwin
+                        SetRootObject();
+                        SetRootCollection();
+                        scItem = erRootObjCol.Add("Relationship");
+
                         
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Identificativo relazione"],R.IdentificativoRelazione))
+                            Logger.PrintLC("Added Relation Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3);
+                        else
+                        {
+                            Logger.PrintLC("Error adding Relation Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3);
+                            CommitAndSave(trID);
+                            return scItem;
+                        }
+
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Padre"], R.TabellaPadre))
+                            Logger.PrintLC("Added Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3);
+                        else
+                        {
+                            Logger.PrintLC("Error adding Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3);
+                            CommitAndSave(trID);
+                            return scItem;
+                        }
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Figlia"], R.TabellaFiglia))
+                            Logger.PrintLC("Added Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3);
+                        else
+                        {
+                            Logger.PrintLC("Error adding Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3);
+                            CommitAndSave(trID);
+                            return scItem;
+                        }
+                        int myInt = (R.Cardinalita == null) ? 0 : (int)R.Cardinalita;
+                        if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Cardinalita"],myInt ))
+                            Logger.PrintLC("Added Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name, 3);
+                        else
+                        {
+                            Logger.PrintLC("Error adding Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name, 3);
+                            CommitAndSave(trID);
+                            return scItem;
+                        }
+                        myInt = (R.TipoRelazione == true) ? 1 : 0;
+                        if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Tipo Relazione"], myInt))
+                            Logger.PrintLC("Added Relation Type (" + R.TipoRelazione + ") to " + scItem.Name, 3);
+                        else
+                        {
+                            Logger.PrintLC("Error adding Relation Type (" + R.TipoRelazione + ") to " + scItem.Name, 3);
+                            CommitAndSave(trID);
+                            return scItem;
+                        }
+                        if (!string.IsNullOrWhiteSpace(R.Note))
+                        {
+                            if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Note"], R.Note))
+                                Logger.PrintLC("Added Relation Note (" + R.Note + ") to " + scItem.Name, 3);
+                            else
+                            {
+                                Logger.PrintLC("Error adding Relation Note (" + R.Note + ") to " + scItem.Name, 3);
+                                CommitAndSave(trID);
+                                return scItem;
+                            }
+                        }
+                        if (!string.IsNullOrWhiteSpace(R.Eccezioni))
+                        {
+                            if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Eccezioni"], R.Eccezioni))
+                                Logger.PrintLC("Added Relation Exceptions (" + R.Eccezioni + ") to " + scItem.Name, 3);
+                            else
+                            {
+                                Logger.PrintLC("Error adding Relation Exceptions (" + R.Eccezioni + ") to " + scItem.Name, 3);
+                                CommitAndSave(trID);
+                                return scItem;
+                            }
+                        }
+                        #endregion
                     }
-
-                    //check numero campi padre
-                    //if countRelazioni != 
-
-                    #region commenti
-                    //    erEntityObjectPE = null;
-
-                    //    if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
-                    //    {
-                    //        Logger.PrintLC("'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.", 3);
-                    //        CommitAndSave(trID);
-                    //        return ret = null;
-                    //    }
-
-                    //    if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
-                    //        Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly", 3);
-                    //    else
-                    //    {
-                    //        Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " not found. Skipping the Attribute.", 3);
-                    //        CommitAndSave(trID);
-                    //        return ret = null;
-                    //    }
-
-                    //    //Area
-                    //    if (!string.IsNullOrWhiteSpace(entity.Area))
-                    //        if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Area"], entity.Area))
-                    //            Logger.PrintLC("Added Area to " + erEntityObjectPE.Name, 3);
-                    //        else
-                    //            Logger.PrintLC("Error adding Area to " + erEntityObjectPE.Name, 3);
-                    //    //Tipologia Tabella
-                    //    if (!string.IsNullOrWhiteSpace(entity.TipologiaTabella))
-                    //        if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Tipologia Tabella"], entity.TipologiaTabella))
-                    //            Logger.PrintLC("Added Tipologia Tabella to " + erEntityObjectPE.Name, 3);
-                    //        else
-                    //            Logger.PrintLC("Error adding Tipologia Tabella to " + erEntityObjectPE.Name, 3);
-                    //    //Storica
-                    //    if (!string.IsNullOrWhiteSpace(entity.Storica))
-                    //        if (con.AssignToObjModel(ref erEntityObjectPE, ConfigFile._ATT_NAME["Storica"], entity.Storica))
-                    //            Logger.PrintLC("Added Storica to " + erEntityObjectPE.Name, 3);
-                    //        else
-                    //            Logger.PrintLC("Error adding Storica to " + erEntityObjectPE.Name, 3);
-
-                    //    erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
-
-                    //    if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
-                    //        if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
-                    //            Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.", 3);
-                    //        else
-                    //        {
-                    //            erAttributeObjectPE = erAttributeObjCol.Add("Attribute");
-                    //            //Name
-                    //            if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
-                    //            {
-                    //                if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], entity.NomeCampoLegacy))
-                    //                    Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 4);
-                    //                else
-                    //                    Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
-                    //                //Physical Name
-                    //                if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy))
-                    //                    Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
-                    //                else
-                    //                    Logger.PrintLC("Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name, 4);
-                    //            }
-                    //            //Datatype
-                    //            if (!string.IsNullOrWhiteSpace(entity.DataType))
-                    //                if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Datatype"], entity.DataType))
-                    //                    Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 4);
-                    //                else
-                    //                    Logger.PrintLC("Error adding Datatype to " + erAttributeObjectPE.Name, 4);
-                    //            //Chiave
-                    //            if (entity.Chiave == 0 || entity.Chiave == 100)
-                    //                if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], (int)entity.Chiave))
-                    //                    Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 4);
-                    //                else
-                    //                    Logger.PrintLC("Error adding Chiave to " + erAttributeObjectPE.Name, 4);
-                    //            //Mandatory Flag
-                    //            if (entity.MandatoryFlag == 1 || entity.MandatoryFlag == 0)
-                    //                if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Mandatory Flag"], (int)entity.MandatoryFlag))
-                    //                    Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 4);
-                    //                else
-                    //                    Logger.PrintLC("Error adding Mandatory Flag to " + erAttributeObjectPE.Name, 4);
-
-                    //        }
-                    #endregion
 
                     CommitAndSave(trID);
                     return ret;

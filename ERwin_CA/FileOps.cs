@@ -27,6 +27,7 @@ namespace ERwin_CA
         public static List<string> CleanDuplicates(List<string> list)
         {
             List<string> nlist = new List<string>();
+            List<string> trueList = new List<string>();
             if (list != null)
             {
                 //foreach(var x in list)
@@ -44,6 +45,17 @@ namespace ERwin_CA
                         nlist.Add(x);
                     }
                 }
+                List<string> nameList = new List<string>(); //da aggiungere fuori dall'IF
+                foreach (var elemento in nlist)
+                {
+                    if (!(nameList.Contains(Path.GetFileNameWithoutExtension(elemento))))
+                    {
+                        nameList.Add(Path.GetFileNameWithoutExtension(elemento));
+                        trueList.Add(elemento);
+                    }
+                }
+                
+
             }
             return nlist;
         }
