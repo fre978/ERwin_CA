@@ -492,7 +492,7 @@ namespace ERwin_CA
                                 Logger.PrintLC("Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID, 3);
                                 CommitAndSave(trID);
                                 return ret = null;
-                            }
+                            } 
                             //Recuperiamo l'Attributo con il nome Campo Padre (aggiunto con la relazione)
                             if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoPadre))
                             {
