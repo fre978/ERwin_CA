@@ -479,7 +479,7 @@ namespace ERwin_CA
                             }
                         }
                         #endregion
-                        CommitAndSave(trID);
+                        CommitAndSave(trID); 
 
                         //Rename Campo Padre nella Tabella Figlia
                         if (R.CampoFiglio != R.CampoPadre)
