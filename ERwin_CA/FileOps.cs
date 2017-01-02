@@ -54,10 +54,8 @@ namespace ERwin_CA
                         trueList.Add(elemento);
                     }
                 }
-                
-
             }
-            return nlist;
+            return trueList;
         }
 
         private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)

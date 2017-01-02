@@ -85,6 +85,8 @@ namespace ERwin_CA
 
                         List<RelationT> DatiFileRelation = ExcelOps.ReadXFileRelation(fInfo, fileT.TipoDBMS);
                         GlobalRelationStrut globalRelationStrut = Funct.CreaGlobalRelationStrut(DatiFileRelation);
+                        object temp = connessione.trID;
+                        connessione.CommitAndSave(temp);
                         foreach (var dati in globalRelationStrut.GlobalRelazioni)
                             connessione.CreateRelation(dati, TemplateFile);
                         //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));

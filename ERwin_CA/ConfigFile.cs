@@ -17,9 +17,14 @@ namespace ERwin_CA
         // SEZIONE ESECUZIONE
         public static int LOG_LEVEL = 4;
 
+        public static string BASE_PATH = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+        public static string APP_PATH = System.IO.Path.GetDirectoryName(BASE_PATH).Replace("file:\\", "");
+        public static string DRIVE = ConfigurationSettings.AppSettings["Drive"];
+        public static string SEARCH_PATH = ConfigurationSettings.AppSettings["Search Folder"];
+
         // SEZIONE DATABASE
-        public const string ERWIN_TEMPLATE_DB2 = @"D:\TEST\Template_DB2_LF.erwin";
-        public const string ERWIN_TEMPLATE_ORACLE = @"D:\TEST\Template_Oracle_LF.erwin";
+        public static string ERWIN_TEMPLATE_DB2 = APP_PATH + @"\Template\Template_DB2_LF.erwin";
+        public static string ERWIN_TEMPLATE_ORACLE = APP_PATH + @"\Template\Template_Oracle_LF.erwin";
 
         private static string tempString = ConfigurationSettings.AppSettings["DBS"].ToUpper();
         public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE" }; //Sempre Upper case
@@ -27,14 +32,14 @@ namespace ERwin_CA
         public const string DB2_NAME = "DB2";
         public const string ORACLE = "Oracle";
         public const string SQLSERVER = "SqlServer";
+        //public static string dd = AppDomain.CurrentDomain.BaseDirectory;
 
         // SEZIONE FILE
-        public static string LOG_FILE = @"D:\TEST\Log.txt";
-        public static string ERWIN_FILE = @"D:\ERwin\Template_DB2_LF - Copia.erwin";
-        public static string ROOT = @"D:\TEST\";
+        public static string LOG_FILE = APP_PATH + @"\Logs\Log.txt";
+        public static string ROOT = SEARCH_PATH;
         
         // SEZIONE CARTELLE
-        public static string FOLDERDESTINATION_GENERAL = @"D:\TEST\Output";
+        public static string FOLDERDESTINATION_GENERAL = ROOT + @"Output";
         public static string FOLDERDESTINATION;
 
         // SEZIONE GENERALE
@@ -63,8 +68,8 @@ namespace ERwin_CA
         public static int HEADER_MAX_COLONNE_ATTRIBUTI = 18;
 
         public static int HEADER_COLONNA_MIN_RELAZIONI = 1;
-        public static int HEADER_COLONNA_MAX_RELAZIONI = 9;
-        public static int HEADER_MAX_COLONNE_RELAZIONI = 9;
+        public static int HEADER_COLONNA_MAX_RELAZIONI = 10;
+        public static int HEADER_MAX_COLONNE_RELAZIONI = 10;
 
         public static int SSA;
 

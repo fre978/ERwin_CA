@@ -293,22 +293,15 @@ namespace ERwin_CA
                 Logger.PrintLC("There was no DB associated to " + relation.ID, 3);
                 return ret;
             }
-
             if (erRootObjCol != null)
             {
-                
-
                 try
                 {
                     OpenTransaction();
                     //collezione completa delle entity
                     erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
-
                     int countRelazioni = relation.Relazioni.Count;
-                    
-
                     VBCon con = new VBCon();
-
                     foreach (var R in relation.Relazioni)
                     {
                         int countKey = 0;
@@ -342,7 +335,7 @@ namespace ERwin_CA
                         }
                         else
                         {
-                            //is key
+                            //key
                             string isKey = null;
                             foreach (SCAPI.ModelObject attributo in erAttributesPadre)
                             {
@@ -367,11 +360,12 @@ namespace ERwin_CA
                                 return ret = null;
                             }
                         }
+                        
                         //esistenza campo figlio
                         SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
                         if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio))
                         {
-                            Logger.PrintLC("Could not find field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID, 3);
+                            Logger.PrintLC("Could not find Child Field " + R.CampoFiglio + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID, 3);
                             CommitAndSave(trID);
                             return ret = null;
                         }
@@ -401,12 +395,11 @@ namespace ERwin_CA
                         #endregion
 
                         #region creazionerelazioni;
-
                         //creare relazione su erwin
                         SetRootObject();
                         SetRootCollection();
                         scItem = erRootObjCol.Add("Relationship");
-
+                        //CommitAndSave(trID);
                         
                         if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Identificativo relazione"],R.IdentificativoRelazione))
                             Logger.PrintLC("Added Relation Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3);
@@ -416,7 +409,7 @@ namespace ERwin_CA
                             CommitAndSave(trID);
                             return scItem;
                         }
-
+                        
                         if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Padre"], R.TabellaPadre))
                             Logger.PrintLC("Added Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3);
                         else
@@ -425,6 +418,7 @@ namespace ERwin_CA
                             CommitAndSave(trID);
                             return scItem;
                         }
+                        
                         if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Figlia"], R.TabellaFiglia))
                             Logger.PrintLC("Added Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3);
                         else
@@ -433,6 +427,17 @@ namespace ERwin_CA
                             CommitAndSave(trID);
                             return scItem;
                         }
+
+                        if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Identificativa"], (int)R.Identificativa))
+                            Logger.PrintLC("Added Relation Identifiable (" + R.Identificativa + ") to " + scItem.Name, 3);
+                        else
+                        {
+                            Logger.PrintLC("Error adding Relation Identifiable (" + R.Identificativa + ") to " + scItem.Name, 3);
+                            CommitAndSave(trID);
+                            return scItem;
+                        }
+
+                        //CommitAndSave(trID);
                         int myInt = (R.Cardinalita == null) ? 0 : (int)R.Cardinalita;
                         if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Cardinalita"],myInt ))
                             Logger.PrintLC("Added Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name, 3);
@@ -443,7 +448,7 @@ namespace ERwin_CA
                             return scItem;
                         }
                         myInt = (R.TipoRelazione == true) ? 1 : 0;
-                        if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Tipo Relazione"], myInt))
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tipo Relazione"], "False"))
                             Logger.PrintLC("Added Relation Type (" + R.TipoRelazione + ") to " + scItem.Name, 3);
                         else
                         {
@@ -474,9 +479,51 @@ namespace ERwin_CA
                             }
                         }
                         #endregion
+                        CommitAndSave(trID);
+
+                        //Rename Campo Padre nella Tabella Figlia
+                        if (R.CampoFiglio != R.CampoPadre)
+                        {
+                            OpenTransaction();
+                            //Recuperiamo nuovamente la Tabella Figlio
+                            erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+                            if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia))
+                            {
+                                Logger.PrintLC("Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID, 3);
+                                CommitAndSave(trID);
+                                return ret = null;
+                            }
+                            //Recuperiamo l'Attributo con il nome Campo Padre (aggiunto con la relazione)
+                            if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoPadre))
+                            {
+                                Logger.PrintLC("Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID, 4);
+                                CommitAndSave(trID);
+                                return ret = null;
+                            }
+                            else
+                            {
+                                if (con.AssignToObjModel(ref campoFiglio, "Name", R.CampoFiglio))
+                                    Logger.PrintLC("Renamed Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4);
+                                else
+                                {
+                                    Logger.PrintLC("Failed Rename: could not find rename Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId, 4);
+                                    CommitAndSave(trID);
+                                    return ret = null;
+                                }
+                                if (con.AssignToObjModel(ref campoFiglio, "PhysicalName", R.CampoFiglio))
+                                    Logger.PrintLC("Renamed (Physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4);
+                                else
+                                {
+                                    Logger.PrintLC("Failed Rename (Physical): could not find rename Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId, 4);
+                                    CommitAndSave(trID);
+                                    return ret = null;
+                                }
+                                CommitAndSave(trID);
+                            }
+                        }
                     }
 
-                    CommitAndSave(trID);
+                    //CommitAndSave(trID);
                     return ret;
                 }
                 catch (Exception exc)
