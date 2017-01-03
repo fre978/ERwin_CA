@@ -37,9 +37,10 @@ namespace ERwin_CA
         // SEZIONE FILE
         public static string LOG_FILE = APP_PATH + @"\Logs\Log.txt";
         public static string ROOT = SEARCH_PATH;
-        
+
         // SEZIONE CARTELLE
-        public static string FOLDERDESTINATION_GENERAL = ROOT + @"Output";
+        private static string DEST_FOLD_NAME = ConfigurationSettings.AppSettings["Destination Folder Name"];
+        public static string FOLDERDESTINATION_GENERAL = ROOT + DEST_FOLD_NAME;
         public static string FOLDERDESTINATION;
 
         // SEZIONE GENERALE

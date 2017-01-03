@@ -481,6 +481,7 @@ namespace ERwin_CA
                         #endregion
                         CommitAndSave(trID); 
 
+                        //***************************************
                         //Rename Campo Padre nella Tabella Figlia
                         if (R.CampoFiglio != R.CampoPadre)
                         {
@@ -502,19 +503,19 @@ namespace ERwin_CA
                             }
                             else
                             {
-                                if (con.AssignToObjModel(ref campoFiglio, "Name", R.CampoFiglio))
+                                //if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio))
+                                //    Logger.PrintLC("Renamed (Physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4);
+                                //else
+                                //{
+                                //    Logger.PrintLC("Failed Rename (Physical): could not find rename Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId, 4);
+                                //    CommitAndSave(trID);
+                                //    return ret = null;
+                                //}
+                                if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio))
                                     Logger.PrintLC("Renamed Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4);
                                 else
                                 {
                                     Logger.PrintLC("Failed Rename: could not find rename Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId, 4);
-                                    CommitAndSave(trID);
-                                    return ret = null;
-                                }
-                                if (con.AssignToObjModel(ref campoFiglio, "PhysicalName", R.CampoFiglio))
-                                    Logger.PrintLC("Renamed (Physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4);
-                                else
-                                {
-                                    Logger.PrintLC("Failed Rename (Physical): could not find rename Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId, 4);
                                     CommitAndSave(trID);
                                     return ret = null;
                                 }

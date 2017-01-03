@@ -162,12 +162,14 @@ namespace ERwin_CA
             bool sheetFound = false;
             bool columnsFound = false;
             int columns = 0;
+            int[] check_sheet = new int[3] { 0, 0, 0 };
             foreach (var worksheet in ws)
             {
                 // SEZIONE TABELLE
                 if (worksheet.Name == ConfigFile.TABELLE)
                 {
                     columns = 0;
+                    check_sheet[0] += 1;
                     sheetFound = true;
                     columnsFound = false;
                     //List<string> dd = new List<string>();
@@ -195,15 +197,12 @@ namespace ERwin_CA
                         columnsFound = true;
                     else
                         goto ERROR;
-                    //worksheet.Cell[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    //worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(184, 204, 228));
-                    //worksheet.Cells[1, 1].Style.Font.Bold = true;
-                    //p.Save();
                 }
 
                 // SEZIONE ATTRIBUTI
                 if (worksheet.Name == ConfigFile.ATTRIBUTI)
                 {
+                    check_sheet[1] += 1;
                     columns = 0;
                     columnsFound = false;
                     sheetFound = true;
@@ -234,6 +233,7 @@ namespace ERwin_CA
                 // SEZIONE RELAZIONI
                 if (worksheet.Name == ConfigFile.RELAZIONI)
                 {
+                    check_sheet[2] += 1;
                     columns = 0;
                     columnsFound = false;
                     sheetFound = true;
@@ -278,14 +278,23 @@ namespace ERwin_CA
                 FileOps.RemoveAttributes(fileCorrect);
                 File.Delete(fileCorrect);
             }
-            if (sheetFound != true || columnsFound != true)
+            if(check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1)
             {
-                Logger.PrintLC(fileDaAprire.Name + ": file NON idoneo all'elaborazione.", 2);
-                Logger.PrintF(fileError, "File columns not formatted correctly.", true);
+                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: at least one Sheet is missing from the file.", 2);
+                Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
+                Logger.PrintF(fileError, "Foglio (o Fogli) mancante/i.", true);
                 return false;
             }
-            Logger.PrintLC(fileDaAprire.Name + ": file IDONEO all'elaborazione.", 2);
-            Logger.PrintF(fileCorrect, "File columns formatted correctly.", true);
+            if (sheetFound != true || columnsFound != true)
+            {
+                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: Columns or Sheets are not in the expected format.", 2);
+                Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
+                Logger.PrintF(fileError, "Colonne o Fogli non formattati correttamente.", true);
+                return false;
+            }
+            Logger.PrintLC(fileDaAprire.Name + ": file valid to be processed.", 2);
+            Logger.PrintF(fileCorrect, "er_driveup – Caricamento Excel su ERwin", true);
+            Logger.PrintF(fileCorrect, "Colonne e Fogli formattati corretamente.", true);
             return true;
         }
 

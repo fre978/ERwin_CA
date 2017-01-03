@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERwin_CA", "ERwin_CA\ERwin_CA.csproj", "{04B7F4E7-99DB-4DF6-BE04-7F972C0DB3DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "er_driveup", "ERwin_CA\er_driveup.csproj", "{04B7F4E7-99DB-4DF6-BE04-7F972C0DB3DC}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VBClassLibrary", "VBClassLibrary\VBClassLibrary.vbproj", "{2E708B36-0582-46F6-BB94-8A257A7B3AF2}"
 EndProject
