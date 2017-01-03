@@ -9,6 +9,29 @@ namespace ERwin_CA
 {
     class Funct
     {
+        public static List<string> DetermineElaborated(List<string> completi, List<string> elaborati)
+        {
+            List<string> restituzione = new List<string>();
+            if (completi == null)
+                return null;
+            if (elaborati == null)
+            {
+                foreach(string elemento in completi)
+                {
+                    restituzione.Add(elemento + ": NOT processed.");
+                }
+                return restituzione;
+            }
+            foreach(string elemento in completi)
+            {
+                if (elaborati.Contains(elemento))
+                    restituzione.Add(elemento + ": PROCESSED.");
+                else
+                    restituzione.Add(elemento + ": NOT processed.");
+            }
+            return restituzione;
+        }
+
         public static bool ParseDataType(string value, string databaseType)
         {
             string[] actualDB = null;

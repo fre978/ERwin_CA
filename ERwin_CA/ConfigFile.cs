@@ -16,15 +16,17 @@ namespace ERwin_CA
 
         // SEZIONE ESECUZIONE
         public static int LOG_LEVEL = 2;
-        public static void RefreshLogLevel()
+        public static bool RefreshLogLevel()
         {
             try
             {
                 int.TryParse(ConfigurationSettings.AppSettings["Log Level"], out LOG_LEVEL);
+                return true;
             }
             catch
             {
                 LOG_LEVEL = 4;
+                return false;
             }
         }
         
@@ -57,15 +59,135 @@ namespace ERwin_CA
         public static string FOLDERDESTINATION;
 
         // SEZIONE GENERALE
-        public static char[] DELIMITER_NAME_FILE = { '_', '.' };
+        public static char[] DELIMITER_NAME_FILE = new char[10];
+        public static bool RefreshDelimiters()
+        {
+            try
+            {
+                List<string> lista = ConfigurationSettings.AppSettings["File Name Delimiter"].Split('|').ToList();
+                if (lista.Count > 10)
+                    lista.RemoveRange(10, lista.Count - 10);
+                string[] newLista = lista.ToArray();
+                int x = 0;
+                foreach (string elemento in lista)
+                {
+                    DELIMITER_NAME_FILE[x] = elemento[0];
+                    x++;
+                }
+                return true;
+            }
+            catch
+            {
+                DELIMITER_NAME_FILE[0] = '_';
+                DELIMITER_NAME_FILE[1] = '.';
+                return false;
+            }
+        }
         public static string[] DATATYPE_DB2 = {"char", "char()", "varchar()", "clob", "clob()",
                                                "date", "time", "timestamp", "timestamp()",
                                                "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint",
                                                "blob", "blob()", "binary", "binary()"};
+        public static bool RefreshDatatypeDB2()
+        {
+            try
+            {
+                DATATYPE_DB2 = ConfigurationSettings.AppSettings["DB2 Types"].Split('|');
+                return true;
+            }
+            catch
+            {
+               DATATYPE_DB2 = new string[] { "char", "char()", "varchar()", "clob", "clob()",
+                                               "date", "time", "timestamp", "timestamp()",
+                                               "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint",
+                                               "blob", "blob()", "binary", "binary()"};
+                return false;
+            }
+        }
+
+        public static bool RefreshAll()
+        {
+            bool response = false;
+            if (!RefreshLogLevel())
+                response = true;
+            if (!RefreshDelimiters())
+                response = true;
+            if (!RefreshDatatypeDB2())
+                response = true;
+            if (!RefreshDatatypeOracle())
+                response = true;
+            if (!RefreshColumns())
+                response = true;
+            return response;
+        }
+
         public static string[] DATATYPE_ORACLE = {"char", "char()", "varchar()", "clob", "clob()", "varchar2()",
                                                   "date", "timestamp", "timestamp()",
                                                   "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "number", "number()", "number(,)",
                                                   "blob"};
+        public static bool RefreshDatatypeOracle()
+        {
+            try
+            {
+                DATATYPE_ORACLE = ConfigurationSettings.AppSettings["ORACLE Types"].Split('|');
+                return true;
+            }
+            catch
+            {
+                DATATYPE_ORACLE = new string[] {  "char", "char()", "varchar()", "clob", "clob()", "varchar2()",
+                                                  "date", "timestamp", "timestamp()",
+                                                  "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "number", "number()", "number(,)",
+                                                  "blob"};
+                return false;
+            }
+        }
+
+        public static bool RefreshColumns()
+        {
+            try
+            {
+                int tempInt = 0;
+                int.TryParse(ConfigurationSettings.AppSettings["Header Row"], out tempInt);
+                HEADER_RIGA = tempInt;
+
+                int.TryParse(ConfigurationSettings.AppSettings["First Tables Column"], out tempInt);
+                HEADER_COLONNA_MIN_TABELLE = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Last Tables Column"], out tempInt);
+                HEADER_COLONNA_MAX_TABELLE = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Tables Columns Number"], out tempInt);
+                HEADER_MAX_COLONNE_TABELLE = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Tables Columns Offset 1"], out tempInt);
+                TABELLE_EXCEL_COL_OFFSET1 = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Tables Columns Offset 2"], out tempInt);
+                TABELLE_EXCEL_COL_OFFSET2 = tempInt;
+
+                int.TryParse(ConfigurationSettings.AppSettings["First Attributes Column"], out tempInt);
+                HEADER_COLONNA_MIN_ATTRIBUTI = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Last Attributes Column"], out tempInt);
+                HEADER_COLONNA_MAX_ATTRIBUTI = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Attributes Columns Number"], out tempInt);
+                HEADER_MAX_COLONNE_ATTRIBUTI = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Attributes Columns Offset 1"], out tempInt);
+                ATTRIBUTI_EXCEL_COL_OFFSET1 = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Attributes Columns Offset 2"], out tempInt);
+                ATTRIBUTI_EXCEL_COL_OFFSET2 = tempInt;
+
+                int.TryParse(ConfigurationSettings.AppSettings["First Relations Column"], out tempInt);
+                HEADER_COLONNA_MIN_RELAZIONI = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Last Relations Column"], out tempInt);
+                HEADER_COLONNA_MAX_RELAZIONI = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Relations Columns Number"], out tempInt);
+                HEADER_MAX_COLONNE_RELAZIONI = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Relations Columns Offset 1"], out tempInt);
+                RELAZIONI_EXCEL_COL_OFFSET1 = tempInt;
+                int.TryParse(ConfigurationSettings.AppSettings["Relations Columns Offset 2"], out tempInt);
+                RELAZIONI_EXCEL_COL_OFFSET2 = tempInt;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public const string TABELLE =   "Censimento Tabelle";
         public const string ATTRIBUTI = "Censimento Attributi";

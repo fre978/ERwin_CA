@@ -20,7 +20,6 @@ namespace ERwin_CA
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
             ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, Timer.GetTimestampFolder(DateTime.Now));
-            ConfigFile.RefreshLogLevel();
             Logger.PrintLC("** STARTING EXECUTION **");
             ExcelOps Accesso = new ExcelOps();
 
@@ -32,7 +31,7 @@ namespace ERwin_CA
                 case 1:
                     break;
                 case 6:
-                    Logger.PrintLC("Program stopped abruptly with this error: ");
+                    Logger.PrintLC("Program stopped abruptly.");
                     break;
                 default:
                     break;

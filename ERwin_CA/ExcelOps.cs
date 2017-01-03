@@ -31,8 +31,11 @@ namespace ERwin_CA
         {
             if (string.IsNullOrEmpty(fileName))
                 return false;
-            if (ExApp == null)
-                return false;
+
+            //if (ExApp == null)
+            //    return false;
+
+            ExApp = new Excel.ApplicationClass();
             FileInfo fileInfo = new FileInfo(fileName);
             if (fileInfo.Exists && (fileInfo.Extension == ".xlsx"))
             {
@@ -65,15 +68,12 @@ namespace ERwin_CA
                     Marshal.FinalReleaseComObject(ExWB);
                     Marshal.FinalReleaseComObject(ExWS);
                     Marshal.FinalReleaseComObject(ExApp);
+                    Logger.PrintLC("Successfully converted " + fileInfo.FullName + " to " + fileName, 2);
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintC("Error: " + exp.Message);
+                    Logger.PrintLC("Error: " + exp.Message, 2);
                     return false;
-                }
-                finally
-                {
-
                 }
             }
             return true;
@@ -98,10 +98,9 @@ namespace ERwin_CA
                 try
                 {
                     Excel.Worksheet ExWS = new Excel.Worksheet();
-                    if (ExApp == null)
-                        ExApp = new Excel.ApplicationClass();
+                    ExApp = new Excel.ApplicationClass();
 
-                    FileOps.RemoveAttributes(fileName);
+                    //FileOps.RemoveAttributes(fileName);
                     ExWB = ExApp.Workbooks.Open(fileName, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing,
@@ -124,7 +123,6 @@ namespace ERwin_CA
                     Logger.PrintLC("File " + fileInfo.Name + " converted successfully to XLSX", 3);
                     Marshal.FinalReleaseComObject(ExWB);
                     Marshal.FinalReleaseComObject(ExWS);
-                    //Marshal.FinalReleaseComObject(ExApp);
                 }
                 catch (Exception exp)
                 {
@@ -145,7 +143,8 @@ namespace ERwin_CA
             if (fileDaAprire.Extension == ".xls")
             {
                 if (!ConvertXLStoXLSX(file))
-                    return false;
+                    if (!ConvertXLStoXLSX(file))
+                        return false;
                 file = Path.ChangeExtension(file, ".xlsx");
                 fileDaAprire = new FileInfo(file);
             }
@@ -282,7 +281,7 @@ namespace ERwin_CA
             {
                 Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: at least one Sheet is missing from the file.", 2);
                 Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
-                Logger.PrintF(fileError, "Foglio (o Fogli) mancante/i.", true);
+                Logger.PrintF(fileError, "Foglio/i mancante/i.", true);
                 return false;
             }
             if (sheetFound != true || columnsFound != true)

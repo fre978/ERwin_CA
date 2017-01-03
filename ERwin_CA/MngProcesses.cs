@@ -19,11 +19,14 @@ namespace ERwin_CA
         {
             try
             {
+                if (ConfigFile.RefreshAll() == true)
+                    Logger.PrintLC("!! Some error occured while parsing the config file. Standard values will be used instead.");
+                List<string> FileElaborati = new List<string>();
                 string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
-                List<string> gg = FileOps.GetTrueFilesToProcess(ElencoExcel);
+                List<string> FileDaElaborare = FileOps.GetTrueFilesToProcess(ElencoExcel);
                 //####################################
                 //Ciclo MAIN
-                foreach (var file in gg)
+                foreach (var file in FileDaElaborare)
                 {
                     Logger.PrintLC("** START PROCESSING FILE: " + file, 2);
                     string TemplateFile = null;
@@ -122,12 +125,17 @@ namespace ERwin_CA
                         connessione.CloseModelConnection();
                         //Eliminazione file originale
                         bool OriginalXLS = false;
+                        string FileElaborato = null;
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx")))
-                            File.Delete(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                        {
+                            FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            File.Delete(FileElaborato);
+                        }
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))
                         {
                             OriginalXLS = true;
-                            File.Delete(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls"));
+                            FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls"));
+                            File.Delete(FileElaborato);
                         }
                         //Conversione file di destinazione nel formato XLS
                         if (OriginalXLS == true)
@@ -138,9 +146,20 @@ namespace ERwin_CA
                                 File.Delete(fInfo.FullName);
                             }
                         }
+                        FileElaborati.Add(FileElaborato);
                     }
+                    //Fine processi
                     Logger.PrintLC("** FINISH PROCESSING FILE: " + file, 2);
                 }
+
+                //Stampa elenco completo file presi in considerazione
+                Logger.PrintLC("\n## SUMMARY FILES:");
+                List<string> ListaCompleta = Funct.DetermineElaborated(FileDaElaborare, FileElaborati);
+                foreach (string elemento in ListaCompleta)
+                {
+                    Logger.PrintLC(elemento, 2);
+                }
+
                 return 0;
             }
             catch (Exception exp)
