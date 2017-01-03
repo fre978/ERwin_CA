@@ -20,7 +20,8 @@ namespace ERwin_CA
         {
             Logger.Initialize(ConfigFile.LOG_FILE);
             ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, Timer.GetTimestampFolder(DateTime.Now));
-            Logger.PrintLC("AVVIO ESECUZIONE");
+            ConfigFile.RefreshLogLevel();
+            Logger.PrintLC("** STARTING EXECUTION **");
             ExcelOps Accesso = new ExcelOps();
 
             int result = MngProcesses.StartProcess();
@@ -39,12 +40,11 @@ namespace ERwin_CA
 
             //####################################
 
-        FINE_PROGRAMMA:
             MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
 
-            Logger.PrintLC("TERMINE ESECUZIONE");
+            Logger.PrintLC("** FINISHED EXECUTION **");
             Timer.SetSecondTime(DateTime.Now);
-            Logger.PrintLC("Tempo esecuzione: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);
+            Logger.PrintLC("Execution time: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);
         }
     }
 }

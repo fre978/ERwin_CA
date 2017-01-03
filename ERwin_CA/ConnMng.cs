@@ -113,16 +113,16 @@ namespace ERwin_CA
                 try
                 {
                     erRootObj = scSession.ModelObjects.Root;
-                    Logger.PrintLC("Root has been successful.", 2);
+                    Logger.PrintLC("Root has been successful.", 3);
                     return true;
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Setting Root's Session error: " + exp.Message, 2);
+                    Logger.PrintLC("Setting Root's Session error: " + exp.Message, 3);
                     return false;
                 }
             else
-                Logger.PrintLC("Could not determine Root because Session is missing.", 2);
+                Logger.PrintLC("Could not determine Root because Session is missing.", 3);
             return false;
         }
 
@@ -132,17 +132,17 @@ namespace ERwin_CA
                 try
                 {
                     erRootObjCol = scSession.ModelObjects.Collect(erRootObj);
-                    Logger.PrintLC("Root Collection has been successful.", 2);
+                    Logger.PrintLC("Root Collection has been successful.", 3);
                     return true;
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Could not get the Root Collection: " + exp.Message, 2);
+                    Logger.PrintLC("Could not get the Root Collection: " + exp.Message, 3);
                     return false;
                 }
             else
             {
-                Logger.PrintLC("Could not get Root Collection because Session is missing.", 2);
+                Logger.PrintLC("Could not get Root Collection because Session is missing.", 3);
                 return false;
             }
         }
@@ -239,45 +239,82 @@ namespace ERwin_CA
 
                 //##################################################
                 //## Controllo esistenza DB ed eventuale aggiunta ##
+                //** Qui vanno aggiunti eventuali altri DB da     **
+                //** prendere in considerazione oltre a DB2 e ORACLE
                 if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
-                    if (!DatabaseN.Contains(entity.DatabaseName))
+                {
+                    if (entity.DB == "DB2")
                     {
-                        scDB = erRootObjCol.Add("DB2_Database");
-                        if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome Database"], entity.DatabaseName))
-                            Logger.PrintLC("Added Database Name to " + scDB.Name, 3);
-                        else
-                            Logger.PrintLC("Error adding Database Name to " + scDB.Name, 3);
-
-                        if (!string.IsNullOrWhiteSpace(entity.HostName))
-                            if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host"], entity.HostName))
-                                Logger.PrintLC("Added Host Name to " + scDB.Name, 3);
+                        if (!DatabaseN.Contains(entity.DatabaseName))
+                        {
+                            scDB = erRootObjCol.Add("DB2_Database");
+                            if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome Database"], entity.DatabaseName))
+                                Logger.PrintLC("Added Database Name to " + scDB.Name, 3);
                             else
-                                Logger.PrintLC("Error adding Host Name to " + scDB.Name, 3);
-                        DatabaseN.Add(entity.DatabaseName);
+                                Logger.PrintLC("Error adding Database Name to " + scDB.Name, 3);
+
+                            if (!string.IsNullOrWhiteSpace(entity.HostName))
+                                if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host"], entity.HostName))
+                                    Logger.PrintLC("Added Host Name to " + scDB.Name, 3);
+                                else
+                                    Logger.PrintLC("Error adding Host Name to " + scDB.Name, 3);
+                            DatabaseN.Add(entity.DatabaseName);
+                        }
                     }
+                }
+                if (entity.DB == "ORACLE")
+                {
+                    if (!string.IsNullOrWhiteSpace(entity.HostName))
+                    {
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome host Oracle"], entity.HostName))
+                            Logger.PrintLC("Added Host Oracle Name to " + scItem.Name, 3);
+                        else
+                            Logger.PrintLC("Error adding Host Oracle Name to " + scItem.Name, 3);
+                    }
+                    if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
+                    {
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Database Oracle"], entity.DatabaseName))
+                            Logger.PrintLC("Added Oracle Database Name to " + scItem.Name, 3);
+                        else
+                            Logger.PrintLC("Error adding Oracle Database Name to " + scItem.Name, 3);
+                    }
+                }
+
                 //##################################################
 
                 //##################################################
                 //## Controllo esistenza SCHEMA ed eventuale aggiunta ##
-                if (!string.IsNullOrWhiteSpace(entity.Schema))
-
+                //** Aggiungere qui eventuali altri casi DB oltre a DB2/ORACLE
+                if (entity.DB == "DB2")
                 {
-
-                    if (!SchemaN.Contains(entity.Schema))
-                    {
-                        scSchema = erRootObjCol.Add("Schema");
-                        if (con.AssignToObjModel(ref scSchema, "Name", entity.Schema))
-                            Logger.PrintLC("Created Schema Name to " + scSchema.Name, 3);
-                        else
-                            Logger.PrintLC("Error creating Schema Name to " + scSchema.Name, 3);
-                        SchemaN.Add(entity.Schema);
-                    }
-                    //Schema
                     if (!string.IsNullOrWhiteSpace(entity.Schema))
-                        if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Schema"], entity.Schema))
-                            Logger.PrintLC("Added Schema to " + scItem.Name, 3);
+                    {
+                        if (!SchemaN.Contains(entity.Schema))
+                        {
+                            scSchema = erRootObjCol.Add("Schema");
+                            if (con.AssignToObjModel(ref scSchema, "Name", entity.Schema))
+                                Logger.PrintLC("Created Schema Name to " + scSchema.Name, 3);
+                            else
+                                Logger.PrintLC("Error creating Schema Name to " + scSchema.Name, 3);
+                            SchemaN.Add(entity.Schema);
+                        }
+                        //Schema
+                        if (!string.IsNullOrWhiteSpace(entity.Schema))
+                            if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Schema"], entity.Schema))
+                                Logger.PrintLC("Added Schema to " + scItem.Name, 3);
+                            else
+                                Logger.PrintLC("Error adding Schema to " + scItem.Name, 3);
+                    }
+                }
+                if(entity.DB == "ORACLE")
+                {
+                    if (!string.IsNullOrWhiteSpace(entity.Schema))
+                    {
+                        if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Schema Oracle"], entity.Schema))
+                            Logger.PrintLC("Added Host Oracle Schema to " + scItem.Name, 3);
                         else
-                            Logger.PrintLC("Error adding Schema to " + scItem.Name, 3);
+                            Logger.PrintLC("Error adding Host Oracle Schema to " + scItem.Name, 3);
+                    }
                 }
                 //##################################################
                 CommitAndSave(trID);
@@ -778,18 +815,18 @@ namespace ERwin_CA
                 FileOps.RemoveAttributes(fileERwin);
                 if (!scPersistenceUnit.Save())
                 {
-                    Logger.PrintLC("Could NOT save Persistence: " + scPersistenceUnit.ObjectId, 2);
+                    Logger.PrintLC("Could NOT save Persistence: " + scPersistenceUnit.ObjectId, 3);
                     return false;
                 }
                 else
                 {
-                    Logger.PrintLC("Persistence SAVED: " + scPersistenceUnit.ObjectId, 2);
+                    Logger.PrintLC("Persistence SAVED: " + scPersistenceUnit.ObjectId, 3);
                     return true;
                 }
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Persistence NOT saved.", 2);
+                Logger.PrintLC("Persistence NOT saved.", 3);
                 return false;
             }
         }

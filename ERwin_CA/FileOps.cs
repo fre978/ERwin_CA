@@ -78,7 +78,7 @@ namespace ERwin_CA
                     // Make the file RW
                     attributes = RemoveAttribute(attributes, attribute);
                     File.SetAttributes(filePath, attributes);
-                    Logger.PrintLC(filePath + " is no longer RO.", 2);
+                    Logger.PrintLC(filePath + " is no longer RO.", 3);
                 }
             }
         }

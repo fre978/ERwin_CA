@@ -15,7 +15,20 @@ namespace ERwin_CA
         //}
 
         // SEZIONE ESECUZIONE
-        public static int LOG_LEVEL = 4;
+        public static int LOG_LEVEL = 2;
+        public static void RefreshLogLevel()
+        {
+            try
+            {
+                int.TryParse(ConfigurationSettings.AppSettings["Log Level"], out LOG_LEVEL);
+            }
+            catch
+            {
+                LOG_LEVEL = 4;
+            }
+        }
+        
+        
 
         public static string BASE_PATH = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
         public static string APP_PATH = System.IO.Path.GetDirectoryName(BASE_PATH).Replace("file:\\", "");
@@ -30,8 +43,8 @@ namespace ERwin_CA
         public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE" }; //Sempre Upper case
 
         public const string DB2_NAME = "DB2";
-        public const string ORACLE = "Oracle";
-        public const string SQLSERVER = "SqlServer";
+        public const string ORACLE = "ORACLE";
+        public const string SQLSERVER = "SQLSERVER";
         //public static string dd = AppDomain.CurrentDomain.BaseDirectory;
 
         // SEZIONE FILE
@@ -98,6 +111,11 @@ namespace ERwin_CA
             {"Nome Database", "Name" },
             //{"Schema", "Name_Qualifier" },
             {"Schema", "Schema_Ref" },
+            //Sezione ORACLE
+            {"Nome host Oracle", "Entity.Physical.NOME_HOST" },
+            {"Nome Database Oracle", "Entity.Physical.NOME_DATABASE" },
+            {"Schema Oracle", "Name_Qualifier" },
+            //Fine ORACLE
             {"Nome Tabella", "Physical_Name" },
             {"Descrizione Tabella", "Comment" },
             {"Tipologia Informazione", "Entity.Physical.TIPOLOGIA_INFORMAZIONE" },
