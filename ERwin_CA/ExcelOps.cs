@@ -135,6 +135,7 @@ namespace ERwin_CA
             return true;
         }
 
+
         public static bool FileValidation(string file)
         {
             //SCAPI.Application testAPP = new SCAPI.Application();
