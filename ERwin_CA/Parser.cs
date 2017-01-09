@@ -17,15 +17,43 @@ namespace ERwin_CA
             string[] fileComponents;
             fileComponents = fileNameInfo.Name.Split(ConfigFile.DELIMITER_NAME_FILE);
             int length = fileComponents.Count();
+            string correct = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + "_OK.txt");
+            string error = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + "_KO.txt");
 
             if (length != 5)
             {
-                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>", 2);
+                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>.", 2);
+                if (File.Exists(correct))
+                {
+                    File.Delete(correct);
+                    Logger.PrintF(error, "er_driveup – Caricamento Excel su ERwin", true);
+                    Logger.PrintF(error, "Colonne e Fogli formattati corretamente.", true);
+                    Logger.PrintF(error, "Formattazione del nome file errata.", true);
+                }
+                if (fileNameInfo.Extension == ".xls")
+                {
+                    string fXLSX = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + ".xlsx");
+                    if (File.Exists(fXLSX))
+                        File.Delete(fXLSX);
+                }
                 return file = null;
             }
             if (!ConfigFile.DBS.Contains(fileComponents[3].ToUpper()))
             {
-                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>", 2);
+                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension> . DB specified not present.", 2);
+                if (File.Exists(correct))
+                {
+                    File.Delete(correct);
+                    Logger.PrintF(error, "er_driveup – Caricamento Excel su ERwin", true);
+                    Logger.PrintF(error, "Colonne e Fogli formattati corretamente.", true);
+                    Logger.PrintF(error, "DB specificato nel nome file non previsto.", true);
+                }
+                if (fileNameInfo.Extension == ".xls")
+                {
+                    string fXLSX = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + ".xlsx");
+                    if (File.Exists(fXLSX))
+                        File.Delete(fXLSX);
+                }
                 return file = null;
             }
 
@@ -40,9 +68,21 @@ namespace ERwin_CA
             catch (Exception exp)
             {
                 Logger.PrintLC(fileName + "produced an error while parsing its name: " + exp.Message, 2);
+                if (File.Exists(correct))
+                {
+                    File.Delete(correct);
+                    Logger.PrintF(error, "er_driveup – Caricamento Excel su ERwin", true);
+                    Logger.PrintF(error, "Colonne e Fogli formattati corretamente.", true);
+                    Logger.PrintF(error, "Errore: " + exp.Message, true);
+                }
+                if (fileNameInfo.Extension == ".xls")
+                {
+                    string fXLSX = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + ".xlsx");
+                    if (File.Exists(fXLSX))
+                        File.Delete(fXLSX);
+                }
                 return file = null;
             }
-
             return file;
         }
     }
