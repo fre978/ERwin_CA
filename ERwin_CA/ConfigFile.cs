@@ -29,13 +29,19 @@ namespace ERwin_CA
                 return false;
             }
         }
-        
-        
+
+        public static string ERROR = "ERR: ";
+        public static string WARNING = "WARN: ";
+        public static string INFO = "INFO:";
 
         public static string BASE_PATH = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
         public static string APP_PATH = System.IO.Path.GetDirectoryName(BASE_PATH).Replace("file:\\", "");
         public static string DRIVE = ConfigurationSettings.AppSettings["Drive"];
         public static string SEARCH_PATH = ConfigurationSettings.AppSettings["Search Folder"];
+
+        public static string CREACOPIEERWIN = ConfigurationSettings.AppSettings["CREACOPIEERWIN"];
+        public static string PERCORSOCOPIEERWIN = APP_PATH + @"\" + ConfigurationSettings.AppSettings["PERCORSOCOPIEERWIN"] + @"\";
+        public static string PERCORSOCOPIEERWINDESTINATION;
 
         // SEZIONE DATABASE
         public static string ERWIN_TEMPLATE_DB2 = APP_PATH + @"\Template\Template_DB2_LF.erwin";
@@ -50,7 +56,7 @@ namespace ERwin_CA
         //public static string dd = AppDomain.CurrentDomain.BaseDirectory;
 
         // SEZIONE FILE
-        public static string LOG_FILE = APP_PATH + @"\Logs\Log.txt";
+        public static string LOG_FILE = APP_PATH +@"\" + ConfigurationSettings.AppSettings["PERCORSOLOG"] + @"\Log.txt";
         public static string ROOT = SEARCH_PATH;
 
         // SEZIONE CARTELLE

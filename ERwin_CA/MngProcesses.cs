@@ -20,7 +20,7 @@ namespace ERwin_CA
             try
             {
                 if (ConfigFile.RefreshAll() == true)
-                    Logger.PrintLC("!! Some error occured while parsing the config file. Standard values will be used instead.");
+                    Logger.PrintLC("!! Some error occured while parsing the config file. Standard values will be used instead.",1, ConfigFile.WARNING);
                 List<string> FileElaborati = new List<string>();
                 string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
                 List<string> FileDaElaborare = FileOps.GetTrueFilesToProcess(ElencoExcel);
@@ -50,6 +50,9 @@ namespace ERwin_CA
                             }
                             FileInfo origin = new FileInfo(file);
                             string fileName = Path.GetFileNameWithoutExtension(file);
+                            string[] fileComponents;
+                            fileComponents = fileName.Split(ConfigFile.DELIMITER_NAME_FILE);
+                            fileName = fileComponents[2];
                             destERFile = Path.Combine(ConfigFile.FOLDERDESTINATION, fileName + Path.GetExtension(TemplateFile));
                             if (!FileOps.CopyFile(TemplateFile, destERFile))
                                 continue;
@@ -83,6 +86,7 @@ namespace ERwin_CA
                         {
                             AttrFile = ExcelOps.ReadXFileAttribute(fInfo, fileT.TipoDBMS);
                         }
+
                         Logger.PrintLC("** FINISH PROCESSING - ATTRIBUTES parsing from Excel", 2);
                         
                         //ATTRIBUTI - PASSAGGIO UNO
@@ -95,6 +99,31 @@ namespace ERwin_CA
                         //############################
                         foreach (var dati in AttrFile)
                             connessione.CreateAttributePassOne(dati, TemplateFile);
+
+
+                        if (ConfigFile.CREACOPIEERWIN == "true")
+                        {
+                            try
+                            {
+                                string ORIGIN = connessione.fileInfoERwin.FullName;
+                                if (File.Exists(ORIGIN))
+                                {
+                                    string PercorsoCopieErwin = ConfigFile.PERCORSOCOPIEERWINDESTINATION;
+                                    string DESTINATION = Path.Combine(PercorsoCopieErwin, Path.GetFileNameWithoutExtension(connessione.fileInfoERwin.FullName) + "_attrib" + connessione.fileInfoERwin.Extension);
+                                    FileOps.CopyFile(ORIGIN, DESTINATION);
+                                    Logger.PrintLC("Created copy of erwin file after ATTRIBUTES to ERwin model (pass one)", 4, ConfigFile.INFO);
+                                }
+                                else
+                                {
+                                    Logger.PrintLC("Impossibile to create a copy of erwin file after ATTRIBUTES to ERwin model (pass one)", 4, ConfigFile.ERROR);
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                Logger.PrintLC("Impossibile to create a copy of erwin file after ATTRIBUTES to ERwin model (pass one)", 4, ConfigFile.ERROR);
+                            }
+                        }
+
                         Logger.PrintLC("** FINISH PROCESSING - ATTRIBUTES to ERwin model (pass one)", 2);
 
                         Logger.PrintLC("** START PROCESSING - RELATIONS parsing from Excel", 2);
@@ -107,6 +136,32 @@ namespace ERwin_CA
                         connessione.CommitAndSave(temp);
                         foreach (var dati in globalRelationStrut.GlobalRelazioni)
                             connessione.CreateRelation(dati, TemplateFile);
+
+
+                        if (ConfigFile.CREACOPIEERWIN == "true")
+                        {
+                            try
+                            {
+                                string ORIGIN = connessione.fileInfoERwin.FullName;
+                                if (File.Exists(ORIGIN))
+                                {
+                                    string PercorsoCopieErwin = ConfigFile.PERCORSOCOPIEERWINDESTINATION;
+                                    string DESTINATION = Path.Combine(PercorsoCopieErwin, Path.GetFileNameWithoutExtension(connessione.fileInfoERwin.FullName) + "_rel" + connessione.fileInfoERwin.Extension);
+                                    FileOps.CopyFile(ORIGIN, DESTINATION);
+                                    Logger.PrintLC("Created copy of erwin file after RELATIONS to ERwin Model", 4, ConfigFile.INFO);
+                                }
+                                else
+                                {
+                                    Logger.PrintLC("Impossibile to create a copy of erwin file after RELATIONS to ERwin Model", 4, ConfigFile.ERROR);
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                Logger.PrintLC("Impossibile to create a copy of erwin file after RELATIONS to ERwin Model", 4, ConfigFile.ERROR);
+                            }
+                        }
+
+
                         Logger.PrintLC("** FINISH PROCESSING - RELATIONS to ERwin Model", 2);
 
                         //ATTRIBUTI - PASSAGGIO DUE

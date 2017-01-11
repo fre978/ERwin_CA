@@ -22,7 +22,7 @@ namespace ERwin_CA
 
             if (length != 5)
             {
-                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>.", 2);
+                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension>.", 2, ConfigFile.ERROR);
                 if (File.Exists(correct))
                 {
                     File.Delete(correct);
@@ -40,7 +40,7 @@ namespace ERwin_CA
             }
             if (!ConfigFile.DBS.Contains(fileComponents[3].ToUpper()))
             {
-                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension> . DB specified not present.", 2);
+                Logger.PrintLC(fileName + " file name doesn't conform to the formatting standard <SSA>_<ACRONYM>_<MODELNAME>_<DBMSTYPE>.<extension> . DB specified not present.", 2, ConfigFile.ERROR);
                 if (File.Exists(correct))
                 {
                     File.Delete(correct);
@@ -67,7 +67,7 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                Logger.PrintLC(fileName + "produced an error while parsing its name: " + exp.Message, 2);
+                Logger.PrintLC(fileName + "produced an error while parsing its name: " + exp.Message, 2, ConfigFile.ERROR);
                 if (File.Exists(correct))
                 {
                     File.Delete(correct);

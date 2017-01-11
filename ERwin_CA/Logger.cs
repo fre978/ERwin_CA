@@ -26,6 +26,11 @@ namespace ERwin_CA
                              "_" +
                              Timer.GetTimestampDay(DateTime.Now) + 
                              ".txt";
+
+            if (!Directory.Exists(FileInfos.DirectoryName))
+            {
+                Directory.CreateDirectory(FileInfos.DirectoryName);
+            }
             //StrWr = File.AppendText(FileNameStream);
         }
 
@@ -33,9 +38,9 @@ namespace ERwin_CA
         /// Scrive sul file di log standard definito nel config file
         /// </summary>
         /// <param name="text"></param>
-        public static void PrintL(string text)
+        public static void PrintL(string text, string type = "")
         {
-            string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
+            string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + type + text;
             using ( StreamWriter StrWr = File.AppendText(FileNameStream))
             {
                 StrWr.WriteLine(line);
@@ -47,9 +52,9 @@ namespace ERwin_CA
         /// Scrive sulla consolle
         /// </summary>
         /// <param name="text"></param>
-        public static void PrintC(string text)
+        public static void PrintC(string text, string type = "")
         {
-            string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + text;
+            string line = Timer.GetTimestampPrecision(DateTime.Now) + "    " + type + text;
             Console.WriteLine(line);
         }
         /// <summary>
@@ -57,7 +62,7 @@ namespace ERwin_CA
         /// </summary>
         /// <param name="text"></param>
         /// <param name="level"></param>
-        public static void PrintLC(string text, int level = 1)
+        public static void PrintLC(string text, int level = 1, string type = "")
         {
             if (!(level > ConfigFile.LOG_LEVEL))
             {
@@ -68,7 +73,7 @@ namespace ERwin_CA
                 {
                     line = line + "    ";
                 }
-                line = line + text;
+                line = line + type + text;
                 Console.WriteLine(line);
                 using (StreamWriter StrWr = File.AppendText(FileNameStream))
                 {
@@ -83,9 +88,9 @@ namespace ERwin_CA
         /// <param name="fileName"></param>
         /// <param name="text"></param>
         /// <param name="timestamp"></param>
-        public static void PrintF(string fileName, string text, bool timestamp = false)
+        public static void PrintF(string fileName, string text, bool timestamp = false, string type = "")
         {
-            string line = (timestamp ? (Timer.GetTimestampPrecision(DateTime.Now) + "    ") : "") +
+            string line = (timestamp ? (Timer.GetTimestampPrecision(DateTime.Now) + "    ") : "") + type +
                         text;
             FileInfo file = new FileInfo(fileName);
             DirectoryInfo dir = new DirectoryInfo(file.DirectoryName);

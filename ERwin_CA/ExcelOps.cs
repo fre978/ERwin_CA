@@ -68,11 +68,11 @@ namespace ERwin_CA
                     Marshal.FinalReleaseComObject(ExWB);
                     Marshal.FinalReleaseComObject(ExWS);
                     Marshal.FinalReleaseComObject(ExApp);
-                    Logger.PrintLC("Successfully converted " + fileInfo.FullName + " to " + fileName, 2);
+                    Logger.PrintLC("Successfully converted " + fileInfo.FullName + " to " + fileName, 2, ConfigFile.INFO);
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Error: " + exp.Message, 2);
+                    Logger.PrintLC("Error: " + exp.Message, 2, ConfigFile.ERROR);
                     return false;
                 }
             }
@@ -120,7 +120,7 @@ namespace ERwin_CA
                                 Type.Missing, Type.Missing);
                     ExWB.Close();
                     ExApp.DisplayAlerts = true;
-                    Logger.PrintLC("File " + fileInfo.Name + " converted successfully to XLSX", 3);
+                    Logger.PrintLC("File " + fileInfo.Name + " converted successfully to XLSX", 3, ConfigFile.INFO);
                     Marshal.FinalReleaseComObject(ExWB);
                     Marshal.FinalReleaseComObject(ExWS);
                 }
@@ -191,7 +191,7 @@ namespace ERwin_CA
                         {
                             //worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Value = "";
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintLC(testoLog, 2);
+                            Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
                             goto ERROR;
                         }
                     }
@@ -222,7 +222,7 @@ namespace ERwin_CA
                         else
                         {
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintLC(testoLog, 2);
+                            Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
                             goto ERROR;
                         }
                     }
@@ -253,7 +253,7 @@ namespace ERwin_CA
                         else
                         {
                             testoLog = fileDaAprire.Name + ": file could not be elaborated.";
-                            Logger.PrintLC(testoLog, 2);
+                            Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
                             goto ERROR;
                         }
                     }
@@ -282,7 +282,7 @@ namespace ERwin_CA
             }
             if(check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1)
             {
-                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: at least one Sheet is missing from the file.", 2);
+                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: at least one Sheet is missing from the file.", 2, ConfigFile.ERROR);
                 Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
                 Logger.PrintF(fileError, "Foglio/i mancante/i.", true);
                 if(isXLS == true)
@@ -292,7 +292,7 @@ namespace ERwin_CA
             }
             if (sheetFound != true || columnsFound != true)
             {
-                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: Columns or Sheets are not in the expected format.", 2);
+                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: Columns or Sheets are not in the expected format.", 2, ConfigFile.ERROR);
                 Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
                 Logger.PrintF(fileError, "Colonne o Fogli non formattati correttamente.", true);
                 if (isXLS == true)
@@ -300,7 +300,7 @@ namespace ERwin_CA
                         File.Delete(fileDaAprire.FullName);
                 return false;
             }
-            Logger.PrintLC(fileDaAprire.Name + ": file valid to be processed.", 2);
+            Logger.PrintLC(fileDaAprire.Name + ": file valid to be processed.", 2, ConfigFile.INFO);
             Logger.PrintF(fileCorrect, "er_driveup – Caricamento Excel su ERwin", true);
             Logger.PrintF(fileCorrect, "Colonne e Fogli formattati corretamente.", true);
             return true;
@@ -319,7 +319,7 @@ namespace ERwin_CA
 
             if (!File.Exists(file))
             {
-                Logger.PrintLC("Reading Tables. File " + fileDaAprire.Name + " doesn't exist.", 3);
+                Logger.PrintLC("Reading Tables. File " + fileDaAprire.Name + " doesn't exist.", 3, ConfigFile.ERROR);
                 return listaFile = null;
             }
             FileOps.RemoveAttributes(file);
@@ -343,7 +343,7 @@ namespace ERwin_CA
             }
             catch(Exception exp)
             {
-                Logger.PrintLC("Reading Tables. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 3);
+                Logger.PrintLC("Reading Tables. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 3, ConfigFile.ERROR);
                 return listaFile = null;
             }
             
@@ -372,7 +372,7 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "Valore di NOME TABELLA mancante.";
                         }
-                        if (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(flag)) && (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             string error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
@@ -408,19 +408,22 @@ namespace ERwin_CA
                                 ValRiga.TableGranularity = worksheet.Cells[RowPos, ConfigFile._TABELLE["Granularità Tabella"]].Text;
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text))
                                 ValRiga.FlagBFD = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                            else
+                                ValRiga.FlagBFD = "N";
                             listaFile.Add(ValRiga);
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "OK";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "";
                         }
                         else
                         {
-                            EmptyRow += 1;
-                            if (EmptyRow >= 10)
-                            {
-                                FilesEnd = true;
-                            }
+                            //EmptyRow += 1;
+                            //if (EmptyRow >= 10)
+                            //{
+                            //    FilesEnd = true;
+                            //}
                         }
                         //******************************************
                         // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
@@ -454,7 +457,7 @@ namespace ERwin_CA
 
             if (!File.Exists(file))
             {
-                Logger.PrintLC("Reading Tables. File " + fileDaAprire.Name + " doesn't exist.", 3);
+                Logger.PrintLC("Reading Tables. File " + fileDaAprire.Name + " doesn't exist.", 3, ConfigFile.ERROR);
                 return listaFile = null;
             }
             FileOps.RemoveAttributes(file);
@@ -478,7 +481,7 @@ namespace ERwin_CA
             }
             catch(Exception exp)
             {
-                Logger.PrintLC("Reading Relation. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 3);
+                Logger.PrintLC("Reading Relation. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 3, ConfigFile.ERROR);
                 return listaFile = null;
             }
             
@@ -547,12 +550,7 @@ namespace ERwin_CA
                             incorrect = true;
                             error += "CAMPO FIGLIO mancante. ";
                         }
-                        if (string.IsNullOrWhiteSpace(identificativa))
-                        {
-                            incorrect = true;
-                            error += "IDENTIFICATIVA mancante. ";
-                        }
-                        else
+                        if (!string.IsNullOrWhiteSpace(identificativa))
                         {
                             if (!(identificativa.ToUpper().Equals("S") || identificativa.ToUpper().Equals("N")))
                             {
@@ -561,12 +559,7 @@ namespace ERwin_CA
                             }
 
                         }
-                        if (string.IsNullOrWhiteSpace(tipoRelazione))
-                        {
-                            incorrect = true;
-                            error += "TIPO RELAZIONE mancante. ";
-                        }
-                        else
+                        if (!string.IsNullOrWhiteSpace(tipoRelazione))
                         {
                             string upperTipoRelazione = tipoRelazione.ToUpper();
                             if (!(upperTipoRelazione.Equals("L") || upperTipoRelazione.Equals("LOGICA") ||
@@ -595,21 +588,28 @@ namespace ERwin_CA
                                 ValRiga.Identificativa = 2;
                             else
                                 ValRiga.Identificativa = 7;
-                            switch (tipoRelazione.ToUpper())
-                            {
-                                case "L":
-                                    ValRiga.TipoRelazione = true;
-                                    break;
-                                case "LOGICA":
-                                    ValRiga.TipoRelazione = true;
-                                    break;
-                                case "F":
-                                    ValRiga.TipoRelazione = false;
-                                    break;
-                                case "FISICA":
-                                    ValRiga.TipoRelazione = false;
-                                    break;
 
+                            if (string.IsNullOrEmpty(tipoRelazione))
+                            {
+                                ValRiga.TipoRelazione = true;
+                            }
+                            else
+                            {
+                                switch (tipoRelazione.ToUpper())
+                                {
+                                    case "L":
+                                        ValRiga.TipoRelazione = true;
+                                        break;
+                                    case "LOGICA":
+                                        ValRiga.TipoRelazione = true;
+                                        break;
+                                    case "F":
+                                        ValRiga.TipoRelazione = false;
+                                        break;
+                                    case "FISICA":
+                                        ValRiga.TipoRelazione = false;
+                                        break;
+                                }
                             }
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text))
                                 ValRiga.Eccezioni = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text;
@@ -620,6 +620,7 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Value = "OK";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET2].Value = "";
                         }
                         else
                         {
@@ -630,9 +631,9 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Value = "KO";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET2].Value = error;
-                            EmptyRow += 1;
-                            if (EmptyRow >= 10)
-                                FilesEnd = true;
+                            //EmptyRow += 1;
+                            //if (EmptyRow >= 10)
+                            //    FilesEnd = true;
                         }
                         //******************************************
                         // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
@@ -670,7 +671,7 @@ namespace ERwin_CA
 
             if (!File.Exists(file))
             {
-                Logger.PrintLC("Reading Attributes. File " + fileDaAprire.Name + " doesn't exist.", 2);
+                Logger.PrintLC("Reading Attributes. File " + fileDaAprire.Name + " doesn't exist.", 2, ConfigFile.ERROR);
                 return listaFile = null;
             }
             FileOps.RemoveAttributes(file);
@@ -694,7 +695,7 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Reading Attributes. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 2);
+                Logger.PrintLC("Reading Attributes. Could not open file " + fileDaAprire.Name + "in location " + fileDaAprire.DirectoryName, 2, ConfigFile.ERROR);
                 return listaFile = null;
             }
 
@@ -713,6 +714,7 @@ namespace ERwin_CA
                         string nomeTabella = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text;
                         string nomeCampo = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome  Campo Legacy"]].Text;
                         string dataType = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Datatype"]].Text;
+                        dataType = Funct.RemoveWhitespace(dataType);
                         string chiave = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Chiave"]].Text;
                         string unique = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Unique"]].Text;
                         string chiaveLogica = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Chiave Logica"]].Text;
@@ -757,16 +759,18 @@ namespace ERwin_CA
                                 error += "DATATYPE non conforme.";
                             }
                         }
-                            //Check Chiave
-                            if (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase)))
+                        //Check Chiave
+                        //if (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(chiave)) && (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase))))
                         {
-                            incorrect = true;
-                            if (!string.IsNullOrWhiteSpace(error))
-                                error += " ";
-                            error += "CHIAVE non conforme.";
+                        incorrect = true;
+                        if (!string.IsNullOrWhiteSpace(error))
+                            error += " ";
+                        error += "CHIAVE non conforme.";
                         }
                         //Check Unique
-                        if (!(string.Equals(unique, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(unique, "N", StringComparison.OrdinalIgnoreCase)))
+                        //if (!(string.Equals(unique, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(unique, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(unique)) && (!(string.Equals(unique, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(unique, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -774,7 +778,8 @@ namespace ERwin_CA
                             error += "UNIQUE non conforme.";
                         }
                         //Check Chiave Logica
-                        if (!(string.Equals(chiaveLogica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiaveLogica, "N", StringComparison.OrdinalIgnoreCase)))
+                        //if (!(string.Equals(chiaveLogica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiaveLogica, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(chiaveLogica)) && (!(string.Equals(chiaveLogica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiaveLogica, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -782,7 +787,8 @@ namespace ERwin_CA
                             error += "CHIAVE LOGICA non conforme.";
                         }
                         //Check Mandatory Flag
-                        if (!(string.Equals(mandatoryFlag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(mandatoryFlag, "N", StringComparison.OrdinalIgnoreCase)))
+                        //if (!(string.Equals(mandatoryFlag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(mandatoryFlag, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(mandatoryFlag)) && (!(string.Equals(mandatoryFlag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(mandatoryFlag, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -790,7 +796,8 @@ namespace ERwin_CA
                             error += "MANDATORY FLAG non conforme.";
                         }
                         //Check Dominio
-                        if (!(string.Equals(dominio, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(dominio, "N", StringComparison.OrdinalIgnoreCase)))
+                        //if (!(string.Equals(dominio, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(dominio, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(dominio)) && (!(string.Equals(dominio, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(dominio, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -798,7 +805,8 @@ namespace ERwin_CA
                             error += "DOMINIO non conforme.";
                         }
                         //Check Storica
-                        if (!(string.Equals(storica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(storica, "N", StringComparison.OrdinalIgnoreCase)))
+                        //if (!(string.Equals(storica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(storica, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(storica)) && (!(string.Equals(storica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(storica, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -806,7 +814,8 @@ namespace ERwin_CA
                             error += "STORICA non conforme.";
                         }
                         //Check Dato Sensibile
-                        if (!(string.Equals(datoSensibile, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(datoSensibile, "N", StringComparison.OrdinalIgnoreCase)))
+                        //if (!(string.Equals(datoSensibile, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(datoSensibile, "N", StringComparison.OrdinalIgnoreCase)))
+                        if (!(string.IsNullOrWhiteSpace(datoSensibile)) && (!(string.Equals(datoSensibile, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(datoSensibile, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             if (!string.IsNullOrWhiteSpace(error))
@@ -822,19 +831,42 @@ namespace ERwin_CA
                             ValRiga.NomeTabellaLegacy = nomeTabella;
                             ValRiga.NomeCampoLegacy = nomeCampo;
                             ValRiga.DataType = dataType;
+
                             if (string.Equals(chiave.ToUpper(), "S"))
                                 ValRiga.Chiave = 0;
                             else
                                 ValRiga.Chiave = 100;
-                            ValRiga.Unique = unique;
-                            ValRiga.ChiaveLogica = chiaveLogica;
+
+                            if (string.Equals(unique.ToUpper(), "S"))
+                                ValRiga.Unique = unique;
+                            else
+                                ValRiga.Unique = "N";
+
+                            if (string.Equals(chiaveLogica.ToUpper(), "S"))
+                                ValRiga.ChiaveLogica = chiaveLogica;
+                            else
+                                ValRiga.ChiaveLogica = "N";
+                            
                             if (string.Equals(mandatoryFlag.ToUpper(), "S"))
                                 ValRiga.MandatoryFlag = 1;
                             else
                                 ValRiga.MandatoryFlag = 0;
-                            ValRiga.Dominio = dominio;
-                            ValRiga.Storica = storica;
-                            ValRiga.DatoSensibile = datoSensibile;
+
+                            if (string.Equals(dominio.ToUpper(), "S"))
+                                ValRiga.Dominio = dominio;
+                            else
+                                ValRiga.Dominio = "N";
+
+                            if (string.Equals(storica.ToUpper(), "S"))
+                                ValRiga.Storica = storica;
+                            else
+                                ValRiga.Storica = "N";
+
+                            if (string.Equals(datoSensibile.ToUpper(), "S"))
+                                ValRiga.DatoSensibile = datoSensibile;
+                            else
+                                ValRiga.DatoSensibile = "N";
+                            
                             //Assegnazione valori opzionali
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["SSA"]].Text))
                                 ValRiga.SSA = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["SSA"]].Text;
@@ -857,10 +889,12 @@ namespace ERwin_CA
                                 ValRiga.Note = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Note"]].Text;
                             listaFile.Add(ValRiga);
                             worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1).Width = 10;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET2).Width = 50;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Value = "OK";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET2].Value = "";
 
                         }
                         else
@@ -872,9 +906,9 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1].Value = "KO";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET2].Value = error;
-                            EmptyRow += 1;
-                            if (EmptyRow >= 10)
-                                FilesEnd = true;
+                            //EmptyRow += 1;
+                            //if (EmptyRow >= 10)
+                            //    FilesEnd = true;
                         }
 
                         //******************************************
@@ -904,7 +938,7 @@ namespace ERwin_CA
                 string file = fileDaAprire.FullName;
                 if (!File.Exists(file))
                 {
-                    Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite);
+                    Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite, ConfigFile.ERROR);
                     return false;
                 }
                 FileOps.RemoveAttributes(file);
@@ -926,7 +960,7 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite);
+                    Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite, ConfigFile.ERROR);
                     return false;
                 }
 
@@ -952,12 +986,12 @@ namespace ERwin_CA
                             Logger.PrintLC("Error while writing on file " +
                                             fileDaAprire.Name +
                                             ". Description: " +
-                                            exp.Message);
+                                            exp.Message,1, ConfigFile.ERROR);
                             return false;
                         }
                     }
                 }
-                Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite);
+                Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite, ConfigFile.ERROR);
                 return false;
             }
             catch

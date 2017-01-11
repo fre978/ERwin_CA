@@ -9,6 +9,7 @@ namespace ERwin_CA
 {
     class Funct
     {
+
         public static List<string> DetermineElaborated(List<string> completi, List<string> elaborati)
         {
             List<string> restituzione = new List<string>();
@@ -30,6 +31,13 @@ namespace ERwin_CA
                     restituzione.Add(elemento + ": NOT processed.");
             }
             return restituzione;
+        }
+
+        public static string RemoveWhitespace(string input)
+        {
+            return new string(input.ToCharArray()
+                .Where(c => !Char.IsWhiteSpace(c))
+                .ToArray());
         }
 
         public static bool ParseDataType(string value, string databaseType)
@@ -142,7 +150,7 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Error filtering relations list. Error:" + exp.Message, 3);
+                Logger.PrintLC("Error filtering relations list. Error:" + exp.Message, 3, ConfigFile.ERROR);
                 return Gstrut = null;
             }
 
