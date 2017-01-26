@@ -37,6 +37,7 @@ namespace ERwin_CA
             }
             else
             {
+                Logger.PrintLC("Search Folder " + homeDir + " not exists, no files found");
                 return AllFiles;
             }
         }

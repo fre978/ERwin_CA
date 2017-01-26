@@ -32,7 +32,7 @@ namespace ERwin_CA
 
         public static string ERROR = "ERR: ";
         public static string WARNING = "WARN: ";
-        public static string INFO = "INFO:";
+        public static string INFO = "INFO: ";
 
         public static string BASE_PATH = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
         public static string APP_PATH = System.IO.Path.GetDirectoryName(BASE_PATH).Replace("file:\\", "");
@@ -60,9 +60,11 @@ namespace ERwin_CA
         public static string ROOT = SEARCH_PATH;
 
         // SEZIONE CARTELLE
-        private static string DEST_FOLD_NAME = ConfigurationSettings.AppSettings["Destination Folder Name"];
+        public static string DEST_FOLD_NAME = ConfigurationSettings.AppSettings["Destination Folder Name"];
+        public static bool DEST_FOLD_UNIQUE = (ConfigurationSettings.AppSettings["Destination Folder Unique"] == "true") ? true : false;
         public static string FOLDERDESTINATION_GENERAL = ROOT + DEST_FOLD_NAME;
         public static string FOLDERDESTINATION;
+        public static string TIMESTAMPFOLDER;
 
         // SEZIONE GENERALE
         public static char[] DELIMITER_NAME_FILE = new char[10];

@@ -14,11 +14,18 @@ namespace ERwin_CA
             List<string> nlist = new List<string>();
             if (list != null)
             {
-                //List<string> nlist = list.ToList();
-                //list = list.Where(x => !list.Contains(ConfigFile.FOLDERDESTINATION, IEqualityComparer));
-                nlist = (from c in list
-                         where !c.Contains(ConfigFile.FOLDERDESTINATION_GENERAL)
-                         select c).ToList();
+                //if (ConfigFile.DEST_FOLD_UNIQUE)
+                //{
+                //    nlist = (from c in list
+                //         where !c.Contains(ConfigFile.FOLDERDESTINATION_GENERAL)
+                //         select c).ToList();
+                //}
+                //else
+                //{
+                    nlist = (from c in list
+                             where !c.Contains(ConfigFile.DEST_FOLD_NAME)
+                             select c).ToList();
+                //}
             }
             nlist = CleanDuplicates(nlist);
             return nlist;
@@ -116,6 +123,38 @@ namespace ERwin_CA
                 return false;
             }
                 
+        }
+
+        /// <summary>
+        /// Legge tutte le righe del file specificato e restituisce una collezione di righe
+        /// </summary>
+        /// <param name="File"></param>
+        /// <param name="ListaRigheSqlFile"></param>
+        /// <returns></returns>
+        public static bool LeggiFile(string File, ref List<string> ListaRigheSqlFile)
+        {
+            try
+            {
+                int counter = 0;
+                string line;
+
+                // Read the file and display it line by line.  
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(File);
+                while ((line = file.ReadLine()) != null)
+                {
+                    ListaRigheSqlFile.Add(line);
+                    counter++;
+                }
+
+                file.Close();
+                
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
 

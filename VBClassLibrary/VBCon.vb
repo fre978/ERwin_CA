@@ -21,7 +21,7 @@
         Try
             model.Properties(prop).Value = value
             Return True
-        Catch
+        Catch ex As Exception
             Return False
         End Try
     End Function

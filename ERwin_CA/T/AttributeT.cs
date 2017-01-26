@@ -28,13 +28,15 @@ namespace ERwin_CA.T
         public string Note { get; set; }
         public string Storica { get; set; }
         public string DatoSensibile { get; set; }
+        public string History { get; set; }
+        public int Step { get; set; }
 
         public AttributeT(int row, string db, string nomeTabellaLegacy, string ssa = null, string area = null,
                           string nomeCampoLegacy = null, string definizioneCampo = null, string tipologiaTabella = null,
                           string dataType = null, int? lunghezza = null, int? decimali = null,
                           int? chiave = null, string unique = null, string chiaveLogica= null,
                           int? mandatoryFlag = null, string dominio = null, string provenienzaDominio = null, 
-                          string note = null, string storica = null, string datoSensibile = null )
+                          string note = null, string storica = null, string datoSensibile = null, string history = null, int step = 1 )
         {
             Row = row;
             DB = db;
@@ -56,6 +58,8 @@ namespace ERwin_CA.T
             Note = note;
             Storica = storica;
             DatoSensibile = datoSensibile;
+            History = history;
+            Step = step;
         }
     }
 }

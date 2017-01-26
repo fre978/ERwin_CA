@@ -140,6 +140,7 @@ namespace ERwin_CA
         {
             //SCAPI.Application testAPP = new SCAPI.Application();
             string testoLog = string.Empty;
+            string TxtControlloNonPassato = string.Empty;
             FileInfo fileDaAprire = new FileInfo(file);
             bool isXLS = false;
             if (fileDaAprire.Extension == ".xls")
@@ -184,13 +185,17 @@ namespace ERwin_CA
                         {
                             columns += 1;
                             if (ConfigFile._TABELLE[value] != columnsPosition)
+                            {
+                                TxtControlloNonPassato = value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
                                 goto ERROR;
+                            }
                             //dd.Add(worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text);
                         }
                         else
                         {
                             //worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Value = "";
-                            testoLog = fileDaAprire.Name + ": file could not be elaborated.";
+                            TxtControlloNonPassato = value + " non è una colonna valida del Foglio " + worksheet.Name;
+                            testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
                             Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
                             goto ERROR;
                         }
@@ -198,7 +203,10 @@ namespace ERwin_CA
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_TABELLE)
                         columnsFound = true;
                     else
+                    {
+                        TxtControlloNonPassato = "colonne mancanti nel Foglio " + worksheet.Name;
                         goto ERROR;
+                    }
                 }
 
                 // SEZIONE ATTRIBUTI
@@ -217,11 +225,15 @@ namespace ERwin_CA
                         {
                             columns += 1;
                             if (ConfigFile._ATTRIBUTI[value] != columnsPosition)
+                            {
+                                TxtControlloNonPassato = value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
                                 goto ERROR;
+                            }
                         }
                         else
                         {
-                            testoLog = fileDaAprire.Name + ": file could not be elaborated.";
+                            TxtControlloNonPassato = value + " non è una colonna valida del Foglio " + worksheet.Name;
+                            testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
                             Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
                             goto ERROR;
                         }
@@ -229,7 +241,10 @@ namespace ERwin_CA
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_ATTRIBUTI)
                         columnsFound = true;
                     else
+                    {
+                        TxtControlloNonPassato = "colonne mancanti nel Foglio " + worksheet.Name;
                         goto ERROR;
+                    }
                 }
 
                 // SEZIONE RELAZIONI
@@ -248,11 +263,15 @@ namespace ERwin_CA
                         {
                             columns += 1;
                             if (ConfigFile._RELAZIONI[value] != columnsPosition)
+                            {
+                                TxtControlloNonPassato = value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
                                 goto ERROR;
+                            }
                         }
                         else
                         {
-                            testoLog = fileDaAprire.Name + ": file could not be elaborated.";
+                            TxtControlloNonPassato = value + " non è una colonna valida del Foglio " + worksheet.Name;
+                            testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
                             Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
                             goto ERROR;
                         }
@@ -260,7 +279,10 @@ namespace ERwin_CA
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_RELAZIONI)
                         columnsFound = true;
                     else
+                    {
+                        TxtControlloNonPassato = "colonne mancanti nel Foglio " + worksheet.Name;
                         goto ERROR;
+                    }
                 }
             }
 
@@ -282,7 +304,7 @@ namespace ERwin_CA
             }
             if(check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1)
             {
-                Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: at least one Sheet is missing from the file.", 2, ConfigFile.ERROR);
+                Logger.PrintLC(fileDaAprire.Name + ": non può essere elaborato: uno dei Fogli non è presente o una delle colonne non è conforme. Errore: " + TxtControlloNonPassato, 2, ConfigFile.ERROR);
                 Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
                 Logger.PrintF(fileError, "Foglio/i mancante/i.", true);
                 if(isXLS == true)
@@ -360,29 +382,50 @@ namespace ERwin_CA
                             RowPos++)
                     {
                         bool incorrect = false;
+                        string error = string.Empty;
                         string nome = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
-                        string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
-                        if (string.IsNullOrWhiteSpace(nome))
+                        if (listaFile.Exists(x => x.TableName == nome))
                         {
                             incorrect = true;
+                            error = "Una tabella con lo stesso nome è già presente.";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "Valore di NOME TABELLA mancante.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = error;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2).Width = 100;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
-                        if (!(string.IsNullOrWhiteSpace(flag)) && (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))))
+                        string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                        if (string.IsNullOrWhiteSpace(nome))
                         {
                             incorrect = true;
-                            string error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            if (!string.IsNullOrWhiteSpace(error))
-                                error = error + " ";
+                            error = "Valore di NOME TABELLA mancante.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
-                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = error + "Valore di FLAG BFD non conforme.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = error;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2).Width = 100;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+                        }
+                        if (!(string.IsNullOrWhiteSpace(flag)) && (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))))
+                        {
+                            incorrect = true;
+                            error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error = error + " ";
+                            error = error + "Valore di FLAG BFD non conforme.";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = error;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2).Width = 100;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
                         
                         if (incorrect == false)
@@ -416,6 +459,8 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "OK";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "";
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2).Width = 100;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
                         else
                         {
@@ -430,14 +475,31 @@ namespace ERwin_CA
                         int prossime = 0;
                         for (int i = 1; i < 11; i++)
                         {
-                            if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._TABELLE["Nome Tabella"]].Text))
+                            if (string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._TABELLE["Nome Tabella"]].Text) && string.IsNullOrWhiteSpace(worksheet.Cells[RowPos + i, ConfigFile._TABELLE["Flag BFD"]].Text))
                                 prossime++;
                         }
                         if (prossime == 10)
                             FilesEnd = true;
                         //******************************************
+
+                        if (incorrect)
+                        {
+                            Logger.PrintLC("Checked Table '" + worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text + "'. Validation KO. Error: " + error, 3, ConfigFile.WARNING);
+                        }
+                        else
+                        {
+                            Logger.PrintLC("Checked Table '" + worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text + "'. Validation OK", 3, ConfigFile.INFO);
+                        }
                     }
-                    p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    if (ConfigFile.DEST_FOLD_UNIQUE)
+                    {
+                        p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    }
+                    else
+                    {
+                        p.SaveAs(new FileInfo(Funct.GetFolderDestination2(fileDaAprire.FullName, fileDaAprire.Name)));
+                    }
+                    
                     return listaFile;
                 }
             }
@@ -499,19 +561,28 @@ namespace ERwin_CA
                     {
                         bool incorrect = false;
                         string error = null;
-                        string identificativoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativo relazione"]].Text;
-                        string tabellaPadre = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tabella Padre"]].Text;
-                        string tabellaFiglia = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tabella Figlia"]].Text;
-                        string cardinalita = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Cardinalità"]].Text;
-                        string campoPadre = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Campo Padre"]].Text;
-                        string campoFiglio = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Campo Figlio"]].Text;
-                        string identificativa = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativa"]].Text;
-                        string eccezione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text;
-                        string tipoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tipo Relazione"]].Text;
-                        string note = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Text;
+                        string identificativoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativo relazione"]].Text.Trim();
+                        string tabellaPadre = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tabella Padre"]].Text.Trim();
+                        string tabellaFiglia = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tabella Figlia"]].Text.Trim();
+                        string cardinalita = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Cardinalità"]].Text.Trim();
+                        string campoPadre = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Campo Padre"]].Text.Trim();
+                        string campoFiglio = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Campo Figlio"]].Text.Trim();
+                        string identificativa = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Identificativa"]].Text.Trim();
+                        string eccezione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Eccezioni"]].Text.Trim();
+                        string tipoRelazione = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Tipo Relazione"]].Text.Trim();
+                        string note = worksheet.Cells[RowPos, ConfigFile._RELAZIONI["Note"]].Text.Trim();
 
-
-                        if (string.IsNullOrWhiteSpace(identificativoRelazione))
+                        if (listaFile.Exists(x => x.IdentificativoRelazione == identificativoRelazione &&
+                                                  x.TabellaPadre == tabellaPadre &&
+                                                  x.TabellaFiglia == tabellaFiglia &&
+                                                  x.CampoPadre == campoPadre &&
+                                                  x.CampoFiglio == campoFiglio)
+                                                  )
+                        {
+                            incorrect = true;
+                            error += "Relazione già presente con ID: " + identificativoRelazione + " Tabella Padre: " + tabellaPadre + " Tabella Figlia: " + tabellaFiglia + " Campo Padre: " + campoPadre + " Campo Figlia: " + campoFiglio;
+                        }
+                            if (string.IsNullOrWhiteSpace(identificativoRelazione))
                         {
                             incorrect = true;
                             error += "IDENTIFICATIVO RELAZIONE mancante. ";
@@ -646,8 +717,27 @@ namespace ERwin_CA
                         if (prossime == 10)
                             FilesEnd = true;
                         //******************************************
+
+                        if (incorrect)
+                        {
+                            Logger.PrintLC("Checked Relation '" + identificativoRelazione + "' between Table '" + tabellaPadre + "' and Table '"+ tabellaFiglia + "'. Validation KO. Error: " + error, 3, ConfigFile.WARNING);
+                        }
+                        else
+                        {
+                            Logger.PrintLC("Checked Relation '" + identificativoRelazione + "' between Table '" + tabellaPadre + "' and Table '" + tabellaFiglia + "'. Validation OK", 3, ConfigFile.INFO);
+                        }
+
                     }
-                    p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    //p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    if (ConfigFile.DEST_FOLD_UNIQUE)
+                    {
+                        p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    }
+                    else
+                    {
+                        //p.SaveAs(new FileInfo(Funct.GetFolderDestination2(fileDaAprire.FullName, fileDaAprire.Name)));
+                        p.SaveAs(fileDaAprire);
+                    }
                     return listaFile;
                 }
             }
@@ -713,6 +803,11 @@ namespace ERwin_CA
                         bool incorrect = false;
                         string nomeTabella = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text;
                         string nomeCampo = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome  Campo Legacy"]].Text;
+                        if (nomeCampo.Contains("-"))
+                        {
+                            nomeCampo = nomeCampo.Replace("-", "_");
+                            Logger.PrintLC("Field '" + worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Nome  Campo Legacy"]].Text + "' of Table '" + nomeTabella + "' has been renamed as " + nomeCampo + ". This value will be used to produce Erwin file", 3, ConfigFile.WARNING);
+                        }
                         string dataType = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Datatype"]].Text;
                         dataType = Funct.RemoveWhitespace(dataType);
                         string chiave = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Chiave"]].Text;
@@ -922,8 +1017,26 @@ namespace ERwin_CA
                         if (prossime == 10)
                             FilesEnd = true;
                         //******************************************
+
+                        if (incorrect)
+                        {
+                            Logger.PrintLC("Checked Field '" + nomeCampo  + "' of Table '" + nomeTabella + "'. Validation KO. Error: " + error, 3, ConfigFile.WARNING);
+                        }
+                        else
+                        {
+                            Logger.PrintLC("Checked Field '" + nomeCampo + "' of Table '" + nomeTabella + "'. Validation OK", 3, ConfigFile.INFO);
+                        }
                     }
-                    p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    //p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    if (ConfigFile.DEST_FOLD_UNIQUE)
+                    {
+                        p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
+                    }
+                    else
+                    {
+                        //p.SaveAs(new FileInfo(Funct.GetFolderDestination2(fileDaAprire.FullName, fileDaAprire.Name)));
+                        p.SaveAs(fileDaAprire);
+                    }
                     return listaFile;
                 }
             }
@@ -977,7 +1090,14 @@ namespace ERwin_CA
                             worksheet.Cells[row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
                             worksheet.Cells[row, column].Style.Font.Bold = true;
                             worksheet.Cells[row, column].Value = "KO";
-                            worksheet.Cells[row, column + 1].Value = text;
+                            string mystring = (string)worksheet.Cells[row, column + 1].Value;
+                            if (!(mystring.Contains(text)))
+                            {
+                                worksheet.Cells[row, column + 1].Value = mystring + text;
+                            }
+                            worksheet.Column(column + 1).Width = 100;
+                            worksheet.Cells[row, column + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                            worksheet.Column(column + 1).Style.WrapText = true;
                             p.SaveAs(fileDaAprire);
                             return true;
                         }
@@ -1000,7 +1120,120 @@ namespace ERwin_CA
             }
         }
 
+        public static bool WriteExcelStatsForEntity(FileInfo fileDaAprire, Dictionary<string, List<String>> CompareResults)
+        {
+            try
+            {
+                string file = fileDaAprire.FullName;
+                
+                ExcelPackage p = null;
+                ExcelWorkbook WB = null;
+                ExcelWorksheets ws = null;
+                try
+                {
+                    p = new ExcelPackage();
+                    WB = p.Workbook;
+                    ws = WB.Worksheets; 
+                    ws.Add(ConfigFile.TABELLE);
+                }
+                catch (Exception exp)
+                {
+                    Logger.PrintLC("Errore durante la scrittura di: " + fileDaAprire.Name + ": impossibile aprire il file " + fileDaAprire.DirectoryName, 1, ConfigFile.ERROR);
+                    return false;
+                }
 
+                var worksheet = ws[ConfigFile.TABELLE];
+
+                Logger.PrintLC("Inizio compilazione file excel", 4, ConfigFile.INFO);
+
+                worksheet.Row(1).Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Row(1).Style.Font.Bold = true;
+                worksheet.Column(1).Width = 50;
+                worksheet.Column(2).Width = 50;
+                worksheet.Cells[1, 1].Value = "Tabelle Documento Di Ricognizione Caricate In Erwin";
+                worksheet.Cells[1, 2].Value = "Tabelle Documento DDL";
+                worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                worksheet.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                worksheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Column(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Column(1).Style.WrapText = true;
+                worksheet.Column(2).Style.WrapText = true;
+
+                int row = 2;
+                foreach (var result in CompareResults)
+                {
+                    bool pair = true;
+                    foreach (var element in result.Value)
+                    {
+                        worksheet.Row(row).Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+                        if (result.Key == "CollezioneTrovati")
+                        {
+                            worksheet.Cells[row, 1].Value = element;
+                            worksheet.Cells[row, 2].Value = element;
+                            if (pair)
+                            {
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.White);
+                            }
+                            else
+                            {
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                            }
+                        }
+                        if (result.Key == "CollezioneNonTrovatiSQL")
+                        {
+                            worksheet.Cells[row, 1].Value = element;
+                            worksheet.Cells[row, 2].Value = "KO Entity non trovata sul DDL";
+                            if (pair)
+                            {
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+                                worksheet.Cells[row, 2].Style.Font.Color.SetColor(Color.White);
+                            }
+                            else
+                            {
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                worksheet.Cells[row, 2].Style.Font.Color.SetColor(Color.White);
+                            }
+                        }
+                        if (result.Key == "CollezioneNonTrovatiXLS")
+                        {
+                            worksheet.Cells[row, 2].Value = element;
+                            worksheet.Cells[row, 1].Value = "KO Entity non caricata su Erwin";
+                            if (pair)
+                            {
+                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+                                worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.White);
+                            }
+                            else
+                            {
+                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.White);
+                            }
+                        }
+                        row += 1;
+                        pair = !pair;
+                    }
+                    
+                }
+
+                Logger.PrintLC("Fine compilazione file excel", 4, ConfigFile.INFO);
+
+                p.SaveAs(fileDaAprire);
+                Logger.PrintLC(fileDaAprire + " Salvato", 4, ConfigFile.INFO);
+                return true;
+            }
+            catch (Exception exp)
+            {
+                Logger.PrintLC("Errore durante la scrittura del file. Errore: " + exp.Message , 4, ConfigFile.ERROR);
+                return false;
+            }
+        }
 
     }
 }

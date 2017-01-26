@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ERwin_CA.T;
+using System.IO;
 
 namespace ERwin_CA
 {
@@ -19,18 +20,35 @@ namespace ERwin_CA
             {
                 foreach(string elemento in completi)
                 {
-                    restituzione.Add(elemento + ": NOT processed.");
+                    restituzione.Add(elemento + ": NON processato.");
                 }
                 return restituzione;
             }
             foreach(string elemento in completi)
             {
                 if (elaborati.Contains(elemento))
-                    restituzione.Add(elemento + ": PROCESSED.");
+                    restituzione.Add(elemento + ": PROCESSATO.");
                 else
-                    restituzione.Add(elemento + ": NOT processed.");
+                    restituzione.Add(elemento + ": NON processato.");
             }
             return restituzione;
+        }
+
+        public static string GetFolderDestination(string FileInElaborazione,string Estensione)
+        {
+            string mystring = string.Empty;
+            mystring = Path.GetFullPath(FileInElaborazione);
+            mystring = mystring.Replace(Path.GetFileName(FileInElaborazione), "");
+            mystring = Path.Combine(mystring, ConfigFile.DEST_FOLD_NAME, ConfigFile.TIMESTAMPFOLDER, Path.GetFileNameWithoutExtension(FileInElaborazione) + Estensione);
+            return mystring;
+        }
+        public static string GetFolderDestination2(string FileInElaborazione, string FullName)
+        {
+            string mystring = string.Empty;
+            mystring = Path.GetFullPath(FileInElaborazione);
+            mystring = mystring.Replace(Path.GetFileName(FileInElaborazione), "");
+            mystring = Path.Combine(mystring, ConfigFile.DEST_FOLD_NAME, ConfigFile.TIMESTAMPFOLDER, FullName);
+            return mystring;
         }
 
         public static string RemoveWhitespace(string input)
