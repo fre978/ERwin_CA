@@ -218,7 +218,7 @@ namespace ERwin_CA
                 //Nome tabella
                 if (!string.IsNullOrWhiteSpace(entity.TableName))
                 {
-                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Tabella"], entity.TableName))
+                    if (con.AssignToObjModel(ref scItem, ConfigFile._TAB_NAME["Nome Tabella"], entity.TableName.ToUpper()))
                         Logger.PrintLC("Added Table Physical Name (" + entity.TableName + ") to " + scItem.ObjectId, 3, ConfigFile.INFO);
                     else
                     {
@@ -228,7 +228,7 @@ namespace ERwin_CA
                         CommitAndSave(trID);
                         return scItem;
                     }
-                    if (con.AssignToObjModel(ref scItem, "Name", entity.TableName))
+                    if (con.AssignToObjModel(ref scItem, "Name", entity.TableName.ToUpper()))
                         Logger.PrintLC("Added Table Name to " + scItem.Name, 3, ConfigFile.INFO);
                     else
                     {
@@ -490,7 +490,7 @@ namespace ERwin_CA
 
                         #region controlliTabellaPadre
                         //cerchiamo la tabella padre
-                        if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre))
+                        if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre.ToUpper()))
                         {
                             errore = "Relation ignored: Could not find table " + R.TabellaPadre + " inside relation ID " + relation.ID;
                             Logger.PrintLC(errore, 3, ConfigFile.ERROR);
@@ -529,7 +529,7 @@ namespace ERwin_CA
 
                         #region controlliTabellaFiglia
                         //cerchiamo la tabella figlia
-                        if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia))
+                        if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                         {
                             errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
                             Logger.PrintLC(errore, 3, ConfigFile.ERROR);
@@ -569,7 +569,7 @@ namespace ERwin_CA
                         #region controlliCampoPadre
                         //esistenza campo padre
                         SCAPI.ModelObjects erAttributesPadre = scSession.ModelObjects.Collect(tabellaPadre, "Attribute");
-                        if (!con.RetriveAttribute(ref campoPadre, erAttributesPadre, R.CampoPadre))
+                        if (!con.RetriveAttribute(ref campoPadre, erAttributesPadre, R.CampoPadre.ToUpper()))
                         {
                             errore = "Relation Ignored: Could not find field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
                             Logger.PrintLC(errore, 3, ConfigFile.ERROR);
@@ -676,7 +676,7 @@ namespace ERwin_CA
                         #region controlliCampoFiglio
                         //esistenza campo figlio
                         SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
-                        if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio))
+                        if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio.ToUpper()))
                         {
                             errore = "Relation Ignored Could not find Child Field " + R.CampoFiglio + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                             Logger.PrintLC(errore, 3, ConfigFile.ERROR);
@@ -843,7 +843,7 @@ namespace ERwin_CA
                             }
                             #endregion
                             #region assegnaTabellaPadre
-                            if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Padre"], R.TabellaPadre))
+                            if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Padre"], R.TabellaPadre.ToUpper()))
                                 Logger.PrintLC("Added Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
@@ -856,7 +856,7 @@ namespace ERwin_CA
                             }
                             #endregion
                             #region assegnaTabellaFiglia
-                            if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Figlia"], R.TabellaFiglia))
+                            if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Figlia"], R.TabellaFiglia.ToUpper()))
                                 Logger.PrintLC("Added Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
@@ -950,7 +950,7 @@ namespace ERwin_CA
                             {
                                 //Recuperiamo nuovamente la Tabella Figlio
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
-                                if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia))
+                                if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
                                     errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
@@ -961,7 +961,7 @@ namespace ERwin_CA
                                 }
                                 //Recuperiamo l'Attributo con il nome Campo Padre (aggiunto con la relazione)
                                 SCAPI.ModelObjects erAttributesFigliox = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
-                                if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre))
+                                if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
                                     errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
@@ -972,7 +972,7 @@ namespace ERwin_CA
                                 }
                                 else
                                 {
-                                    if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio))
+                                    if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
                                     { 
                                         Logger.PrintLC("Renamed (phisical) Child Field with name (" + R.CampoFiglio + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
                                     }
@@ -999,7 +999,7 @@ namespace ERwin_CA
                             {
                                 //Recuperiamo nuovamente la Tabella Figlio
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
-                                if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia))
+                                if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
                                     errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
@@ -1010,7 +1010,7 @@ namespace ERwin_CA
                                 }
                                 //Recuperiamo l'Attributo con il nome Campo Padre (aggiunto con la relazione)
                                 SCAPI.ModelObjects erAttributesFigliox = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
-                                if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre))
+                                if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
                                     errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
@@ -1021,7 +1021,7 @@ namespace ERwin_CA
                                 }
                                 else
                                 {
-                                    if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio))
+                                    if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
                                         Logger.PrintLC("Renamed Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
                                     else
                                     {
@@ -1091,7 +1091,7 @@ namespace ERwin_CA
                     return ret = null;
                 }
 
-                if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
+                if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy.ToUpper()))
                     Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly", 3, ConfigFile.INFO);
                 else
                 {
@@ -1133,13 +1133,10 @@ namespace ERwin_CA
                         entity.History += "\n" + errore;
                     }
 
-                
-
-
                 erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
 
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
-                    if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
+                    if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy.ToUpper()))
                     {
                         errore = "Attribute entity " + entity.NomeCampoLegacy + " already present.";
                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
@@ -1151,7 +1148,7 @@ namespace ERwin_CA
                         //Name
                         if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                         {
-                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], entity.NomeCampoLegacy))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], entity.NomeCampoLegacy.ToUpper()))
                                 Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 4, ConfigFile.INFO);
                             else
                             {
@@ -1160,7 +1157,7 @@ namespace ERwin_CA
                                 entity.History += "\n" + errore;
                             }
                             //Physical Name
-                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy))
+                            if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Nome Campo Legacy"], entity.NomeCampoLegacy.ToUpper()))
                                 Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
@@ -1245,7 +1242,7 @@ namespace ERwin_CA
                     CommitAndSave(trID);
                     return ret = null;
                 }
-                if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy))
+                if (con.RetriveEntity(ref erEntityObjectPE, erObjectCollection, entity.NomeTabellaLegacy.ToUpper()))
                     Logger.PrintLC("Table entity " + entity.NomeTabellaLegacy + " retrived correctly", 3, ConfigFile.INFO);
                 else
                 {
@@ -1259,8 +1256,31 @@ namespace ERwin_CA
                 erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
 
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
-                    if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy))
+                    if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy.ToUpper()))
                     {
+                        ////Verifico che la chiave non sia stata alterata dalla relazione, eventualmente la ripristino
+                        string isKey = string.Empty;
+                        // ogni colonna deve avere un valore chiave
+                        if (con.RetrieveFromObjModel(erAttributeObjectPE, "Type", ref isKey))
+                        {
+                            //verifico che il tipo di chiave non sia cambiato rispetto a quella che ho settato dalla collezione
+                            if (isKey != entity.Chiave.ToString())
+                            {
+                                //escludendo i casi in cui non era chiave e lo è diventata a seguito della relazione
+                                if (entity.Chiave == 0 || entity.Chiave == 100)
+                                    //riassegno il corretto valore chiave all'attributo
+                                    if (con.AssignToObjModelInt(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], (int)entity.Chiave))
+                                    {
+                                        Logger.PrintLC("La chiave alterata dalla relazione è stata ripristinata per il campo " + entity.NomeCampoLegacy + " della tabella " + entity.NomeTabellaLegacy, 4, ConfigFile.INFO);
+                                    }
+                                    else
+                                    {
+                                        errore = "Error adding Chiave to " + erAttributeObjectPE.Name;
+                                        Logger.PrintLC("La chiave alterata dalla relazione NON è stata ripristinata per il campo " + entity.NomeCampoLegacy + " della tabella " + entity.NomeTabellaLegacy, 4, ConfigFile.ERROR);
+                                        entity.History += "\n" + errore;
+                                    }
+                            }
+                        }
                         //Definizione Campo
                         if (!string.IsNullOrWhiteSpace(entity.DefinizioneCampo))
                         {

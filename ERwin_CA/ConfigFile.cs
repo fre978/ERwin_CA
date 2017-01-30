@@ -36,7 +36,6 @@ namespace ERwin_CA
 
         public static string BASE_PATH = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
         public static string APP_PATH = System.IO.Path.GetDirectoryName(BASE_PATH).Replace("file:\\", "");
-        public static string DRIVE = ConfigurationSettings.AppSettings["Drive"];
         public static string SEARCH_PATH = ConfigurationSettings.AppSettings["Search Folder"];
 
         public static string CREACOPIEERWIN = ConfigurationSettings.AppSettings["CREACOPIEERWIN"];
@@ -200,6 +199,9 @@ namespace ERwin_CA
         public const string TABELLE =   "Censimento Tabelle";
         public const string ATTRIBUTI = "Censimento Attributi";
         public const string RELAZIONI = "Relazioni-ModelloDatiLegacy";
+        public const string TABELLE_DIFF = "Differenze Tabelle";
+        public const string ATTRIBUTI_DIFF = "Differenze Attributi";
+        
         public static string COLONNA_01 = "SSA";
         public static int HEADER_RIGA = 3;
 

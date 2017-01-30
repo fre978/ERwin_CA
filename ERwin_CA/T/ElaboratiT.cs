@@ -11,11 +11,13 @@ namespace ERwin_CA.T
     {
         public string FileElaborato { get; set; }
         public List<EntityT> EntityElaborate { get; set; }
+        public List<AttributeT> AttributiElaborati { get; set; }
 
-        public ElaboratiT(string fileElaborato, List<EntityT> entityElaborate)
+        public ElaboratiT(string fileElaborato, List<EntityT> entityElaborate, List<AttributeT> attributiElaborati)
         {
             FileElaborato = fileElaborato;
             EntityElaborate = entityElaborate;
+            AttributiElaborati = attributiElaborati;
         }
     }
 }

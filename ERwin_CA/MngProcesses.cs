@@ -26,9 +26,7 @@ namespace ERwin_CA
                 List<string> FileElaboratiSQL = new List<string>();
                 string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
                 List<string> FileDaElaborare = FileOps.GetTrueFilesToProcess(ElencoExcel);
-
-                //Dictionary<string, List<EntityT>> EntityElaborate;
-                
+                                
                 //####################################
                 //Ciclo MAIN
                 foreach (var file in FileDaElaborare)
@@ -363,27 +361,48 @@ namespace ERwin_CA
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx")))
                         {
                             FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                            File.Delete(FileElaborato);
+                            if ((EntitaCreate != 0) || (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))) //se non ha creato entyty non lo cancello perche KO
+                                File.Delete(FileElaborato);
                         }
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))
                         {
                             OriginalXLS = true;
                             FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls"));
-                            File.Delete(FileElaborato);
+                            if (EntitaCreate != 0) //se non ha creato entyty non lo cancello perche KO
+                                File.Delete(FileElaborato);
                         }
                         //Conversione file di destinazione nel formato XLS
-                        if (OriginalXLS == true)
+                        if (EntitaCreate != 0)
+                        {
+                            if (OriginalXLS == true)
+                            {
+                                if (File.Exists(fInfo.FullName))
+                                {
+                                    ExcelOps.ConvertXLSXtoXLS(fInfo.FullName);
+                                    File.Delete(fInfo.FullName);
+                                }
+                            }
+                        }
+                        else
                         {
                             if (File.Exists(fInfo.FullName))
                             {
-                                ExcelOps.ConvertXLSXtoXLS(fInfo.FullName);
                                 File.Delete(fInfo.FullName);
                             }
+                            string erw = Path.GetFileNameWithoutExtension(fInfo.FullName) + ".erwin";
+                            erw = fInfo.FullName.Replace(fInfo.Name, erw);
+                            if (File.Exists(erw))
+                            {
+                                File.Delete(erw);
+                            }
                         }
+
+                        
                         FileElaborati.Add(FileElaborato);
-                        ElaboratiT Elaborato = new ElaboratiT(fileElaborato: "", entityElaborate: new List<EntityT>());
+                        ElaboratiT Elaborato = new ElaboratiT(fileElaborato: "", entityElaborate: new List<EntityT>(), attributiElaborati: new List<AttributeT>());
                         Elaborato.FileElaborato = FileElaborato;
                         Elaborato.EntityElaborate = DatiFile;
+                        Elaborato.AttributiElaborati = AttrFile;
                         Elaborati.Add(Elaborato);
                         
                     }
@@ -403,28 +422,31 @@ namespace ERwin_CA
 
                 foreach (var Elaborato in Elaborati)
                 {
-                    #region ProcessingFileSQL
                     string FileElaborato = Elaborato.FileElaborato;
                     List<EntityT> EntityElaborate = Elaborato.EntityElaborate;
-                    Logger.PrintLC("** INIZIO ELABORAZIONE SQL: " + FileElaborato, 2);
+                    List<AttributeT> AttributiElaborati = Elaborato.AttributiElaborati;
 
-                    //per i file correttamente elaborati nel modulo precedente cerchiamo se ci sono i corrispettivi file ddl
-                    #region RicercaCoppieXlsDdl
+                    #region ProcessingFileSQL
+                    Logger.PrintLC("** INIZIO ELABORAZIONE DDL: " + FileElaborato, 2);
+
+                    
+                    #region ElaborazioneCoppieXlsDdl
                     string fullNameSQL = Path.GetFileNameWithoutExtension(FileElaborato) + ".sql";
                     string FileDaElaborareSQL = Path.GetFullPath(FileElaborato);
                     FileDaElaborareSQL = FileDaElaborareSQL.Replace(Path.GetFileName(FileElaborato), fullNameSQL);
                     string FileDifferenze = Path.GetFileNameWithoutExtension(FileElaborato) + "_diffvsddl.xlsx";
                     FileDifferenze = Path.Combine(ConfigFile.FOLDERDESTINATION,FileDifferenze);
 
+                    //per i file correttamente elaborati nel modulo precedente cerchiamo se ci sono i corrispettivi file ddl
                     if (File.Exists(FileDaElaborareSQL))
                     {
-                        Logger.PrintLC("Un corrispondente file SQL esiste per il file " + FileElaborato, 3,ConfigFile.INFO);
+                        Logger.PrintLC("Un corrispondente file DDL esiste per il file " + FileElaborato, 3,ConfigFile.INFO);
 
                         //se il file esiste inizio a leggere il contenuto e a collezionarne le informazioni
                         #region EsameTabelleSQL
                         Dictionary<string, List<String>> CompareResults = new Dictionary<string, List<string>>();
 
-                        Logger.PrintLC("** INIZIO ELABORAZIONE - TABELLE parsing da SQL", 2);
+                        Logger.PrintLC("** INIZIO ELABORAZIONE - TABELLE parsing da DDL", 2);
                         List<string> ListaRigheFileSQL = new List<string>();
 
                         Logger.PrintLC("Lettura file " + FileDaElaborareSQL, 3, ConfigFile.INFO);
@@ -450,28 +472,74 @@ namespace ERwin_CA
                         else
                         {
                             //info non lette correttamente
-                            Logger.PrintLC("Lettura non riuscita del file " + FileElaborato, 3, ConfigFile.ERROR);
+                            Logger.PrintLC("Lettura non riuscita del file " + FileDaElaborareSQL, 3, ConfigFile.ERROR);
                         }
                         
                         FileElaboratiSQL.Add(FileDaElaborareSQL);
-                        Logger.PrintLC("** FINE ELABORAZIONE - TABELLE parsing da SQL", 2);
+                        Logger.PrintLC("** FINE ELABORAZIONE - TABELLE parsing da DDL", 2);
                         #endregion
 
                         #region ScritturaFileXLS
-                        Logger.PrintLC("** INIZIO ELABORAZIONE - TABELLE scrittura risultati su XLS", 2);
+                        Logger.PrintLC("** INIZIO ELABORAZIONE - TABELLE scrittura risultati differenze DDL <-> XLS", 2);
 
                         if (ExcelOps.WriteExcelStatsForEntity(new FileInfo(FileDifferenze), CompareResults))
                         {
                             //scrittura excel OK
-                            Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file SQL riuscita", 3, ConfigFile.INFO);
+                            Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file DDL riuscita", 3, ConfigFile.INFO);
                         }
                         else
                         {
                             //scrittura excel KO
-                            Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file SQL non riuscita", 3, ConfigFile.ERROR);
+                            Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file DDL non riuscita", 3, ConfigFile.ERROR);
                         }
 
-                        Logger.PrintLC("** FINE ELABORAZIONE - TABELLE scrittura risultati su XLS", 2);
+                        Logger.PrintLC("** FINE ELABORAZIONE - TABELLE scrittura risultati differenze DDL <-> XLS", 2);
+                        #endregion
+
+                        #region EsameAttributiSQL
+                        Logger.PrintLC("** INIZIO ELABORAZIONE - ATTRIBUTI parsing da DDL", 2);
+                        
+                        if (ListaRigheFileSQL.Count > 0)
+                        {
+                            //estrazione elenco attributi dalle righe del file sql
+                            Logger.PrintLC("Estrazione attributi da " + FileDaElaborareSQL, 3, ConfigFile.INFO);
+                            List<string> CollezioneAttributi = SqlOps.CollezionaAttributi(ListaRigheFileSQL);
+                            Logger.PrintLC("Attributi trovati in " + FileDaElaborareSQL, 3, ConfigFile.INFO);
+
+                            if (SqlOps.CompareAttribute(CollezioneAttributi, AttributiElaborati, ref CompareResults))
+                            {
+                                Logger.PrintLC("Comparazione attributi riuscita tra " + FileElaborato + " e " + FileDaElaborareSQL, 3, ConfigFile.INFO);
+                            }
+                            else
+                            {
+                                Logger.PrintLC("Comparazione attributi non riuscita tra " + FileElaborato + " e " + FileDaElaborareSQL, 3, ConfigFile.ERROR);
+                            }
+                        }
+                        else
+                        {
+                            //info non lette correttamente
+                            Logger.PrintLC("Lettura non riuscita del file " + FileDaElaborareSQL, 3, ConfigFile.ERROR);
+                        }
+
+                        //FileElaboratiSQL.Add(FileDaElaborareSQL);
+                        Logger.PrintLC("** FINE ELABORAZIONE - ATTRIBUTI parsing da DDL", 2);
+                        #endregion
+
+                        #region ScritturaFileXLS
+                        Logger.PrintLC("** INIZIO ELABORAZIONE - ATTRIBUTI scrittura risultati differenze DDL <-> XLS", 2);
+
+                        if (ExcelOps.WriteExcelStatsForAttribute(new FileInfo(FileDifferenze), CompareResults))
+                        {
+                            //scrittura excel OK
+                            Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file DDL riuscita", 3, ConfigFile.INFO);
+                        }
+                        else
+                        {
+                            //scrittura excel KO
+                            Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file DDL non riuscita", 3, ConfigFile.ERROR);
+                        }
+
+                        Logger.PrintLC("** FINE ELABORAZIONE - ATTRIBUTI scrittura risultati differenze DDL <-> XLS", 2);
                         #endregion
 
                         FileElaboratiSQL.Add(FileElaborato);
@@ -484,7 +552,7 @@ namespace ERwin_CA
                     }
                     #endregion
 
-                    Logger.PrintLC("** FINE ELABORAZIONE SQL: " + FileElaborato, 2);
+                    Logger.PrintLC("** FINE ELABORAZIONE DDL: " + FileElaborato, 2);
                     #endregion
                 }
                 #region SummaryFiles
