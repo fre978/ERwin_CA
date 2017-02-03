@@ -339,5 +339,6 @@ namespace ERwin_CA
 
         // ##############################
 
+        public static bool DDL_Show_Right_Rows = (ConfigurationSettings.AppSettings["DDL Show Right Rows"] == "true") ? true : false;
     }
 }

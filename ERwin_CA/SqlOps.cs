@@ -81,7 +81,7 @@ namespace ERwin_CA
                     string TableName = attribute.NomeTabellaLegacy.ToUpper();
                     string AttributeName = attribute.NomeCampoLegacy.ToUpper();
                     string Attributo = TableName + "." + AttributeName;
-                    if (CollezioneSQL.Exists(x => x == Attributo))
+                    if (CollezioneSQL.Exists(x => x.Contains(Attributo)))
                     {
                         //presente nel file sql -> OK
                         CollezioneTrovati.Add(Attributo);
@@ -95,14 +95,17 @@ namespace ERwin_CA
 
                 foreach (string attribute in CollezioneSQL)
                 {
-                    if (CollezioneTrovati.Exists(x => x == attribute))
+                    string[] elementoCollezioneSQL = attribute.Split('|');
+                    if (CollezioneTrovati.Exists(x => x == elementoCollezioneSQL[0]))
                     {
                         //esiste già nella tabella trovati -> OK
+                        CollezioneTrovati.Remove(elementoCollezioneSQL[0]);
+                        CollezioneTrovati.Add(attribute);
                     }
                     else
                     {
                         //non esiste sull'xls -> KO
-                        CollezioneNonTrovatiXLS.Add(attribute);
+                        CollezioneNonTrovatiXLS.Add(elementoCollezioneSQL[0]);
                     }
                 }
                 MyDictionary.Add("CollezioneAttributiTrovati", CollezioneTrovati);
@@ -172,6 +175,9 @@ namespace ERwin_CA
             List<string> ret = new List<string>();
             string[] RigaSplit;
             bool cerca = false;
+            string memTable = string.Empty;
+            string memConstraint = string.Empty;
+            bool completeContraint = true;
             try
             {
                 string entity = string.Empty;
@@ -179,9 +185,40 @@ namespace ERwin_CA
                 {
                     string myriga = riga.ToUpper();
                     int i = 0;
-                    int memRow = 0;
-                    
 
+                    if (myriga.Contains("CONSTRAINT"))
+                    {
+                        if (myriga.Contains(";"))
+                        {
+                            //la constraint è completa cosi
+                            memConstraint = myriga;
+                            completeContraint = true;
+                        }
+                        else
+                        {
+                            //la constraint è suddivisa su piu righe
+                            memConstraint = myriga;
+                            completeContraint = false;
+                            continue;
+                        }
+                    }
+                    if (!(completeContraint))
+                    {
+                        memConstraint += myriga;
+                        if (myriga.Contains(";"))
+                        {
+                            //la constraint è completa cosi
+                            myriga = memConstraint;
+                            completeContraint = true;
+                        }
+                        else
+                        {
+                            //la constraint non è ancora completa
+                            continue;
+                        }
+
+                    }
+                    
                     //salto le righe vuote
                     if (string.IsNullOrEmpty(myriga))
                         continue;
@@ -206,7 +243,8 @@ namespace ERwin_CA
                                     elemento = arrayelemento[arrayelemento.Count() - 1];
                                     //usero entity come prefisso per gli attributi che troverò nelle righe successive
                                     entity = elemento;
-                                    continue;
+                                    memTable = elemento;
+                                    break;
                                 }
                                 
                             }
@@ -231,12 +269,58 @@ namespace ERwin_CA
                     {
                         if (cerca) 
                             cerca = false;
+
+                        if (string.IsNullOrEmpty(memTable))
+                        {
+                            //non ho una tabella su cui lavorare
+                        }
+                        else
+                        {
+                            if (myriga.ToUpper().Contains("PRIMARY"))
+                            {
+                                string constraint = myriga.ToUpper().Substring(myriga.IndexOf("(") + 1, myriga.IndexOf(")") - myriga.IndexOf("(") - 1);
+                                string[] keys = constraint.Split(',');
+                                foreach (string key in keys)
+                                    if (ret.Exists(x => x.Contains(memTable + "." + key.Trim())))
+                                    {
+                                        string temp = ret.Find(x => x.Contains(memTable + "." + key.Trim()));
+                                        ret.Remove(temp);
+                                        ret.Add(temp + "true");
+                                    }
+                            }
+                        }
                         continue;
                     }
                     if ((myriga.Trim().Contains("TABLE")))
                     {
                         if (cerca)
                             cerca = false;
+
+                        //all'interno del ciclo cerco le righe contenenti create table
+                        if ((myriga.ToUpper()).Contains("ALTER TABLE"))
+                        {
+                            //se trovo una alter table devo verificare che ci sia una constraint nelle righe successive
+                            RigaSplit = riga.Split(' ');
+                            foreach (string e in RigaSplit)
+                            {
+                                if (e.ToUpper() == "TABLE")
+                                {
+                                    string elemento = string.Empty;
+                                    //verifico che ci sia l'elemento successivo nell'array
+                                    if (RigaSplit.Count() >= i)
+                                    {
+                                        elemento = RigaSplit[i + 1];
+                                        //separo eventuali notazioni db.dbo.tabella prendendo l'ultimo elemento dell'insieme
+                                        string[] arrayelemento = elemento.Split('.');
+                                        elemento = arrayelemento[arrayelemento.Count() - 1];
+                                        //usero entity come prefisso per gli attributi che troverò nelle righe successive
+                                        memTable = elemento;
+                                        break;
+                                    }
+                                }
+                                i = i + 1;
+                            }
+                        }
                         continue;
                     }
                     if ((myriga.Trim().Contains("LABEL")))
@@ -254,20 +338,56 @@ namespace ERwin_CA
                             //splitto le parole della riga
                             RigaSplit = riga.Split(' ');
 
+                            bool cercaDatatype = false;
+                            string datatype = string.Empty;
+                            string attribute = string.Empty;
+                            string mandatory = riga.ToUpper().Contains("NOT NULL") ? "true" : "false";
+                            string key = string.Empty;
+
+
                             //il nome dell'attributo è il primo elemento di una riga di dichiarazione degli attributi ma può essere nel formato db.dbo.tabella.attributo
                             foreach (string x in RigaSplit)
                             {
                                 if (!(string.IsNullOrEmpty(x)))
                                 {
-                                    string[] arrayelemento = x.Split('.');
-                                    //prendo l'ultimo elemento dell'attributo e lo aggiungo alla lista di attributi se non esiste
-                                    string elemento = entity + "." + arrayelemento[arrayelemento.Count() - 1];
-                                    if (!(ret.Exists(y => y == elemento)))
-                                        ret.Add(elemento);
-                                    break;
+                                    if (!(cercaDatatype))
+                                    { 
+                                        string[] arrayelemento = x.Split('.');
+                                        //prendo l'ultimo elemento dell'attributo e lo aggiungo alla lista di attributi se non esiste
+                                        string elemento = entity + "." + arrayelemento[arrayelemento.Count() - 1];
+                                        if (!(ret.Exists(y => y == elemento)))
+                                        {
+                                            attribute = elemento;
+                                            cercaDatatype = true;
+                                        }
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        datatype += x;
+                                        if ((datatype.Contains('(')) && (!datatype.Contains(')')))
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
                                 }
                             }
+
+                            if (!(ret.Exists(y => y.Contains(attribute))))
+                            {
+                                datatype = datatype.Trim().EndsWith(",") ? 
+                                    datatype.Trim().Substring(0, datatype.Trim().Length - 1) 
+                                    : datatype;
+                                ret.Add(attribute + "|" + datatype + "|" + mandatory + "|" + key);
+                            }
+
                             continue;
+
+
                         }
                         catch
                         {
@@ -277,7 +397,7 @@ namespace ERwin_CA
                 }
                 return ret;
             }
-            catch
+            catch (Exception exp)
             {
                 return ret;
             }

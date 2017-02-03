@@ -417,7 +417,7 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
                         }
-                        if (!(string.IsNullOrWhiteSpace(flag)) && (!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))))
+                        if ((!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))))
                         {
                             incorrect = true;
                             error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
@@ -609,10 +609,35 @@ namespace ERwin_CA
                         }
                         else
                         {
-                            if (!(cardinalita.Equals("1:1") || cardinalita.Equals("1:n")))
-                            {
-                                incorrect = true;
-                                error += "CARDINALITA non conforme. ";
+                            //if (!(cardinalita.Equals("1:1") || cardinalita.Equals("1:n")))
+                            //{
+                            //    incorrect = true;
+                            //    error += "CARDINALITA non conforme. ";
+                            //}
+                            switch (cardinalita)
+                            { 
+                                case "1:1":
+                                    break;
+                                case "1:n":
+                                    break;
+                                case "n:n":
+                                    break;
+                                case "(0,1) a (0,1)":
+                                    break;
+                                case "(0,1) a (1,M)":
+                                    break;
+                                case "(0,1) a (0,1,M)":
+                                    break;
+                                case "1 a (0,1)":
+                                    break;
+                                case "1 a (1,M)":
+                                    break;
+                                case "1 a (0,1,M)":
+                                    break;
+                                default:
+                                    incorrect = true;
+                                    error += "CARDINALITA non conforme. ";
+                                    break;
                             }
 
                         }
@@ -654,10 +679,44 @@ namespace ERwin_CA
                             ValRiga.IdentificativoRelazione = identificativoRelazione;
                             ValRiga.TabellaPadre = tabellaPadre;
                             ValRiga.TabellaFiglia = tabellaFiglia;
-                            if (cardinalita.Equals("1:1"))
-                                ValRiga.Cardinalita = -1;
-                            else
-                                ValRiga.Cardinalita = -3;
+                            //if (cardinalita.Equals("1:1"))
+                            //    ValRiga.Cardinalita = -1;
+                            //else
+                            //    ValRiga.Cardinalita = -3;
+                            switch (cardinalita)
+                            {
+                                case "1:1":
+                                    ValRiga.Cardinalita = -1;
+                                    break;
+                                case "1:n":
+                                    ValRiga.Cardinalita = -2;
+                                    break;
+                                case "n:n":
+                                    ValRiga.History = "CARDINALITA non gestita dall'applicazione";
+                                    break;
+                                case "(0,1) a (0,1)":
+                                    ValRiga.Cardinalita = -1;
+                                    break;
+                                case "(0,1) a (1,M)":
+                                    ValRiga.Cardinalita = -2;
+                                    break;
+                                case "(0,1) a (0,1,M)":
+                                    ValRiga.Cardinalita = -3;
+                                    break;
+                                case "1 a (0,1)":
+                                    ValRiga.Cardinalita = -1;
+                                    break;
+                                case "1 a (1,M)":
+                                    ValRiga.Cardinalita = -2;
+                                    break;
+                                case "1 a (0,1,M)":
+                                    ValRiga.Cardinalita = -3;
+                                    break;
+                                default:
+                                    ValRiga.History = "CARDINALITA non conforme";
+                                    break;
+                            }
+
                             ValRiga.CampoPadre = campoPadre;
                             ValRiga.CampoFiglio = campoFiglio;
                             if (identificativa.ToUpper().Equals("S"))
@@ -1164,17 +1223,24 @@ namespace ERwin_CA
                 worksheet.Column(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 worksheet.Column(1).Style.WrapText = true;
                 worksheet.Column(2).Style.WrapText = true;
+                worksheet.View.FreezePanes(2, 1);
+                //ExcelRange firstRow = (ExcelRange)worksheet.Row(1);
+                //firstRow.f
+                //firstRow.Select();
+                //firstRow.Application.ActiveWindow.FreezePanes = true;
 
                 int row = 2;
                 bool pair = true;
+                bool ExcelVuoto = true;
                 foreach (var result in CompareResults)
                 {
                     foreach (var element in result.Value)
                     {
                         worksheet.Row(row).Style.Fill.PatternType = ExcelFillStyle.Solid;
 
-                        if (result.Key == "CollezioneTrovati")
+                        if ((result.Key == "CollezioneTrovati") && ConfigFile.DDL_Show_Right_Rows)
                         {
+                            ExcelVuoto = false;
                             worksheet.Cells[row, 1].Value = element;
                             worksheet.Cells[row, 2].Value = element;
                             if (pair)
@@ -1189,9 +1255,12 @@ namespace ERwin_CA
                                 worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
                                 worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
                             }
+                            row += 1;
+                            pair = !pair;
                         }
                         if (result.Key == "CollezioneNonTrovatiSQL")
                         {
+                            ExcelVuoto = false;
                             worksheet.Cells[row, 1].Value = element;
                             worksheet.Cells[row, 2].Value = "KO: Entity non trovata sul DDL";
                             if (pair)
@@ -1208,9 +1277,12 @@ namespace ERwin_CA
                                 worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.Red);
                                 worksheet.Cells[row, 2].Style.Font.Color.SetColor(Color.White);
                             }
+                            row += 1;
+                            pair = !pair;
                         }
                         if (result.Key == "CollezioneNonTrovatiXLS")
                         {
+                            ExcelVuoto = false;
                             worksheet.Cells[row, 2].Value = element;
                             worksheet.Cells[row, 1].Value = "KO: Entity non caricata su Erwin";
                             if (pair)
@@ -1227,11 +1299,21 @@ namespace ERwin_CA
                                 worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
                                 worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.White);
                             }
+                            row += 1;
+                            pair = !pair;
                         }
-                        row += 1;
-                        pair = !pair;
+                        
                     }
                     
+                }
+                if (ExcelVuoto)
+                {
+                    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.White);
+                    worksheet.Cells[2, 1].Value = "Nessuna Differenza Riscontrata";
+                    worksheet.Cells[2, 1].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 1].Style.Font.Color.SetColor(Color.White);
+                    worksheet.Cells[2, 2].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 2].Style.Font.Color.SetColor(Color.White);
                 }
 
                 Logger.PrintLC("Fine compilazione file excel", 4, ConfigFile.INFO);
@@ -1247,7 +1329,7 @@ namespace ERwin_CA
             }
         }
 
-        public static bool WriteExcelStatsForAttribute(FileInfo fileDaAprire, Dictionary<string, List<String>> CompareResults)
+        public static bool WriteExcelStatsForAttribute(FileInfo fileDaAprire, Dictionary<string, List<String>> CompareResults, List<AttributeT> Attributi)
         {
             try
             {
@@ -1289,16 +1371,44 @@ namespace ERwin_CA
                 worksheet.Row(1).Style.Fill.PatternType = ExcelFillStyle.Solid;
                 worksheet.Row(1).Style.Font.Bold = true;
                 worksheet.Row(1).Style.Fill.BackgroundColor.SetColor(Color.White);
-                worksheet.Column(1).Width = 50;
-                worksheet.Column(2).Width = 50;
-                worksheet.Cells[1, 1].Value = "Attributi Documento Di Ricognizione Caricate In Erwin";
+                worksheet.Row(1).Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                worksheet.Column(1).Width = 45;
+                worksheet.Column(2).Width = 45;
+                worksheet.Column(3).Width = 25;
+                worksheet.Column(4).Width = 25;
+                worksheet.Column(5).Width = 25;
+                worksheet.Cells[1, 1].Value = "Attributi Documento Di Ricognizione Caricati In Erwin";
                 worksheet.Cells[1, 2].Value = "Attributi Documento DDL";
+                worksheet.Cells[1, 3].Value = "Differenze Campo Datatype";
+                worksheet.Cells[1, 4].Value = "Differenze Campo Chiave";
+                worksheet.Cells[1, 5].Value = "Differenze Campo Mandatory";
                 worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
                 worksheet.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                worksheet.Cells[1, 3].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                worksheet.Cells[1, 4].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                worksheet.Cells[1, 5].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                //worksheet.Cells[1, 1].Style.Font.Color.SetColor(Color.Red);
+                //worksheet.Cells[1, 2].Style.Font.Color.SetColor(Color.Red);
+                //worksheet.Cells[1, 3].Style.Font.Color.SetColor(Color.Red);
+                //worksheet.Cells[1, 4].Style.Font.Color.SetColor(Color.Red);
+                //worksheet.Cells[1, 5].Style.Font.Color.SetColor(Color.Red);
                 worksheet.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 worksheet.Column(2).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                worksheet.Column(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 worksheet.Column(1).Style.WrapText = true;
                 worksheet.Column(2).Style.WrapText = true;
+                worksheet.Column(3).Style.WrapText = true;
+                worksheet.Column(4).Style.WrapText = true;
+                worksheet.Column(5).Style.WrapText = true;
+                //Excel.Range firstRow = (Excel.Range)worksheet.Row(1);
+                //firstRow.Activate();
+                //firstRow.Select();
+                //firstRow.Application.ActiveWindow.FreezePanes = true;
+                worksheet.View.FreezePanes(2, 1);
+
+                bool ExcelVuoto = true;
 
                 int row = 2;
                 bool pair = true;
@@ -1310,23 +1420,101 @@ namespace ERwin_CA
 
                         if (result.Key == "CollezioneAttributiTrovati")
                         {
-                            worksheet.Cells[row, 1].Value = element;
-                            worksheet.Cells[row, 2].Value = element;
-                            if (pair)
+                            string[] elementi = element.Split('|');
+                            if (elementi.Count() != 4)
                             {
-                                worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.White);
-                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
-                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                worksheet.Cells[row, 1].Value = "errore nella comparazione dell'elemento: " + element;
+                                ExcelVuoto = false;
+                                continue;
+                            }
+                            
+                            
+                            AttributeT AttributoRif = Attributi.Find(x => elementi[0] == x.NomeTabellaLegacy + "." + x.NomeCampoLegacy);
+                            bool datatypeOK = true;
+                            bool mandatoryOK = true;
+                            bool keyOK = true;
+                            string mandatoryXLS = string.Empty;
+                            string mandatoryDDL = string.Empty;
+                            string keyXLS = string.Empty;
+                            string keyDDL = string.Empty;
+
+                            mandatoryDDL = elementi[2] == "true" ? "NOT NULL" : "NULL";
+                            mandatoryXLS = AttributoRif.MandatoryFlag == 1 ? "NOT NULL" : "NULL";
+                            keyXLS = elementi[3] == "true" ? "CHIAVE PRIMARIA" : "";
+                            keyDDL = AttributoRif.Chiave == 0 ? "CHIAVE PRIMARIA" : "";
+
+                            if (AttributoRif.DataType != elementi[1])
+                                datatypeOK = false;
+                            if (mandatoryDDL != mandatoryXLS)
+                                mandatoryOK = false;
+                            if (keyDDL != keyXLS)
+                                keyOK = false;
+
+                            if ((!ConfigFile.DDL_Show_Right_Rows) && datatypeOK && mandatoryOK && keyOK) 
+                            {
+                              // se tutte e 4 le condizioni sono vere non scrive. Se anche solo una è falsa scrive.  
                             }
                             else
-                            {
-                                worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
-                                worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
-                                worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                            { 
+                                ExcelVuoto = false;
+                                worksheet.Cells[row, 1].Value = elementi[0];
+                                worksheet.Cells[row, 2].Value = elementi[0];
+                                worksheet.Cells[row, 3].Value = "XLS: " + AttributoRif.DataType + "\n" + "DDL: " + elementi[1];
+                                worksheet.Cells[row, 4].Value = "XLS: " + keyXLS + "\n" + "DDL: " + keyDDL;
+                                worksheet.Cells[row, 5].Value = "XLS: " + mandatoryXLS + "\n" + "DDL: " + mandatoryDDL;
+
+
+                                if (pair)
+                                {
+                                    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.White);
+                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                    worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                    worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                    worksheet.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                    worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.White);
+                                    if (datatypeOK)
+                                        worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                                    else
+                                        worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+                                    if (mandatoryOK)
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                                    else
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+                                    if (keyOK)
+                                        worksheet.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.LightGreen);
+                                    else
+                                        worksheet.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.OrangeRed);
+
+                                }
+                                else
+                                {
+                                    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                    worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                    worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                    worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                    worksheet.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                    worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                                    if (datatypeOK)
+                                        worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                                    else
+                                        worksheet.Cells[row, 3].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                    if (mandatoryOK)
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                                    else
+                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                    if (keyOK)
+                                        worksheet.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                                    else
+                                        worksheet.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                }
+                                row += 1;
+                                pair = !pair;
                             }
+
                         }
                         if (result.Key == "CollezioneAttributiNonTrovatiSQL")
                         {
+                            ExcelVuoto = false;
                             worksheet.Cells[row, 1].Value = element;
                             worksheet.Cells[row, 2].Value = "KO: Attributo non trovato sul DDL";
                             if (pair)
@@ -1343,9 +1531,12 @@ namespace ERwin_CA
                                 worksheet.Cells[row, 2].Style.Fill.BackgroundColor.SetColor(Color.Red);
                                 worksheet.Cells[row, 2].Style.Font.Color.SetColor(Color.White);
                             }
+                            row += 1;
+                            pair = !pair;
                         }
                         if (result.Key == "CollezioneAttributiNonTrovatiXLS")
                         {
+                            ExcelVuoto = false;
                             worksheet.Cells[row, 2].Value = element;
                             worksheet.Cells[row, 1].Value = "KO: Attributo non caricato su Erwin";
                             if (pair)
@@ -1362,10 +1553,29 @@ namespace ERwin_CA
                                 worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
                                 worksheet.Cells[row, 1].Style.Font.Color.SetColor(Color.White);
                             }
+                            row += 1;
+                            pair = !pair;
                         }
-                        row += 1;
-                        pair = !pair;
+                        Logger.PrintLC("Riga " + row + " scritta nel file excel", 5, ConfigFile.INFO);
+                        
                     }
+
+                }
+
+                if (ExcelVuoto)
+                {
+                    worksheet.Row(2).Style.Fill.BackgroundColor.SetColor(Color.White);
+                    worksheet.Cells[2, 1].Value = "Nessuna Differenza Riscontrata";
+                    worksheet.Cells[2, 1].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 1].Style.Font.Color.SetColor(Color.White);
+                    worksheet.Cells[2, 2].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 2].Style.Font.Color.SetColor(Color.White);
+                    worksheet.Cells[2, 3].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 3].Style.Font.Color.SetColor(Color.White);
+                    worksheet.Cells[2, 4].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 4].Style.Font.Color.SetColor(Color.White);
+                    worksheet.Cells[2, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                    worksheet.Cells[2, 5].Style.Font.Color.SetColor(Color.White);
 
                 }
 

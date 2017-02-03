@@ -134,6 +134,8 @@ namespace ERwin_CA
                         {
                             Logger.PrintF(fileCorrect, EntitaCreate + " tabelle create", true, ConfigFile.INFO);
                             Logger.PrintLC(EntitaCreate + " entity created", 2, ConfigFile.INFO);
+                            Logger.PrintF(fileCorrect, "create " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.TableDescr)).Count() + " tabelle senza descrizione su un totale di " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count, true, ConfigFile.INFO);
+                            Logger.PrintLC("create " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.TableDescr)).Count() + " tabelle senza descrizione su un totale di " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count, 2, ConfigFile.INFO);
                         }
                         else
                         {
@@ -436,6 +438,14 @@ namespace ERwin_CA
                     FileDaElaborareSQL = FileDaElaborareSQL.Replace(Path.GetFileName(FileElaborato), fullNameSQL);
                     string FileDifferenze = Path.GetFileNameWithoutExtension(FileElaborato) + "_diffvsddl.xlsx";
                     FileDifferenze = Path.Combine(ConfigFile.FOLDERDESTINATION,FileDifferenze);
+                    if (ConfigFile.DEST_FOLD_UNIQUE)
+                    {
+                        FileDifferenze = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDifferenze);
+                    }
+                    else
+                    {
+                        FileDifferenze = Funct.GetFolderDestination2(FileDaElaborareSQL, new FileInfo(FileDifferenze).Name);
+                    }
 
                     //per i file correttamente elaborati nel modulo precedente cerchiamo se ci sono i corrispettivi file ddl
                     if (File.Exists(FileDaElaborareSQL))
@@ -528,7 +538,7 @@ namespace ERwin_CA
                         #region ScritturaFileXLS
                         Logger.PrintLC("** INIZIO ELABORAZIONE - ATTRIBUTI scrittura risultati differenze DDL <-> XLS", 2);
 
-                        if (ExcelOps.WriteExcelStatsForAttribute(new FileInfo(FileDifferenze), CompareResults))
+                        if (ExcelOps.WriteExcelStatsForAttribute(new FileInfo(FileDifferenze), CompareResults, AttributiElaborati))
                         {
                             //scrittura excel OK
                             Logger.PrintLC("Scrittura dei risultati dell'elaborazione del file DDL riuscita", 3, ConfigFile.INFO);
@@ -543,7 +553,16 @@ namespace ERwin_CA
                         #endregion
 
                         FileElaboratiSQL.Add(FileElaborato);
-                        File.Copy(FileDaElaborareSQL, Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileName(FileDaElaborareSQL)));
+
+                        
+                        if (ConfigFile.DEST_FOLD_UNIQUE)
+                        {
+                            File.Copy(FileDaElaborareSQL, Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileName(FileDaElaborareSQL)));
+                        }
+                        else
+                        {
+                            File.Copy(FileDaElaborareSQL, Funct.GetFolderDestination2(FileDaElaborareSQL, fullNameSQL), true);
+                        }
                         File.Delete(FileDaElaborareSQL);
                     }
                     else
