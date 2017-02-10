@@ -329,7 +329,7 @@ namespace ERwin_CA
                 //##################################################
                 //## Controllo esistenza DB ed eventuale aggiunta ##
                 //** Qui vanno aggiunti eventuali altri DB da     **
-                //** prendere in considerazione oltre a DB2 e ORACLE
+                //** prendere in considerazione oltre a DB2 e ORACLE e SQL SERVER
                 if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
                 {
                     if (entity.DB == "DB2")
@@ -361,6 +361,37 @@ namespace ERwin_CA
                         }
                     }
                 }
+
+                if (entity.DB == "SQLSERVER")
+                {
+                    if (!DatabaseN.Contains(entity.DatabaseName))
+                    {
+                        scDB = erRootObjCol.Add("SQLServer_Database");
+                        if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome Database SQLSERVER"], entity.DatabaseName))
+                            Logger.PrintLC("Added Database Name to " + scDB.Name, 3, ConfigFile.INFO);
+                        else
+                        {
+                            //errore = "Error adding Database Name to " + scDB.Name;
+                            errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome Database SQLSERVER"] + " a " + scDB.Name;
+                            entity.History += "\n" + errore;
+                            Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(entity.HostName))
+                            if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host SQLSERVER"], entity.HostName))
+                                Logger.PrintLC("Added Host Name to " + scDB.Name, 3, ConfigFile.INFO);
+                            else
+                            {
+                                //errore = "Error adding Host Name to " + scDB.Name;
+                                errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host SQLSERVER"] + " a " + scDB.Name;
+                                entity.History += "\n" + errore;
+                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                            }
+                        DatabaseN.Add(entity.DatabaseName);
+                    }
+
+                }
+
                 if (entity.DB == "ORACLE")
                 {
                     if (!string.IsNullOrWhiteSpace(entity.HostName))
@@ -394,7 +425,7 @@ namespace ERwin_CA
                 //##################################################
                 //## Controllo esistenza SCHEMA ed eventuale aggiunta ##
                 //** Aggiungere qui eventuali altri casi DB oltre a DB2/ORACLE
-                if (entity.DB == "DB2")
+                if ((entity.DB == "DB2") || (entity.DB == "SQLSERVER"))
                 {
                     if (!string.IsNullOrWhiteSpace(entity.Schema))
                     {
@@ -502,324 +533,327 @@ namespace ERwin_CA
                         campoPadre = null;
                         campoFiglio = null;
                         RelazioniOk.Remove(R.IdentificativoRelazione);
-
-                        #region verificheErwin
-
-                        #region controlliTabellaPadre
-                        //cerchiamo la tabella padre
-                        if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre.ToUpper()))
+                        if (string.IsNullOrEmpty(R.History))
                         {
-                            //errore = "Relation ignored: Could not find table " + R.TabellaPadre + " inside relation ID " + relation.ID;
-                            errore = "Relazione ignorata: impossibile trovare la tabella " + R.TabellaPadre + " all'interno della relazione. ID: " + relation.ID;
-                            Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                            R.History += "\n" + errore;
-                            CommitAndSave(trID);
-                            //return ret = null;
-                            continue;
-                        }
-                        else
-                        {
-                            //verifica che la tabella padre sia sempre la medesima su tutte le righe della relazione
-                            if (PrimoGiro)
-                            {
-                                _TabellaPadre = R.TabellaPadre;
-                            }
-                            else
-                            {
-                                if (_TabellaPadre == R.TabellaPadre)
-                                {
-                                    //la tabella padre è la stessa delle righe precedenti della stessa relazione  
-                                }
-                                else
-                                {
-                                    //Non è possibile tracciare una relazione con tabelle differenti
-                                    //errore = "Relation ignored: Cannot trace relationship with a different father table inside the same relation" + relation.ID;
-                                    errore = "Relatione ignorata: impossibile tracciare la relazione con una tabella padre differente all'interno della stessa relazione" + relation.ID;
-                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                                    R.History += "\n" + errore;
-                                    CommitAndSave(trID);
-                                    //return ret = null;
-                                    continue;
-                                }
-                            }
+                            #region verificheErwin
 
-                        }
-                        #endregion
-
-                        #region controlliTabellaFiglia
-                        //cerchiamo la tabella figlia
-                        if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
-                        {
-                            //errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
-                            errore = "Relazione ignorata: impossibile trovare la tabella " + R.TabellaFiglia + " all'interno della relazione. ID: " + relation.ID;
-                            Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                            R.History += "\n" + errore;
-                            CommitAndSave(trID);
-                            //return ret = null;
-                            continue;
-                        }
-                        else
-                        {
-                            //verifica che la tabella figlia sia sempre la medesima su tutte le righe della relazione
-                            if (PrimoGiro)
+                            #region controlliTabellaPadre
+                            //cerchiamo la tabella padre
+                            if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre.ToUpper()))
                             {
-                                _TabellaFiglia = R.TabellaFiglia;
-                            }
-                            else
-                            {
-                                if (_TabellaFiglia == R.TabellaFiglia)
-                                {
-                                    //la tabella figlia è la stessa delle righe precedenti della stessa relazione  
-                                }
-                                else
-                                {
-                                    //Non è possibile tracciare una relazione con tabelle differenti
-                                    //errore = "Relation ignored: Cannot trace relationship with a different child table inside the same relation " + relation.ID;
-                                    errore = "Relazione ignorata: impossibile tracciare una relazione con una tabella figlia differente all'interno di una stessa relazione. ID: " + relation.ID;
-                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                                    R.History += "\n" + errore;
-                                    CommitAndSave(trID);
-                                    //return ret = null;
-                                    continue;
-                                }
-                            }
-
-                        }
-                        #endregion
-
-                        #region controlliCampoPadre
-                        //esistenza campo padre
-                        SCAPI.ModelObjects erAttributesPadre = scSession.ModelObjects.Collect(tabellaPadre, "Attribute");
-                        if (!con.RetriveAttribute(ref campoPadre, erAttributesPadre, R.CampoPadre.ToUpper()))
-                        {
-                            //errore = "Relation Ignored: Could not find field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
-                            errore = "Relazione ignorata: impossibile trovare il campo " + R.CampoPadre + " all'interno della tabella " + R.TabellaPadre + " per la relazione ID: " + relation.ID;
-                            Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                            R.History += "\n" + errore;
-                            CommitAndSave(trID);
-                            //return ret = null;
-                            continue;
-                        }
-                        else
-                        {
-                            //verifica che sia key
-                            string isKey = null;
-                            _CampoPadre = R.CampoPadre;
-                            campoPadreTrovato = "N";
-
-                            //scandaglio tutte gli attributi dell'entity padre
-
-                            #region cicloAttributiTabellaPadre
-                            foreach (SCAPI.ModelObject attributo in erAttributesPadre)
-                            {
-                                // ogni colonna deve avere un valore chiave
-                                if (!con.RetrieveFromObjModel(attributo, "Type", ref isKey))
-                                {
-                                    //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
-                                    errore = "Relazione ignorata: Impossibile trovare l'attributo Type del campo " + R.CampoPadre + " all'interno della tabella " + R.TabellaPadre + " per la relazione ID: " + relation.ID;
-                                    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
-                                    R.History += "\n" + errore;
-                                    CommitAndSave(trID);
-                                    //return ret = null;
-                                    continue;
-                                }
-                                else
-                                {
-                                    //se è chiave primaria verifico che sia quella della colonna che sto cercando
-                                    if (isKey == "0")
-                                    {
-                                        //se siamo al primo giro contiamo le chiavi, dai giri successivi lo sappiamo.
-                                        if (PrimoGiro)
-                                            countKey += 1;
-
-                                        if (attributo.Name == _CampoPadre)
-                                        {
-                                            campoPadreTrovato = "S";
-                                            //bypasso il ciclo perche ho trovato l'attributo di cui desideravo verificare la chiave ma solo dal secondo giro del ciclo
-                                            if (!(PrimoGiro))
-                                                continue;
-                                        }
-                                    }
-                                }
-                                
-                            }
-                            #endregion
-                            if (campoPadreTrovato == "S")
-                            {
-                                _CampoPadre = string.Empty;
-                                campoPadreTrovato = string.Empty;
-                            }
-                            else
-                            {
-                                //errore = "Relation Ignored: Unmatching PK fields in table " + R.TabellaPadre + " with relation ID " + relation.ID + ": " + _CampoPadre + " is not a key of the table";
-                                errore = "Relazione ignorata: corrispondenza mancante per il campo PK nella tabella " + R.TabellaPadre + " per la relazione ID " + relation.ID + ": " + _CampoPadre + " non è una chiave primaria";
-                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                                R.History += "\n" + errore;
-                                if (trID != lastIdCommitted)
-                                    CommitAndSave(trID);
-                                //return ret = null;
-                                continue;
-                            }
-                            if (!(countKey == countRelazioni))
-                            {
-                                //errore = "Relation Ignored: Unmatching PK numbers in table " + R.TabellaPadre + " with relation ID " + relation.ID;
-                                errore = "Relazione ignorata: Corrispondenza mancante nel numero di PK della tabella " + R.TabellaPadre + " per la relazione ID " + relation.ID;
-                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                                R.History += "\n" + errore;
-                                if (trID != lastIdCommitted)
-                                    CommitAndSave(trID);
-                                //return ret = null;
-                                continue;
-                            }
-                        }
-                        #endregion
-
-                        #region controlliIdentificativa
-                        if (PrimoGiro)
-                        {
-                            _Identificativa = R.Identificativa;
-                        }
-                        else
-                        {
-                            if (_Identificativa == R.Identificativa)
-                            {
-                                //la tabella figlia è la stessa delle righe precedenti della stessa relazione  
-                            }
-                            else
-                            {
-                                //Non è possibile tracciare una relazione con tabelle differenti
-                                errore = "Relazione ignorata: Impossibile tracciare una relazione con Identificativa differente all'interno della stessa relazione. ID: " + relation.ID;
+                                //errore = "Relation ignored: Could not find table " + R.TabellaPadre + " inside relation ID " + relation.ID;
+                                errore = "Relazione ignorata: impossibile trovare la tabella " + R.TabellaPadre + " all'interno della relazione. ID: " + relation.ID;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 R.History += "\n" + errore;
                                 CommitAndSave(trID);
                                 //return ret = null;
                                 continue;
                             }
-                        }
-                        #endregion
-
-                        #region controlliCampoFiglio
-                        //esistenza campo figlio
-                        SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
-                        if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio.ToUpper()))
-                        {
-                            //errore = "Relation Ignored Could not find Child Field " + R.CampoFiglio + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                            errore = "Relazione ignorata: Impossibile trovare il Child Field " + R.CampoFiglio + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
-                            Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                            R.History += "\n" + errore;
-                            CommitAndSave(trID);
-                            //return ret = null;
-                            continue;
-                        }
-                        else
-                        {
-                            // Se la relazione è di tipo identificativa
-                            if (R.Identificativa == 2)
+                            else
                             {
-                                //i campi di una relazione identificativa nella tabella figlio devono essere tutti di tipo chiave
-                                string isKey = null;
-                                if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
+                                //verifica che la tabella padre sia sempre la medesima su tutte le righe della relazione
+                                if (PrimoGiro)
                                 {
-                                    //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                                    errore = "Relazione ignorata: impossibile trovare l'attributo Type del campo " + R.CampoFiglio + " all'interno della child table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
-                                    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
-                                    R.History += "\n" + errore;
-                                    CommitAndSave(trID);
-                                    //return ret = null;
-                                    continue;
+                                    _TabellaPadre = R.TabellaPadre;
                                 }
                                 else
                                 {
-                                    if (isKey != "0")
+                                    if (_TabellaPadre == R.TabellaPadre)
                                     {
-                                        //errore = "Relation Ignored: " + R.CampoFiglio + "expected Key inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                                        errore = "Relazione ignorata: " + R.CampoFiglio + " deve essere chiave all'interno della child table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
-                                        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                        //la tabella padre è la stessa delle righe precedenti della stessa relazione  
+                                    }
+                                    else
+                                    {
+                                        //Non è possibile tracciare una relazione con tabelle differenti
+                                        //errore = "Relation ignored: Cannot trace relationship with a different father table inside the same relation" + relation.ID;
+                                        errore = "Relatione ignorata: impossibile tracciare la relazione con una tabella padre differente all'interno della stessa relazione" + relation.ID;
+                                        Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                         R.History += "\n" + errore;
                                         CommitAndSave(trID);
                                         //return ret = null;
                                         continue;
                                     }
                                 }
+
+                            }
+                            #endregion
+
+                            #region controlliTabellaFiglia
+                            //cerchiamo la tabella figlia
+                            if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
+                            {
+                                //errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
+                                errore = "Relazione ignorata: impossibile trovare la tabella " + R.TabellaFiglia + " all'interno della relazione. ID: " + relation.ID;
+                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                R.History += "\n" + errore;
+                                CommitAndSave(trID);
+                                //return ret = null;
+                                continue;
                             }
                             else
                             {
-                                //i campi di una relazione non identificativa nella tabella figlio non possono essere tutti di tipo chiave
-                                string isKey = null;
-                                checkNotIdentificativa = true;
-                                if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
+                                //verifica che la tabella figlia sia sempre la medesima su tutte le righe della relazione
+                                if (PrimoGiro)
                                 {
-                                    //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                                    errore = "Relazione ignorata: Impossibile trovare l'attributo Type del campo " + R.CampoFiglio + " all'interno della child table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
-                                    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    _TabellaFiglia = R.TabellaFiglia;
+                                }
+                                else
+                                {
+                                    if (_TabellaFiglia == R.TabellaFiglia)
+                                    {
+                                        //la tabella figlia è la stessa delle righe precedenti della stessa relazione  
+                                    }
+                                    else
+                                    {
+                                        //Non è possibile tracciare una relazione con tabelle differenti
+                                        //errore = "Relation ignored: Cannot trace relationship with a different child table inside the same relation " + relation.ID;
+                                        errore = "Relazione ignorata: impossibile tracciare una relazione con una tabella figlia differente all'interno di una stessa relazione. ID: " + relation.ID;
+                                        Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                        R.History += "\n" + errore;
+                                        CommitAndSave(trID);
+                                        //return ret = null;
+                                        continue;
+                                    }
+                                }
+
+                            }
+                            #endregion
+
+                            #region controlliCampoPadre
+                            //esistenza campo padre
+                            SCAPI.ModelObjects erAttributesPadre = scSession.ModelObjects.Collect(tabellaPadre, "Attribute");
+                            if (!con.RetriveAttribute(ref campoPadre, erAttributesPadre, R.CampoPadre.ToUpper()))
+                            {
+                                //errore = "Relation Ignored: Could not find field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
+                                errore = "Relazione ignorata: impossibile trovare il campo " + R.CampoPadre + " all'interno della tabella " + R.TabellaPadre + " per la relazione ID: " + relation.ID;
+                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                R.History += "\n" + errore;
+                                CommitAndSave(trID);
+                                //return ret = null;
+                                continue;
+                            }
+                            else
+                            {
+                                //verifica che sia key
+                                string isKey = null;
+                                _CampoPadre = R.CampoPadre;
+                                campoPadreTrovato = "N";
+
+                                //scandaglio tutte gli attributi dell'entity padre
+
+                                #region cicloAttributiTabellaPadre
+                                foreach (SCAPI.ModelObject attributo in erAttributesPadre)
+                                {
+                                    // ogni colonna deve avere un valore chiave
+                                    if (!con.RetrieveFromObjModel(attributo, "Type", ref isKey))
+                                    {
+                                        //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
+                                        errore = "Relazione ignorata: Impossibile trovare l'attributo Type del campo " + R.CampoPadre + " all'interno della tabella " + R.TabellaPadre + " per la relazione ID: " + relation.ID;
+                                        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                        R.History += "\n" + errore;
+                                        CommitAndSave(trID);
+                                        //return ret = null;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        //se è chiave primaria verifico che sia quella della colonna che sto cercando
+                                        if (isKey == "0")
+                                        {
+                                            //se siamo al primo giro contiamo le chiavi, dai giri successivi lo sappiamo.
+                                            if (PrimoGiro)
+                                                countKey += 1;
+
+                                            if (attributo.Name == _CampoPadre)
+                                            {
+                                                campoPadreTrovato = "S";
+                                                //bypasso il ciclo perche ho trovato l'attributo di cui desideravo verificare la chiave ma solo dal secondo giro del ciclo
+                                                if (!(PrimoGiro))
+                                                    continue;
+                                            }
+                                        }
+                                    }
+
+                                }
+                                #endregion
+                                if (campoPadreTrovato == "S")
+                                {
+                                    _CampoPadre = string.Empty;
+                                    campoPadreTrovato = string.Empty;
+                                }
+                                else
+                                {
+                                    //errore = "Relation Ignored: Unmatching PK fields in table " + R.TabellaPadre + " with relation ID " + relation.ID + ": " + _CampoPadre + " is not a key of the table";
+                                    errore = "Relazione ignorata: corrispondenza mancante per il campo PK nella tabella " + R.TabellaPadre + " per la relazione ID " + relation.ID + ": " + _CampoPadre + " non è una chiave primaria";
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    R.History += "\n" + errore;
+                                    if (trID != lastIdCommitted)
+                                        CommitAndSave(trID);
+                                    //return ret = null;
+                                    continue;
+                                }
+                                if (!(countKey == countRelazioni))
+                                {
+                                    //errore = "Relation Ignored: Unmatching PK numbers in table " + R.TabellaPadre + " with relation ID " + relation.ID;
+                                    errore = "Relazione ignorata: Corrispondenza mancante nel numero di PK della tabella " + R.TabellaPadre + " per la relazione ID " + relation.ID;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    R.History += "\n" + errore;
+                                    if (trID != lastIdCommitted)
+                                        CommitAndSave(trID);
+                                    //return ret = null;
+                                    continue;
+                                }
+                            }
+                            #endregion
+
+                            #region controlliIdentificativa
+                            if (PrimoGiro)
+                            {
+                                _Identificativa = R.Identificativa;
+                            }
+                            else
+                            {
+                                if (_Identificativa == R.Identificativa)
+                                {
+                                    //la tabella figlia è la stessa delle righe precedenti della stessa relazione  
+                                }
+                                else
+                                {
+                                    //Non è possibile tracciare una relazione con tabelle differenti
+                                    errore = "Relazione ignorata: Impossibile tracciare una relazione con Identificativa differente all'interno della stessa relazione. ID: " + relation.ID;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     R.History += "\n" + errore;
                                     CommitAndSave(trID);
                                     //return ret = null;
                                     continue;
                                 }
+                            }
+                            #endregion
+
+                            #region controlliCampoFiglio
+                            //esistenza campo figlio
+                            SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
+                            if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio.ToUpper()))
+                            {
+                                //errore = "Relation Ignored Could not find Child Field " + R.CampoFiglio + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
+                                errore = "Relazione ignorata: Impossibile trovare il Child Field " + R.CampoFiglio + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
+                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                R.History += "\n" + errore;
+                                CommitAndSave(trID);
+                                //return ret = null;
+                                continue;
+                            }
+                            else
+                            {
+                                // Se la relazione è di tipo identificativa
+                                if (R.Identificativa == 2)
+                                {
+                                    //i campi di una relazione identificativa nella tabella figlio devono essere tutti di tipo chiave
+                                    string isKey = null;
+                                    if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
+                                    {
+                                        //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
+                                        errore = "Relazione ignorata: impossibile trovare l'attributo Type del campo " + R.CampoFiglio + " all'interno della child table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
+                                        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                        R.History += "\n" + errore;
+                                        CommitAndSave(trID);
+                                        //return ret = null;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        if (isKey != "0")
+                                        {
+                                            //errore = "Relation Ignored: " + R.CampoFiglio + "expected Key inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
+                                            errore = "Relazione ignorata: " + R.CampoFiglio + " deve essere chiave all'interno della child table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
+                                            Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                            R.History += "\n" + errore;
+                                            CommitAndSave(trID);
+                                            //return ret = null;
+                                            continue;
+                                        }
+                                    }
+                                }
                                 else
                                 {
-                                    //se almeno uno dei campi della relazione non identificativa non è key la relazione può essere tracciata
-                                    if (isKey != "0")
+                                    //i campi di una relazione non identificativa nella tabella figlio non possono essere tutti di tipo chiave
+                                    string isKey = null;
+                                    checkNotIdentificativa = true;
+                                    if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
                                     {
-                                        isNotIdentificativa = true;
+                                        //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
+                                        errore = "Relazione ignorata: Impossibile trovare l'attributo Type del campo " + R.CampoFiglio + " all'interno della child table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
+                                        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                        R.History += "\n" + errore;
+                                        CommitAndSave(trID);
+                                        //return ret = null;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        //se almeno uno dei campi della relazione non identificativa non è key la relazione può essere tracciata
+                                        if (isKey != "0")
+                                        {
+                                            isNotIdentificativa = true;
+                                        }
                                     }
                                 }
                             }
-                        }
-                        #endregion
+                            #endregion
 
-                        #region controlliCardinalità
-                        if (PrimoGiro)
-                            _Cardinalita = R.Cardinalita;
-                        else
-                        {
-                            if (_Cardinalita == R.Cardinalita)
-                            {
-                                //la tabella padre è la stessa delle righe precedenti della stessa relazione  
-                            }
+                            #region controlliCardinalità
+                            if (PrimoGiro)
+                                _Cardinalita = R.Cardinalita;
                             else
                             {
-                                //Non è possibile tracciare una relazione con tabelle differenti
-                                //errore = "Relation ignored: Cannot trace relationship with a different cardinality inside the same relation" + relation.ID;
-                                errore = "Relazione ignorata: Impossibile tracciare una relazione con una differente cardinalità all'interno della stessa relazione. ID: " + relation.ID;
-                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                                R.History += "\n" + errore;
-                                CommitAndSave(trID);
-                                //return ret = null;
-                                continue;
+                                if (_Cardinalita == R.Cardinalita)
+                                {
+                                    //la tabella padre è la stessa delle righe precedenti della stessa relazione  
+                                }
+                                else
+                                {
+                                    //Non è possibile tracciare una relazione con tabelle differenti
+                                    //errore = "Relation ignored: Cannot trace relationship with a different cardinality inside the same relation" + relation.ID;
+                                    errore = "Relazione ignorata: Impossibile tracciare una relazione con una differente cardinalità all'interno della stessa relazione. ID: " + relation.ID;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    R.History += "\n" + errore;
+                                    CommitAndSave(trID);
+                                    //return ret = null;
+                                    continue;
+                                }
                             }
+                            #endregion
+
+                            #region controlliTipoRelazione
+                            if (PrimoGiro)
+                                _TipoRelazione = R.TipoRelazione;
+                            else
+                            {
+                                if (_TipoRelazione == R.TipoRelazione)
+                                {
+                                    //la tabella padre è la stessa delle righe precedenti della stessa relazione  
+                                }
+                                else
+                                {
+                                    //Non è possibile tracciare una relazione con tabelle differenti
+                                    //errore = "Relation ignored: Cannot trace relationship with a different relation type inside the same relation" + relation.ID;
+                                    errore = "Relazione ignorata: impossibile tracciare una relazione con un differente Relation Type all'interno della stessa relazione. ID: " + relation.ID;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    R.History += "\n" + errore;
+                                    CommitAndSave(trID);
+                                    //return ret = null;
+                                    continue;
+                                }
+                            }
+                            #endregion
+                            
+                            #endregion
+
+                            PrimoGiro = false;
+                            RelazioniOk.Add(R.IdentificativoRelazione);
                         }
-                        #endregion
                         
-                        #region controlliTipoRelazione
-                        if (PrimoGiro)
-                            _TipoRelazione = R.TipoRelazione;
-                        else
-                        {
-                            if (_TipoRelazione == R.TipoRelazione)
-                            {
-                                //la tabella padre è la stessa delle righe precedenti della stessa relazione  
-                            }
-                            else
-                            {
-                                //Non è possibile tracciare una relazione con tabelle differenti
-                                //errore = "Relation ignored: Cannot trace relationship with a different relation type inside the same relation" + relation.ID;
-                                errore = "Relazione ignorata: impossibile tracciare una relazione con un differente Relation Type all'interno della stessa relazione. ID: " + relation.ID;
-                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                                R.History += "\n" + errore;
-                                CommitAndSave(trID);
-                                //return ret = null;
-                                continue;
-                            }
-                        }
-                        #endregion
-
-
-                        #endregion
-
-                        PrimoGiro = false;
-                        RelazioniOk.Add(R.IdentificativoRelazione);
+                        
                     }
 
                     if (relation.Relazioni.Exists(x => x.History != null))
@@ -1327,10 +1361,16 @@ namespace ERwin_CA
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                     if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy.ToUpper()))
                     {
-                        ////Verifico che la chiave non sia stata alterata dalla relazione, eventualmente la ripristino
-                        string isKey = string.Empty;
+                        //valorizzo Ordine
+                        string Ordine = string.Empty;
+                        if (con.RetrieveFromObjModel(erAttributeObjectPE, ConfigFile._ATT_NAME["Ordine"], ref Ordine))
+                        {
+                            entity.Ordine = Ordine;
+                        }
+                            ////Verifico che la chiave non sia stata alterata dalla relazione, eventualmente la ripristino
+                            string isKey = string.Empty;
                         // ogni colonna deve avere un valore chiave
-                        if (con.RetrieveFromObjModel(erAttributeObjectPE, "Type", ref isKey))
+                        if (con.RetrieveFromObjModel(erAttributeObjectPE, ConfigFile._ATT_NAME["Chiave"], ref isKey))
                         {
                             //verifico che il tipo di chiave non sia cambiato rispetto a quella che ho settato dalla collezione
                             if (isKey != entity.Chiave.ToString())

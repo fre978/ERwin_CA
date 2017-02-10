@@ -58,13 +58,17 @@ namespace ERwin_CA
                 .ToArray());
         }
 
-        public static bool ParseDataType(string value, string databaseType)
+        public static bool ParseDataType(string value, string databaseType, bool OnlyFormal = false)
         {
             string[] actualDB = null;
             if (!ConfigFile.DBS.Contains(databaseType))
                 return false;
             else
             {
+                if (OnlyFormal)
+                {
+                    databaseType = databaseType + "_FOR";
+                }
                 switch (databaseType)
                 {
                     case ConfigFile.DB2_NAME:
@@ -74,6 +78,18 @@ namespace ERwin_CA
                         actualDB = ConfigFile.DATATYPE_ORACLE;
                         break;
                     case ConfigFile.SQLSERVER:
+                        actualDB = ConfigFile.DATATYPE_SQLSERVER;
+                        break;
+                    case ConfigFile.DB2_NAME + "_FOR":
+                        actualDB = ConfigFile.DATATYPE_DB2_FOR;
+                        break;
+                    case ConfigFile.ORACLE + "_FOR":
+                        actualDB = ConfigFile.DATATYPE_ORACLE_FOR;
+                        break;
+                    case ConfigFile.SQLSERVER + "_FOR":
+                        actualDB = ConfigFile.DATATYPE_SQLSERVER_FOR;
+                        break;
+                    default:
                         break;
                 }
             }
@@ -123,6 +139,44 @@ namespace ERwin_CA
                     return true;
                 else
                     return false;
+            }
+        }
+
+        public static bool ParseFlag(string value, string FlagType)
+        {
+            string[] actualDB = null;
+            switch (FlagType)
+            {
+                case "YES":
+                    actualDB = ConfigFile.Yes;
+                    break;
+                case "NO":
+                    actualDB = ConfigFile.No;
+                    break;
+                default:
+                    break;
+            }
+            
+            if (actualDB.Contains(value.ToUpper()))
+                return true;
+            else
+                return false;
+            
+        }
+
+        public static bool Stats(decimal current, decimal maximum, string message, string fileCorrect)
+        {
+            try
+            { 
+            decimal percent = (current / maximum) * 100;
+            message = decimal.Round(percent,3) + "% (" + current + " su " + maximum + ") " + message;
+            Logger.PrintF(fileCorrect, message, true, ConfigFile.INFO);
+            Logger.PrintLC(message, 2, ConfigFile.INFO);
+            return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -177,79 +231,102 @@ namespace ERwin_CA
 
         public static GlobalRelationStrut CleanGlobalRelationStrut(GlobalRelationStrut GStrut)
         {
-            List<RelationStrut> errorRelationStrut = new List<RelationStrut>();
-            //verifica tutte le strutture
-            foreach (RelationStrut RStrut in GStrut.GlobalRelazioni)
+            try
             {
-                if (RStrut.Relazioni.Count != 1)
+                List<RelationStrut> errorRelationStrut = new List<RelationStrut>();
+                //verifica tutte le strutture
+                foreach (RelationStrut RStrut in GStrut.GlobalRelazioni)
                 {
-                    //verifica singola struttura
-                    string tabellapadreverifica = null;
-                    string tabellafigliaverifica = null;
-                    int? cardinalitaverifica = null;
-                    int? identificativaverifica = null;
-                    bool? tiporelazioneverifica = null;
-                    List<string> campopadreverifica = new List<string>();
-                    List<string> campofiglioverifica = new List<string>();
-                
-                    int contatore = 0;
-                    bool errore = false;
-
-                
-                    foreach (RelationT R in RStrut.Relazioni)
+                    if (RStrut.Relazioni.Count != 1)
                     {
+                        //verifica singola struttura
+                        string tabellapadreverifica = null;
+                        string tabellafigliaverifica = null;
+                        int? cardinalitaverifica = null;
+                        int? identificativaverifica = null;
+                        bool? tiporelazioneverifica = null;
+                        List<string> campopadreverifica = new List<string>();
+                        List<string> campofiglioverifica = new List<string>();
 
-                        if (contatore == 0)
+                        int contatore = 0;
+                        bool errore = false;
+
+
+                        foreach (RelationT R in RStrut.Relazioni)
                         {
-                            tabellapadreverifica = R.TabellaPadre;
-                            tabellafigliaverifica = R.TabellaFiglia;
-                            cardinalitaverifica = R.Cardinalita;
-                            identificativaverifica = R.Identificativa;
-                            tiporelazioneverifica = R.TipoRelazione;
-                            campopadreverifica.Add(R.CampoPadre);
-                            campofiglioverifica.Add(R.CampoFiglio);
 
-                        }
-                        else
-                        {
-                            if (tabellapadreverifica != R.TabellaPadre
-                                || tabellafigliaverifica != R.TabellaFiglia
-                                || cardinalitaverifica != R.Cardinalita
-                                || identificativaverifica != R.Identificativa
-                                || tiporelazioneverifica != R.TipoRelazione)
+                            if (contatore == 0)
                             {
-                                errore = true;
-                                //PUNTO IN CUI ANDARE A SCRIVERE SULL'EXCEL ALLA RIGA APPROPRIATA
-                                continue;
-                            }
+                                tabellapadreverifica = R.TabellaPadre;
+                                tabellafigliaverifica = R.TabellaFiglia;
+                                cardinalitaverifica = R.Cardinalita;
+                                identificativaverifica = R.Identificativa;
+                                tiporelazioneverifica = R.TipoRelazione;
+                                campopadreverifica.Add(R.CampoPadre);
+                                campofiglioverifica.Add(R.CampoFiglio);
 
-
-                            if (campopadreverifica.Contains(R.CampoPadre) || campofiglioverifica.Contains(R.CampoFiglio))
-                            {
-                                errore = true;
-                                //PUNTO IN CUI ANDARE A SCRIVERE SULL'EXCEL ALLA RIGA APPROPRIATA
-                                continue;
                             }
                             else
                             {
-                                campopadreverifica.Add(R.CampoPadre);
-                                campofiglioverifica.Add(R.CampoFiglio);
+                                if (tabellapadreverifica != R.TabellaPadre
+                                    || tabellafigliaverifica != R.TabellaFiglia
+                                    || cardinalitaverifica != R.Cardinalita
+                                    || identificativaverifica != R.Identificativa
+                                    || tiporelazioneverifica != R.TipoRelazione)
+                                {
+                                    errore = true;
+                                    //PUNTO IN CUI ANDARE A SCRIVERE SULL'EXCEL ALLA RIGA APPROPRIATA
+                                    R.History = "Relazione ignorata: ID " + RStrut.ID + " presenta valori diversi per uno o più dei seguenti campi: tabella padre, tabella figlia, cardinalità, identificativa e tipo relazione";
+                                    Logger.PrintLC("Relazione ignorata: ID " + RStrut.ID + " presenta valori diversi per uno o più dei seguenti campi: tabella padre, tabella figlia, cardinalità, identificativa e tipo relazione", 3, ConfigFile.ERROR);
+                                    continue;
+                                }
+
+
+                                if (campopadreverifica.Contains(R.CampoPadre) || campofiglioverifica.Contains(R.CampoFiglio))
+                                {
+                                    errore = true;
+                                    R.History = "Relazione ignorata: ID " + RStrut.ID + " contiene già una relazione col medesimo campo padre e/o col medesimo campo figlio";
+                                    Logger.PrintLC("Relazione ignorata: ID " + RStrut.ID + " contiene già una relazione col medesimo campo padre e/o col medesimo campo figlio", 3, ConfigFile.ERROR);
+                                    continue;
+                                }
+                                else
+                                {
+                                    campopadreverifica.Add(R.CampoPadre);
+                                    campofiglioverifica.Add(R.CampoFiglio);
+                                }
+
                             }
+                            contatore += 1;
 
                         }
-                        contatore += 1;
-
+                        if (errore == true)
+                            errorRelationStrut.Add(RStrut);
                     }
-                    if (errore == true)
-                        errorRelationStrut.Add(RStrut);
+                }
+
+                foreach (var errore in errorRelationStrut)
+                {
+                    RelationStrut mystrut = GStrut.GlobalRelazioni.Find(x => x == errore);
+                    if (mystrut != null)
+                    {
+                        foreach (RelationT R in mystrut.Relazioni)
+                        {
+                            RelationT comodo = mystrut.Relazioni.Find(x => !string.IsNullOrEmpty(x.History));
+                            if (comodo != null)
+                            {
+                                if (string.IsNullOrEmpty(R.History))
+                                {
+                                    R.History = comodo.History;
+                                }
+                            }
+                        }
+                    }
                 }
             }
-
-            foreach (var errore in errorRelationStrut)
+            catch
             {
-                GStrut.GlobalRelazioni.Remove(errore);
+                //
             }
-
             return GStrut;
         }
     }

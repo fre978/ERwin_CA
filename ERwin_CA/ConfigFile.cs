@@ -45,9 +45,10 @@ namespace ERwin_CA
         // SEZIONE DATABASE
         public static string ERWIN_TEMPLATE_DB2 = APP_PATH + @"\Template\Template_DB2_LF.erwin";
         public static string ERWIN_TEMPLATE_ORACLE = APP_PATH + @"\Template\Template_Oracle_LF.erwin";
+        public static string ERWIN_TEMPLATE_SQLSERVER = APP_PATH + @"\Template\Template_SqlServer_LF.erwin";
 
         private static string tempString = ConfigurationSettings.AppSettings["DBS"].ToUpper();
-        public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE" }; //Sempre Upper case
+        public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE", "SQLSERVER }; //Sempre Upper case
 
         public const string DB2_NAME = "DB2";
         public const string ORACLE = "ORACLE";
@@ -90,6 +91,9 @@ namespace ERwin_CA
                 return false;
             }
         }
+        public static string[] Yes = { "S", "SI" };
+        public static string[] No = { "N", "NO" };
+
         public static string[] DATATYPE_DB2 = {"char", "char()", "varchar()", "clob", "clob()",
                                                "date", "time", "timestamp", "timestamp()",
                                                "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint",
@@ -111,22 +115,26 @@ namespace ERwin_CA
             }
         }
 
-        public static bool RefreshAll()
+        public static string[] DATATYPE_SQLSERVER = { "char", "char()", "varchar", "varchar()", "xml", "text",
+                                                    "date", "datetime", "time", "time()", "timestamp", "smalldatetime", "datetime2", "datetime2()",
+                                                    "decimal", "decimal()", "decimal(,)", "bit", "bigint", "double precision", "float", "float()", "real", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "money", "smallmoney", "tinyint", "uniqueidentifier",
+                                                    "binary", "binary()", "image", "sql_variant", "varbinary", "varbinary()" };
+        public static bool RefreshDatatypeSQLSERVER()
         {
-            bool response = false;
-            if (!RefreshLogLevel())
-                response = true;
-            if (!RefreshDelimiters())
-                response = true;
-            if (!RefreshDatatypeDB2())
-                response = true;
-            if (!RefreshDatatypeOracle())
-                response = true;
-            if (!RefreshColumns())
-                response = true;
-            return response;
+            try
+            {
+                DATATYPE_SQLSERVER = ConfigurationSettings.AppSettings["SQLSERVER Types"].Split('|');
+                return true;
+            }
+            catch
+            {
+                DATATYPE_SQLSERVER = new string[] { "char", "char()", "varchar", "varchar()", "xml", "text",
+                                                    "date", "datetime", "time", "time()", "timestamp", "smalldatetime", "datetime2", "datetime2()",
+                                                    "decimal", "decimal()", "decimal(,)", "bit", "bigint", "double precision", "float", "float()", "real", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "money", "smallmoney", "tinyint", "uniqueidentifier",
+                                                    "binary", "binary()", "image", "sql_variant", "varbinary", "varbinary()" };
+                return false;
+            }
         }
-
         public static string[] DATATYPE_ORACLE = {"char", "char()", "varchar()", "clob", "clob()", "varchar2()",
                                                   "date", "timestamp", "timestamp()",
                                                   "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "number", "number()", "number(,)",
@@ -147,6 +155,82 @@ namespace ERwin_CA
                 return false;
             }
         }
+
+        public static string[] DATATYPE_DB2_FOR = {"date", "time", "timestamp", "timestamp()",
+                                               "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint" };
+        public static bool RefreshDatatypeDB2_FOR()
+        {
+            try
+            {
+                DATATYPE_DB2_FOR = ConfigurationSettings.AppSettings["DB2 Types FOR"].Split('|');
+                return true;
+            }
+            catch
+            {
+                DATATYPE_DB2_FOR = new string[] {"date", "time", "timestamp", "timestamp()",
+                                               "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint"};
+                return false;
+            }
+        }
+
+        public static string[] DATATYPE_SQLSERVER_FOR = {"date", "datetime", "time", "time()", "timestamp", "smalldatetime", "datetime2", "datetime2()",
+                                                    "decimal", "decimal()", "decimal(,)", "bit", "bigint", "double precision", "float", "float()", "real", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "money", "smallmoney", "tinyint", "uniqueidentifier"};
+        public static bool RefreshDatatypeSQLSERVER_FOR()
+        {
+            try
+            {
+                DATATYPE_SQLSERVER_FOR = ConfigurationSettings.AppSettings["SQLSERVER Types FOR"].Split('|');
+                return true;
+            }
+            catch
+            {
+                DATATYPE_SQLSERVER_FOR = new string[] {"date", "datetime", "time", "time()", "timestamp", "smalldatetime", "datetime2", "datetime2()",
+                                                    "decimal", "decimal()", "decimal(,)", "bit", "bigint", "double precision", "float", "float()", "real", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "money", "smallmoney", "tinyint", "uniqueidentifier"};
+                return false;
+            }
+        }
+        public static string[] DATATYPE_ORACLE_FOR = {"date", "timestamp", "timestamp()",
+                                                  "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "number", "number()", "number(,)"};
+        public static bool RefreshDatatypeOracle_FOR()
+        {
+            try
+            {
+                DATATYPE_ORACLE_FOR = ConfigurationSettings.AppSettings["ORACLE Types FOR"].Split('|');
+                return true;
+            }
+            catch
+            {
+                DATATYPE_ORACLE_FOR = new string[] {  "date", "timestamp", "timestamp()",
+                                                  "decimal", "decimal()", "decimal(,)", "dec", "dec()", "dec(,)", "numeric", "numeric()", "numeric(,)", "integer", "int", "smallint", "number", "number()", "number(,)"};
+                return false;
+            }
+        }
+
+        public static bool RefreshAll()
+        {
+            bool response = false;
+            if (!RefreshLogLevel())
+                response = true;
+            if (!RefreshDelimiters())
+                response = true;
+            if (!RefreshDatatypeDB2())
+                response = true;
+            if (!RefreshDatatypeOracle())
+                response = true;
+            if (!RefreshDatatypeSQLSERVER())
+                response = true;
+            if (!RefreshDatatypeDB2_FOR())
+                response = true;
+            if (!RefreshDatatypeOracle_FOR())
+                response = true;
+            if (!RefreshDatatypeSQLSERVER_FOR())
+                response = true;
+            if (!RefreshColumns())
+                response = true;
+            return response;
+        }
+
+        
 
         public static bool RefreshColumns()
         {
@@ -201,7 +285,9 @@ namespace ERwin_CA
         public const string RELAZIONI = "Relazioni-ModelloDatiLegacy";
         public const string TABELLE_DIFF = "Differenze Tabelle";
         public const string ATTRIBUTI_DIFF = "Differenze Attributi";
-        
+        public const string CONTROLLI = "Controlli Campi";
+
+
         public static string COLONNA_01 = "SSA";
         public static int HEADER_RIGA = 3;
 
@@ -248,6 +334,10 @@ namespace ERwin_CA
             {"Nome Database Oracle", "Entity.Physical.NOME_DATABASE" },
             {"Schema Oracle", "Name_Qualifier" },
             //Fine ORACLE
+            //Sezione SQLSERVER
+            {"Nome host SQLSERVER", "SQLServer_Database.Physical.NOME_HOST" },
+            {"Nome Database SQLSERVER", "Name" },
+            //Fine SQLSERVER
             {"Nome Tabella", "Physical_Name" },
             {"Descrizione Tabella", "Comment" },
             {"Tipologia Informazione", "Entity.Physical.TIPOLOGIA_INFORMAZIONE" },
@@ -303,7 +393,8 @@ namespace ERwin_CA
             {"Provenienza Dominio", "Attribute.Physical.PROVENIENZA_DOMINIO" },
             {"Note", "Attribute.Physical.NOTE" },
             {"Storica", "Entity.Physical.STORICA" },
-            {"Dato Sensibile", "Attribute.Physical.DATO_SENSIBILE" }
+            {"Dato Sensibile", "Attribute.Physical.DATO_SENSIBILE" },
+            {"Ordine", "Attribute_Order" }
         };
         // ##############################
 

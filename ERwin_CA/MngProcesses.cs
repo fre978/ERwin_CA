@@ -26,6 +26,9 @@ namespace ERwin_CA
                 List<string> FileElaboratiSQL = new List<string>();
                 string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
                 List<string> FileDaElaborare = FileOps.GetTrueFilesToProcess(ElencoExcel);
+                decimal current = 0;
+                decimal maximum = 0;
+                string message = string.Empty;
                                 
                 //####################################
                 //Ciclo MAIN
@@ -47,6 +50,9 @@ namespace ERwin_CA
                                     break;
                                 case ConfigFile.ORACLE:
                                     TemplateFile = ConfigFile.ERWIN_TEMPLATE_ORACLE;
+                                    break;
+                                case ConfigFile.SQLSERVER:
+                                    TemplateFile = ConfigFile.ERWIN_TEMPLATE_SQLSERVER;
                                     break;
                                 default:
                                     TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
@@ -132,10 +138,16 @@ namespace ERwin_CA
                         string fileCorrect = Path.Combine(new FileInfo(file).DirectoryName, Path.GetFileNameWithoutExtension(file) + "_OK.txt");
                         if (EntitaCreate != 0)
                         {
-                            Logger.PrintF(fileCorrect, EntitaCreate + " tabelle create", true, ConfigFile.INFO);
-                            Logger.PrintLC(EntitaCreate + " entity created", 2, ConfigFile.INFO);
-                            Logger.PrintF(fileCorrect, "create " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.TableDescr)).Count() + " tabelle senza descrizione su un totale di " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count, true, ConfigFile.INFO);
-                            Logger.PrintLC("create " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.TableDescr)).Count() + " tabelle senza descrizione su un totale di " + DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count, 2, ConfigFile.INFO);
+                            //statistica tabelle create
+                            current = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
+                            maximum = DatiFile.Count;
+                            message = "tabelle correttamente create";
+                            Funct.Stats(current, maximum, message, fileCorrect);
+                            //statistica tabelle senza descrizione
+                            current = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.TableDescr)).Count();
+                            maximum = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
+                            message = "tabelle senza descrizione sul totale delle tabelle create";
+                            Funct.Stats(current, maximum, message, fileCorrect);
                         }
                         else
                         {
@@ -355,6 +367,103 @@ namespace ERwin_CA
                             #endregion
                         }
 
+                        if (EntitaCreate != 0)
+                        {
+                            #region StatsAttributi
+                            #region TabelleConPrimaryKey
+                            //statistica tabelle senza primary key
+                            List<string> SenzaChiave = new List<string>();
+                            List<string> ConChiave = new List<string>();
+                            foreach (AttributeT attributo in AttrFile)
+                            {
+                                //se è chiave
+                                if (attributo.Chiave == 0 && string.IsNullOrEmpty(attributo.History))
+                                {
+                                    //se già non esistente
+                                    if (!(ConChiave.Exists(x => x == attributo.NomeTabellaLegacy)))
+                                    {
+                                        //rimuovo dai senza chiave
+                                        if (SenzaChiave.Exists(x => x == attributo.NomeTabellaLegacy))
+                                        {
+                                            SenzaChiave.Remove(attributo.NomeTabellaLegacy);
+                                        }
+                                        //aggiungo
+                                        ConChiave.Add(attributo.NomeTabellaLegacy);
+                                    }
+                                }
+                                else
+                                {
+                                    //se non esiste fra quelli con le chiavi e non esiste nemmeno fra quelli senza
+                                    if (!(ConChiave.Exists(x => x == attributo.NomeTabellaLegacy)) && !(SenzaChiave.Exists(x => x == attributo.NomeTabellaLegacy)))
+                                    {
+                                        //aggiungo
+                                        SenzaChiave.Add(attributo.NomeTabellaLegacy);
+                                    }
+                                }
+                            }
+                            current = SenzaChiave.Count;
+                            maximum = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
+                            message = "tabelle prive di chiave primaria rispetto al totale delle tabelle create";
+                            Funct.Stats(current, maximum, message, fileCorrect);
+                            #endregion
+                            #region AttributiConalmenoUnErrore
+                            //statistica tabelle senza descrizione
+                            current = AttrFile.FindAll(x => !(string.IsNullOrEmpty(x.History))).Count;
+                            maximum = AttrFile.Count;
+                            message = "attributi errati rispetto al totale degli attributi elaborati";
+                            Funct.Stats(current, maximum, message, fileCorrect);
+                            #endregion
+                            #region AttributiSenzaDescrizione
+                            //statistica tabelle senza descrizione
+                            current = AttrFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.DefinizioneCampo)).Count();
+                            maximum = AttrFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
+                            message = "attributi privi di descrizione rispetto al totale degli attributi creati";
+                            Funct.Stats(current, maximum, message, fileCorrect);
+                            #endregion
+                            #endregion
+                            #region StatsRelazioni
+                            List<string> TabelleRelazionate = new List<string>();
+                            List<string> RelazioniOK = new List<string>();
+                            foreach (RelationStrut rel in globalRelationStrut.GlobalRelazioni)
+                            {
+                                #region TabelleIsola
+                                RelationT myrel = rel.Relazioni.Find(x => string.IsNullOrEmpty(x.History));
+                                if (myrel != null)
+                                {
+                                    if (!TabelleRelazionate.Exists(x => x == myrel.TabellaPadre))
+                                    {
+                                        TabelleRelazionate.Add(myrel.TabellaPadre);
+                                    }
+                                    if (!TabelleRelazionate.Exists(x => x == myrel.TabellaFiglia))
+                                    {
+                                        TabelleRelazionate.Add(myrel.TabellaFiglia);
+                                    }
+                                }
+                                #endregion
+                                #region RelazioniOK/KO
+                                //myrel = rel.Relazioni.Find(x => string.IsNullOrEmpty(x.History));
+                                if (myrel != null)
+                                {
+                                    if (!RelazioniOK.Exists(x => x == myrel.IdentificativoRelazione))
+                                    {
+                                        RelazioniOK.Add(myrel.IdentificativoRelazione);
+                                    }
+                                }
+                                #endregion
+                            }
+                            
+                            current = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count - TabelleRelazionate.Count;
+                            maximum = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
+                            message = "tabelle prive di relazioni sul totale delle relazioni create";
+                            Funct.Stats(current, maximum, message, fileCorrect);
+                            current = (globalRelationStrut.GlobalRelazioni.Count) - TabelleRelazionate.Count;
+                            maximum = (globalRelationStrut.GlobalRelazioni.Count);
+                            message = "relazioni errate sul totale delle elaborazioni elaborate";
+                            Funct.Stats(current, maximum, message, fileCorrect);
+                            #endregion
+                            
+                        }
+
                         //Chiusura connessione per il file attuale.
                         connessione.CloseModelConnection();
                         //Eliminazione file originale
@@ -363,34 +472,38 @@ namespace ERwin_CA
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx")))
                         {
                             FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                            if ((EntitaCreate != 0) || (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))) //se non ha creato entyty non lo cancello perche KO
+                            if ((EntitaCreate != 0) || (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))) 
                                 File.Delete(FileElaborato);
                         }
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))
                         {
                             OriginalXLS = true;
                             FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls"));
-                            if (EntitaCreate != 0) //se non ha creato entyty non lo cancello perche KO
-                                File.Delete(FileElaborato);
+                            //if (EntitaCreate != 0) //se non ha creato entyty non lo cancello perche KO
+                            //{
+                            File.Delete(FileElaborato);
+                            //}
                         }
                         //Conversione file di destinazione nel formato XLS
-                        if (EntitaCreate != 0)
+                        //if (EntitaCreate != 0)
+                        //{
+                        if (OriginalXLS == true)
                         {
-                            if (OriginalXLS == true)
+                            if (File.Exists(fInfo.FullName))
                             {
-                                if (File.Exists(fInfo.FullName))
+                                if (ExcelOps.ConvertXLSXtoXLS(fInfo.FullName))
                                 {
-                                    ExcelOps.ConvertXLSXtoXLS(fInfo.FullName);
                                     File.Delete(fInfo.FullName);
                                 }
                             }
                         }
-                        else
+                        //}
+                        if (EntitaCreate == 0)
                         {
-                            if (File.Exists(fInfo.FullName))
-                            {
-                                File.Delete(fInfo.FullName);
-                            }
+                            //if (File.Exists(fInfo.FullName))
+                            //{
+                            //    File.Delete(fInfo.FullName);
+                            //}
                             string erw = Path.GetFileNameWithoutExtension(fInfo.FullName) + ".erwin";
                             erw = fInfo.FullName.Replace(fInfo.Name, erw);
                             if (File.Exists(erw))
@@ -401,10 +514,11 @@ namespace ERwin_CA
 
                         
                         FileElaborati.Add(FileElaborato);
-                        ElaboratiT Elaborato = new ElaboratiT(fileElaborato: "", entityElaborate: new List<EntityT>(), attributiElaborati: new List<AttributeT>());
+                        ElaboratiT Elaborato = new ElaboratiT(fileElaborato: "", entityElaborate: new List<EntityT>(), attributiElaborati: new List<AttributeT>(), relazioniElaborate: new GlobalRelationStrut());
                         Elaborato.FileElaborato = FileElaborato;
                         Elaborato.EntityElaborate = DatiFile;
                         Elaborato.AttributiElaborati = AttrFile;
+                        Elaborato.RelazioniElaborate = globalRelationStrut;
                         Elaborati.Add(Elaborato);
                         
                     }
@@ -427,6 +541,82 @@ namespace ERwin_CA
                     string FileElaborato = Elaborato.FileElaborato;
                     List<EntityT> EntityElaborate = Elaborato.EntityElaborate;
                     List<AttributeT> AttributiElaborati = Elaborato.AttributiElaborati;
+                    GlobalRelationStrut RelazioniElaborate = Elaborato.RelazioniElaborate;
+
+                    #region DocExcelControlli
+                    List<string> DocExcelControlli = new List<string>();
+                    List<EntityT> EntityBFD = Elaborato.EntityElaborate.FindAll(x => x.FlagBFD == "S" && string.IsNullOrEmpty(x.History));
+                    List<RelationStrut> LRelazioniBFD = RelazioniElaborate.GlobalRelazioni;
+                    foreach (EntityT E in EntityBFD)
+                    {
+                        List<AttributeT> AttributiBFD = AttributiElaborati.FindAll(x => x.NomeTabellaLegacy.ToUpper() == E.TableName.ToUpper() && string.IsNullOrEmpty(x.History));
+                        foreach (AttributeT A in AttributiBFD)
+                        {
+                            int? type = A.Chiave;
+                            int? null_option_type = A.MandatoryFlag;
+                            string phisical_data_type = A.DataType;
+                            string NomeStrutturaInformativa = string.Empty;
+                            string NomeCampo = string.Empty;
+                            string CodLocaleControllo = string.Empty;
+                            string RuoloCampo = string.Empty;
+
+                            if (type == 0)
+                            {
+                                NomeStrutturaInformativa = E.TableName.ToUpper();
+                                NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                CodLocaleControllo = "DUP";
+                                RuoloCampo = "OggettoControllo";
+                                DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                            }
+                            if (A.MandatoryFlag == 1)
+                            {
+                                NomeStrutturaInformativa = E.TableName.ToUpper();
+                                NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                CodLocaleControllo = "NUL";
+                                RuoloCampo = "OggettoControllo";
+                                DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                            }
+                            if (Funct.ParseDataType(phisical_data_type, "DB2", true))
+                            {
+                                NomeStrutturaInformativa = E.TableName.ToUpper();
+                                NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                CodLocaleControllo = "FOR";
+                                RuoloCampo = "OggettoControllo";
+                                DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                            }
+                            foreach (RelationStrut SRelazioniBFD in LRelazioniBFD)
+                            {
+                                List<RelationT> Relazioni = SRelazioniBFD.Relazioni.FindAll(x => x.CampoFiglio == A.NomeCampoLegacy && x.TabellaFiglia == A.NomeTabellaLegacy && string.IsNullOrEmpty(x.History));
+                                foreach (RelationT Relazione in Relazioni)
+                                {
+                                    NomeStrutturaInformativa = E.TableName.ToUpper();
+                                    NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                    CodLocaleControllo = "DRI";
+                                    RuoloCampo = "OggettoControllo";
+                                    DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+
+                                    NomeStrutturaInformativa = Relazione.TabellaPadre.ToUpper();
+                                    NomeCampo = Relazione.CampoPadre.ToUpper();
+                                    CodLocaleControllo = "DRI";
+                                    RuoloCampo = "CampoConfronto";
+                                    DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                }
+                            }
+                        }
+                    }
+                    string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliCampi.xlsx";
+                    //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
+                    if (ConfigFile.DEST_FOLD_UNIQUE)
+                    {
+                        FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
+                    }
+                    else
+                    {
+                        FileDocControlli = Funct.GetFolderDestination2(FileElaborato, new FileInfo(FileDocControlli).Name);
+                    }
+                    ExcelOps.WriteDocExcelControlli(new FileInfo(FileDocControlli), DocExcelControlli);
+
+                    #endregion
 
                     #region ProcessingFileSQL
                     Logger.PrintLC("** INIZIO ELABORAZIONE DDL: " + FileElaborato, 2);
@@ -573,6 +763,7 @@ namespace ERwin_CA
 
                     Logger.PrintLC("** FINE ELABORAZIONE DDL: " + FileElaborato, 2);
                     #endregion
+
                 }
                 #region SummaryFiles
                 //Stampa elenco completo file presi in considerazione
@@ -580,7 +771,9 @@ namespace ERwin_CA
                 ListaCompleta = Funct.DetermineElaborated(FileElaborati, FileElaboratiSQL);
                 foreach (string elemento in ListaCompleta)
                 {
-                    Logger.PrintLC(elemento, 2);
+                    string myelemento = elemento.ToUpper().Replace(".XLSX", ".SQL");
+                    myelemento = myelemento.Replace(".XLS", ".SQL");
+                    Logger.PrintLC(myelemento, 2);
                 }
                 #endregion
 
