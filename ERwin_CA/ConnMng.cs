@@ -1365,7 +1365,9 @@ namespace ERwin_CA
                 //errore = "There was no DB associated to " + entity.NomeTabellaLegacy;
                 errore = "Non ci sono DB associati a " + entity.NomeTabellaLegacy;
                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                entity.History += "\n" + errore;
+                if (entity.History != null)
+                    errore = "\n" + errore;
+                entity.History += errore;
                 entity.Step = 2;
                 return ret;
             }
