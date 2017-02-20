@@ -22,12 +22,25 @@ namespace ERwin_CA
                 //}
                 //else
                 //{
+
+                /*
+                nlist = (from c in list
+                         where !c.Contains(ConfigFile.DEST_FOLD_NAME)
+                         select c).ToList();
+                */
+
+                //nlist = list.Where(x => x.Contains(ConfigFile.DEST_FOLD_NAME)).ToList();
+
+                if (!(string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim())))
+                {
                     nlist = (from c in list
-                             where !c.Contains(ConfigFile.DEST_FOLD_NAME)
+                             where c.ToUpper().Contains(ConfigFile.INPUT_FOLDER_NAME.ToUpper())
                              select c).ToList();
+                }
                 //}
+                if(nlist != null)
+                    nlist = CleanDuplicates(nlist);
             }
-            nlist = CleanDuplicates(nlist);
             return nlist;
         }
 
@@ -85,7 +98,7 @@ namespace ERwin_CA
                     // Make the file RW
                     attributes = RemoveAttribute(attributes, attribute);
                     File.SetAttributes(filePath, attributes);
-                    Logger.PrintLC(filePath + " is no longer RO.", 3, ConfigFile.INFO);
+                    //Logger.PrintLC(filePath + " is no longer RO.", 3, ConfigFile.INFO);
                 }
             }
         }

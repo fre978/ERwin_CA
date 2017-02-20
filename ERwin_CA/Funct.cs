@@ -157,7 +157,7 @@ namespace ERwin_CA
                     break;
             }
             
-            if (actualDB.Contains(value.ToUpper()))
+            if (actualDB.Contains(value.ToUpper().Trim()))
                 return true;
             else
                 return false;
@@ -168,11 +168,11 @@ namespace ERwin_CA
         {
             try
             { 
-            decimal percent = (current / maximum) * 100;
-            message = decimal.Round(percent,3) + "% (" + current + " su " + maximum + ") " + message;
-            Logger.PrintF(fileCorrect, message, true, ConfigFile.INFO);
-            Logger.PrintLC(message, 2, ConfigFile.INFO);
-            return true;
+                decimal percent = (current / maximum) * 100;
+                message = decimal.Round(percent,3) + "% (" + current + " su " + maximum + ") " + message;
+                Logger.PrintF(fileCorrect, message, true, ConfigFile.INFO);
+                Logger.PrintLC(message, 2, ConfigFile.INFO);
+                return true;
             }
             catch
             {
@@ -285,8 +285,8 @@ namespace ERwin_CA
                                 if (campopadreverifica.Contains(R.CampoPadre) || campofiglioverifica.Contains(R.CampoFiglio))
                                 {
                                     errore = true;
-                                    R.History = "Relazione ignorata: ID " + RStrut.ID + " contiene già una relazione col medesimo campo padre e/o col medesimo campo figlio";
-                                    Logger.PrintLC("Relazione ignorata: ID " + RStrut.ID + " contiene già una relazione col medesimo campo padre e/o col medesimo campo figlio", 3, ConfigFile.ERROR);
+                                    R.History = "Relazione ignorata: ID " + RStrut.ID + " campo padre e/o campo figlio duplicati all'interno della relazione";
+                                    Logger.PrintLC("Relazione ignorata: ID " + RStrut.ID + " campo padre e/o campo figlio duplicati all'interno della relazione", 3, ConfigFile.ERROR);
                                     continue;
                                 }
                                 else

@@ -15,7 +15,8 @@ namespace ERwin_CA
         //}
 
         // SEZIONE ESECUZIONE
-        public static int LOG_LEVEL = 2;
+        private static int LOG_LEVEL_DEFAULT = 4;
+        public static int LOG_LEVEL = LOG_LEVEL_DEFAULT;
         public static bool RefreshLogLevel()
         {
             try
@@ -25,7 +26,7 @@ namespace ERwin_CA
             }
             catch
             {
-                LOG_LEVEL = 4;
+                LOG_LEVEL = LOG_LEVEL_DEFAULT;
                 return false;
             }
         }
@@ -37,6 +38,7 @@ namespace ERwin_CA
         public static string BASE_PATH = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
         public static string APP_PATH = System.IO.Path.GetDirectoryName(BASE_PATH).Replace("file:\\", "");
         public static string SEARCH_PATH = ConfigurationSettings.AppSettings["Search Folder"];
+        public static string INPUT_FOLDER_NAME = ConfigurationSettings.AppSettings["Input Folder Name"];
 
         public static string CREACOPIEERWIN = ConfigurationSettings.AppSettings["CREACOPIEERWIN"];
         public static string PERCORSOCOPIEERWIN = APP_PATH + @"\" + ConfigurationSettings.AppSettings["PERCORSOCOPIEERWIN"] + @"\";
@@ -46,6 +48,7 @@ namespace ERwin_CA
         public static string ERWIN_TEMPLATE_DB2 = APP_PATH + @"\Template\Template_DB2_LF.erwin";
         public static string ERWIN_TEMPLATE_ORACLE = APP_PATH + @"\Template\Template_Oracle_LF.erwin";
         public static string ERWIN_TEMPLATE_SQLSERVER = APP_PATH + @"\Template\Template_SqlServer_LF.erwin";
+        public static string CONTROLLI_TEMPLATE = APP_PATH + @"\Template\Controlli_Campi_v4.xlsx";
 
         private static string tempString = ConfigurationSettings.AppSettings["DBS"].ToUpper();
         public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE", "SQLSERVER }; //Sempre Upper case
@@ -285,7 +288,7 @@ namespace ERwin_CA
         public const string RELAZIONI = "Relazioni-ModelloDatiLegacy";
         public const string TABELLE_DIFF = "Differenze Tabelle";
         public const string ATTRIBUTI_DIFF = "Differenze Attributi";
-        public const string CONTROLLI = "Controlli Campi";
+        public const string CONTROLLI = "Controlli_campi";
 
 
         public static string COLONNA_01 = "SSA";

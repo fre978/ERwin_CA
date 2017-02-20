@@ -55,8 +55,10 @@ namespace ERwin_CA
                                     TemplateFile = ConfigFile.ERWIN_TEMPLATE_SQLSERVER;
                                     break;
                                 default:
-                                    TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
-                                    break;
+                                    Logger.PrintLC(file + ": DB descriptor is invalid. Skipping it.");
+                                    continue;
+                                    //TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
+                                    //break;
                             }
                             FileInfo origin = new FileInfo(file);
                             string fileName = Path.GetFileNameWithoutExtension(file);
@@ -100,34 +102,50 @@ namespace ERwin_CA
 
                         int EntitaCreate = 0;
                         foreach (var dati in DatiFile)
-                        { 
+                        {
                             SCAPI.ModelObject Entita = connessione.CreateEntity(dati, TemplateFile);
                             if (Entita != null)
                             {
                                 EntitaCreate += 1;
                             }
-
-                            //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                            if (!string.IsNullOrEmpty(dati.History))
-                            { 
-                                int col = ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1;
-                                Logger.PrintLC("Updating excel file for error on entity creation for the table '" + dati.TableName + "' in erwin. Error: " + dati.History, 3);
-                                //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                if (ConfigFile.DEST_FOLD_UNIQUE)
-                                {
-                                    fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                }
-                                else
-                                {
-                                    fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                                }
-
-                                if (File.Exists(fInfo.FullName))
-                                {
-                                    ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Row, col, 1, dati.History, ConfigFile.TABELLE);
-                                }
-                            }
                         }
+                            ////aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
+                            //if (!string.IsNullOrEmpty(dati.History))
+                            //{ 
+                            //    int col = ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1;
+                            //    Logger.PrintLC("Updating excel file for error on entity creation for the table '" + dati.TableName + "' in erwin. Error: " + dati.History, 3);
+                            //    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            //    if (ConfigFile.DEST_FOLD_UNIQUE)
+                            //    {
+                            //        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            //    }
+                            //    else
+                            //    {
+                            //        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                            //    }
+
+                            //    if (File.Exists(fInfo.FullName))
+                            //    {
+                            //        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Row, col, 1, dati.History, ConfigFile.TABELLE);
+                            //    }
+                            //}
+                            //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
+                            int col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                            Logger.PrintLC("Updating excel file for error on entity creation", 3);
+                            //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            if (ConfigFile.DEST_FOLD_UNIQUE)
+                            {
+                                fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            }
+                            else
+                            {
+                                fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                            }
+                            if (File.Exists(fInfo.FullName))
+                            {
+                                ExcelOps.XLSXWriteErrorInCell(fInfo, DatiFile.FindAll(x => !string.IsNullOrEmpty(x.History)), col, 1, ConfigFile.TABELLE);
+                            }
+                        
 
                         Logger.PrintLC("** FINISH PROCESSING - TABLES to ERwin Model", 2);
                         #endregion
@@ -141,12 +159,12 @@ namespace ERwin_CA
                             //statistica tabelle create
                             current = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
                             maximum = DatiFile.Count;
-                            message = "tabelle correttamente create";
+                            message = "tabelle create";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             //statistica tabelle senza descrizione
                             current = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.TableDescr)).Count();
                             maximum = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
-                            message = "tabelle senza descrizione sul totale delle tabelle create";
+                            message = "tabelle senza descrizione";
                             Funct.Stats(current, maximum, message, fileCorrect);
                         }
                         else
@@ -206,29 +224,31 @@ namespace ERwin_CA
                             //############################
                             foreach (var dati in AttrFile)
                             {
-                                connessione.CreateAttributePassOne(dati, TemplateFile);
-
-                                //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                                if (!string.IsNullOrEmpty(dati.History))
+                                if (string.IsNullOrEmpty(dati.History))
                                 {
-                                    int col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
-                                    Logger.PrintLC("Updating excel file for error on attributes creation (pass one) for the field '" + dati.NomeCampoLegacy + "' in erwin. Error: " + dati.History, 3);
-                                    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                    if (ConfigFile.DEST_FOLD_UNIQUE)
-                                    {
-                                        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                    }
-                                    else
-                                    {
-                                        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                                    }
-                                    if (File.Exists(fInfo.FullName))
-                                    {
-                                        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Row, col, 1, dati.History, ConfigFile.ATTRIBUTI);
-                                    }
+                                    connessione.CreateAttributePassOne(dati, TemplateFile);
                                 }
+
+                                
                             }
 
+                            //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
+                            col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                            Logger.PrintLC("Updating excel file for error on attributes creation (pass one)", 3);
+                            //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            if (ConfigFile.DEST_FOLD_UNIQUE)
+                            {
+                                fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            }
+                            else
+                            {
+                                fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                            }
+                            if (File.Exists(fInfo.FullName))
+                            {
+                                ExcelOps.XLSXWriteErrorInCell(fInfo, AttrFile.FindAll(x => !string.IsNullOrEmpty(x.History) && x.Step == 1), col, 1, ConfigFile.ATTRIBUTI);
+                            }
+                            
 
                             if (ConfigFile.CREACOPIEERWIN == "true")
                             {
@@ -275,28 +295,42 @@ namespace ERwin_CA
                             {
                                 connessione.CreateRelation(dati, TemplateFile);
 
+                                //if (string.IsNullOrEmpty(dato.History))
+                                //{
+                                //    col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1;
+                                //    Logger.PrintLC("Updating excel file for error on relation creation for the field '" + dato.IdentificativoRelazione + "' in erwin. Error: " + dato.History, 3);
+                                //    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                                //    if (ConfigFile.DEST_FOLD_UNIQUE)
+                                //    {
+                                //        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                                //    }
+                                //    else
+                                //    {
+                                //        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                                //    }
+                                //    if (File.Exists(fInfo.FullName))
+                                //    {
+                                //        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Relazioni, col, 1, dato.History, ConfigFile.RELAZIONI);
+                                //    }
+                                //}
                                 //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                                foreach (var dato in dati.Relazioni)
+                                col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                                Logger.PrintLC("Updating excel file for error on relation creation", 3);
+                                //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                                if (ConfigFile.DEST_FOLD_UNIQUE)
                                 {
-                                    if (!string.IsNullOrEmpty(dato.History))
-                                    {
-                                        int col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1;
-                                        Logger.PrintLC("Updating excel file for error on relation creation for the field '" + dato.IdentificativoRelazione + "' in erwin. Error: " + dato.History, 3);
-                                        //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                        if (ConfigFile.DEST_FOLD_UNIQUE)
-                                        {
-                                            fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                        }
-                                        else
-                                        {
-                                            fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                                        }
-                                        if (File.Exists(fInfo.FullName))
-                                        {
-                                            ExcelOps.XLSXWriteErrorInCell(fInfo, dato.Row, col, 1, dato.History, ConfigFile.RELAZIONI);
-                                        }
-                                    }
+                                    fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
                                 }
+                                else
+                                {
+                                    fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                                }
+                                if (File.Exists(fInfo.FullName))
+                                {
+                                    ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Relazioni.FindAll(x => !string.IsNullOrEmpty(x.History)), col, 1, ConfigFile.RELAZIONI);
+                                }
+
+
                             }
                             if (ConfigFile.CREACOPIEERWIN == "true")
                             {
@@ -340,28 +374,47 @@ namespace ERwin_CA
                             //############################
                             foreach (var dati in AttrFile)
                             {
-                                connessione.CreateAttributePassTwo(dati, TemplateFile);
-
-                                //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                                if (!string.IsNullOrEmpty(dati.History) && (dati.Step == 2))
+                                if (string.IsNullOrEmpty(dati.History))
                                 {
-                                    int col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
-                                    Logger.PrintLC("Updating excel file for error on attributes creation (pass two) for the field '" + dati.NomeCampoLegacy + "' in erwin. Error: " + dati.History, 3);
-                                    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                    if (ConfigFile.DEST_FOLD_UNIQUE)
-                                    {
-                                        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                    }
-                                    else
-                                    {
-                                        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                                    }
-                                    if (File.Exists(fInfo.FullName))
-                                    {
-                                        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Row, col, 1, dati.History, ConfigFile.ATTRIBUTI);
-                                    }
+                                    connessione.CreateAttributePassTwo(dati, TemplateFile);
                                 }
 
+                                ////aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
+                                //if (!string.IsNullOrEmpty(dati.History) && (dati.Step == 2))
+                                //{
+                                //    col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                                //    Logger.PrintLC("Updating excel file for error on attributes creation (pass two) for the field '" + dati.NomeCampoLegacy + "' in erwin. Error: " + dati.History, 3);
+                                //    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                                //    if (ConfigFile.DEST_FOLD_UNIQUE)
+                                //    {
+                                //        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                                //    }
+                                //    else
+                                //    {
+                                //        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                                //    }
+                                //    if (File.Exists(fInfo.FullName))
+                                //    {
+                                //        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Row, col, 1, dati.History, ConfigFile.ATTRIBUTI);
+                                //    }
+                                //}
+
+                            }
+                            //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
+                            col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                            Logger.PrintLC("Updating excel file for error on attributes creation (pass two)", 3);
+                            //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            if (ConfigFile.DEST_FOLD_UNIQUE)
+                            {
+                                fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                            }
+                            else
+                            {
+                                fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                            }
+                            if (File.Exists(fInfo.FullName))
+                            {
+                                ExcelOps.XLSXWriteErrorInCell(fInfo, AttrFile.FindAll(x => !string.IsNullOrEmpty(x.History) && x.Step == 2), col, 1, ConfigFile.ATTRIBUTI);
                             }
                             Logger.PrintLC("** FINISH PROCESSING - ATTRIBUTES to ERwin model (pass two)", 2);
                             #endregion
@@ -403,21 +456,21 @@ namespace ERwin_CA
                             }
                             current = SenzaChiave.Count;
                             maximum = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
-                            message = "tabelle prive di chiave primaria rispetto al totale delle tabelle create";
+                            message = "tabelle senza PK";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             #endregion
-                            #region AttributiConalmenoUnErrore
+                            #region AttributiConAlmenoUnErrore
                             //statistica tabelle senza descrizione
                             current = AttrFile.FindAll(x => !(string.IsNullOrEmpty(x.History))).Count;
                             maximum = AttrFile.Count;
-                            message = "attributi errati rispetto al totale degli attributi elaborati";
+                            message = "attributi con almeno un errore";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             #endregion
                             #region AttributiSenzaDescrizione
                             //statistica tabelle senza descrizione
                             current = AttrFile.FindAll(x => string.IsNullOrEmpty(x.History) && string.IsNullOrEmpty(x.DefinizioneCampo)).Count();
                             maximum = AttrFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
-                            message = "attributi privi di descrizione rispetto al totale degli attributi creati";
+                            message = "attributi senza descrizione";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             #endregion
                             #endregion
@@ -454,11 +507,11 @@ namespace ERwin_CA
                             
                             current = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count - TabelleRelazionate.Count;
                             maximum = DatiFile.FindAll(x => string.IsNullOrEmpty(x.History)).Count;
-                            message = "tabelle prive di relazioni sul totale delle relazioni create";
+                            message = "tabelle senza relazioni";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             current = (globalRelationStrut.GlobalRelazioni.Count) - TabelleRelazionate.Count;
                             maximum = (globalRelationStrut.GlobalRelazioni.Count);
-                            message = "relazioni errate sul totale delle elaborazioni elaborate";
+                            message = "relazioni con almeno un errore";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             #endregion
                             
@@ -472,7 +525,7 @@ namespace ERwin_CA
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx")))
                         {
                             FileElaborato = Path.Combine(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                            if ((EntitaCreate != 0) || (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))) 
+                            //if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))
                                 File.Delete(FileElaborato);
                         }
                         if (File.Exists(Path.Combine(Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".xls")))
@@ -494,6 +547,7 @@ namespace ERwin_CA
                                 if (ExcelOps.ConvertXLSXtoXLS(fInfo.FullName))
                                 {
                                     File.Delete(fInfo.FullName);
+                                    ExcelOps.OpenAndClose(fInfo.FullName);  //Eliminare? Test
                                 }
                             }
                         }
@@ -514,7 +568,10 @@ namespace ERwin_CA
 
                         
                         FileElaborati.Add(FileElaborato);
-                        ElaboratiT Elaborato = new ElaboratiT(fileElaborato: "", entityElaborate: new List<EntityT>(), attributiElaborati: new List<AttributeT>(), relazioniElaborate: new GlobalRelationStrut());
+                        ElaboratiT Elaborato = new ElaboratiT(fileElaborato: "", 
+                                                              entityElaborate: new List<EntityT>(), 
+                                                              attributiElaborati: new List<AttributeT>(), 
+                                                              relazioniElaborate: new GlobalRelationStrut());
                         Elaborato.FileElaborato = FileElaborato;
                         Elaborato.EntityElaborate = DatiFile;
                         Elaborato.AttributiElaborati = AttrFile;
@@ -545,77 +602,99 @@ namespace ERwin_CA
 
                     #region DocExcelControlli
                     List<string> DocExcelControlli = new List<string>();
-                    List<EntityT> EntityBFD = Elaborato.EntityElaborate.FindAll(x => x.FlagBFD == "S" && string.IsNullOrEmpty(x.History));
-                    List<RelationStrut> LRelazioniBFD = RelazioniElaborate.GlobalRelazioni;
-                    foreach (EntityT E in EntityBFD)
+                    if (Elaborato.EntityElaborate.Count != 0)
                     {
-                        List<AttributeT> AttributiBFD = AttributiElaborati.FindAll(x => x.NomeTabellaLegacy.ToUpper() == E.TableName.ToUpper() && string.IsNullOrEmpty(x.History));
-                        foreach (AttributeT A in AttributiBFD)
+                        Logger.PrintLC("** INIZIO ELABORAZIONE CONTROLLI: " + FileElaborato, 2);
+                        List<EntityT> EntityBFD = Elaborato.EntityElaborate.FindAll(x => x.FlagBFD == "S" && string.IsNullOrEmpty(x.History));
+                        List<RelationStrut> LRelazioniBFD = RelazioniElaborate.GlobalRelazioni;
+                        int myprogr = 0;
+                        foreach (EntityT E in EntityBFD)
                         {
-                            int? type = A.Chiave;
-                            int? null_option_type = A.MandatoryFlag;
-                            string phisical_data_type = A.DataType;
-                            string NomeStrutturaInformativa = string.Empty;
-                            string NomeCampo = string.Empty;
-                            string CodLocaleControllo = string.Empty;
-                            string RuoloCampo = string.Empty;
-
-                            if (type == 0)
+                            myprogr += 1;
+                            List<AttributeT> AttributiBFD = AttributiElaborati.FindAll(x => x.NomeTabellaLegacy.ToUpper() == E.TableName.ToUpper() && string.IsNullOrEmpty(x.History));
+                            foreach (AttributeT A in AttributiBFD)
                             {
-                                NomeStrutturaInformativa = E.TableName.ToUpper();
-                                NomeCampo = A.NomeCampoLegacy.ToUpper();
-                                CodLocaleControllo = "DUP";
-                                RuoloCampo = "OggettoControllo";
-                                DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
-                            }
-                            if (A.MandatoryFlag == 1)
-                            {
-                                NomeStrutturaInformativa = E.TableName.ToUpper();
-                                NomeCampo = A.NomeCampoLegacy.ToUpper();
-                                CodLocaleControllo = "NUL";
-                                RuoloCampo = "OggettoControllo";
-                                DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
-                            }
-                            if (Funct.ParseDataType(phisical_data_type, "DB2", true))
-                            {
-                                NomeStrutturaInformativa = E.TableName.ToUpper();
-                                NomeCampo = A.NomeCampoLegacy.ToUpper();
-                                CodLocaleControllo = "FOR";
-                                RuoloCampo = "OggettoControllo";
-                                DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
-                            }
-                            foreach (RelationStrut SRelazioniBFD in LRelazioniBFD)
-                            {
-                                List<RelationT> Relazioni = SRelazioniBFD.Relazioni.FindAll(x => x.CampoFiglio == A.NomeCampoLegacy && x.TabellaFiglia == A.NomeTabellaLegacy && string.IsNullOrEmpty(x.History));
-                                foreach (RelationT Relazione in Relazioni)
+                                int? type = A.Chiave;
+                                int? null_option_type = A.MandatoryFlag;
+                                string phisical_data_type = A.DataType;
+                                string NomeStrutturaInformativa = string.Empty;
+                                string NomeCampo = string.Empty;
+                                string CodLocaleControllo = string.Empty;
+                                string RuoloCampo = string.Empty;
+                                string Ambito = "BFDL1";
+                                string CC = "LI";
+                                string DD = E.DB;
+                                string mydb = E.DatabaseName;
+                                string alfanum = "00000000000000";
+                                alfanum = alfanum.Substring(mydb.Length, alfanum.Length - myprogr.ToString().Length - mydb.Length);
+                                alfanum = mydb + alfanum + myprogr;
+                                if (type == 0)
                                 {
                                     NomeStrutturaInformativa = E.TableName.ToUpper();
                                     NomeCampo = A.NomeCampoLegacy.ToUpper();
-                                    CodLocaleControllo = "DRI";
+                                    CodLocaleControllo = "DUP";
+                                    CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
                                     RuoloCampo = "OggettoControllo";
-                                    DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                    if (!(DocExcelControlli.Exists(x=> x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                        DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                }
+                                if (A.MandatoryFlag == 1)
+                                {
+                                    NomeStrutturaInformativa = E.TableName.ToUpper();
+                                    NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                    CodLocaleControllo = "NUL";
+                                    CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
+                                    RuoloCampo = "OggettoControllo";
+                                    if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                        DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                }
+                                if (Funct.ParseDataType(phisical_data_type, "DB2", true))
+                                {
+                                    NomeStrutturaInformativa = E.TableName.ToUpper();
+                                    NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                    CodLocaleControllo = "FOR";
+                                    CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
+                                    RuoloCampo = "OggettoControllo";
+                                    if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                        DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                }
+                                foreach (RelationStrut SRelazioniBFD in LRelazioniBFD)
+                                {
+                                    List<RelationT> Relazioni = SRelazioniBFD.Relazioni.FindAll(x => x.CampoFiglio == A.NomeCampoLegacy && x.TabellaFiglia == A.NomeTabellaLegacy && string.IsNullOrEmpty(x.History));
+                                    foreach (RelationT Relazione in Relazioni)
+                                    {
+                                        NomeStrutturaInformativa = E.TableName.ToUpper();
+                                        NomeCampo = A.NomeCampoLegacy.ToUpper();
+                                        CodLocaleControllo = "DRI";
+                                        CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
+                                        RuoloCampo = "OggettoControllo";
+                                        if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                            DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
 
-                                    NomeStrutturaInformativa = Relazione.TabellaPadre.ToUpper();
-                                    NomeCampo = Relazione.CampoPadre.ToUpper();
-                                    CodLocaleControllo = "DRI";
-                                    RuoloCampo = "CampoConfronto";
-                                    DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                        NomeStrutturaInformativa = Relazione.TabellaPadre.ToUpper();
+                                        NomeCampo = Relazione.CampoPadre.ToUpper();
+                                        CodLocaleControllo = "DRI";
+                                        CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
+                                        RuoloCampo = "CampoConfronto";
+                                        if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                            DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                    }
                                 }
                             }
                         }
+                        string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliTempistiche.xlsx";
+                        //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
+                        if (ConfigFile.DEST_FOLD_UNIQUE)
+                        {
+                            FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
+                        }
+                        else
+                        {
+                            FileDocControlli = Funct.GetFolderDestination2(FileElaborato, new FileInfo(FileDocControlli).Name);
+                        }
+                        ExcelOps.WriteDocExcelControlli(new FileInfo(FileDocControlli), DocExcelControlli);
                     }
-                    string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliCampi.xlsx";
-                    //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
-                    if (ConfigFile.DEST_FOLD_UNIQUE)
-                    {
-                        FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
-                    }
-                    else
-                    {
-                        FileDocControlli = Funct.GetFolderDestination2(FileElaborato, new FileInfo(FileDocControlli).Name);
-                    }
-                    ExcelOps.WriteDocExcelControlli(new FileInfo(FileDocControlli), DocExcelControlli);
-
+                    Logger.PrintLC("** FINE ELABORAZIONE CONTROLLI: " + FileElaborato, 2);
                     #endregion
 
                     #region ProcessingFileSQL

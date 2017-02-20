@@ -152,6 +152,7 @@ namespace ERwin_CA
                                     //separo eventuali notazioni db.dbo.tabella prendendo l'ultimo elemento dell'insieme
                                     string[] arrayelemento = elemento.Split('.');
                                     elemento = arrayelemento[arrayelemento.Count() - 1];
+                                    elemento = elemento.Replace("[", "").Replace("]", "").Replace("(", "").ToUpper();
                                 }
                                 if (!(ret.Exists(x => x == elemento)))
                                     ret.Add(elemento);
@@ -241,6 +242,7 @@ namespace ERwin_CA
                                     //separo eventuali notazioni db.dbo.tabella prendendo l'ultimo elemento dell'insieme
                                     string[] arrayelemento = elemento.Split('.');
                                     elemento = arrayelemento[arrayelemento.Count() - 1];
+                                    elemento = elemento.Replace("[", "").Replace("]", "").Replace("(", "").ToUpper();
                                     //usero entity come prefisso per gli attributi che troverò nelle righe successive
                                     entity = elemento;
                                     memTable = elemento;

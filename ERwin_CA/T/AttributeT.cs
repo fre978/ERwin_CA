@@ -28,6 +28,7 @@ namespace ERwin_CA.T
         public string Note { get; set; }
         public string Storica { get; set; }
         public string DatoSensibile { get; set; }
+        public string Ordine { get; set; }
         public string History { get; set; }
         public int Step { get; set; }
 
@@ -36,7 +37,7 @@ namespace ERwin_CA.T
                           string dataType = null, int? lunghezza = null, int? decimali = null,
                           int? chiave = null, string unique = null, string chiaveLogica= null,
                           int? mandatoryFlag = null, string dominio = null, string provenienzaDominio = null, 
-                          string note = null, string storica = null, string datoSensibile = null, string history = null, int step = 1 )
+                          string note = null, string storica = null, string datoSensibile = null, string ordine = null, string history = null, int step = 0 )
         {
             Row = row;
             DB = db;
@@ -58,6 +59,7 @@ namespace ERwin_CA.T
             Note = note;
             Storica = storica;
             DatoSensibile = datoSensibile;
+            Ordine = Ordine;
             History = history;
             Step = step;
         }

@@ -70,9 +70,10 @@
                                   entityName As String) As Boolean
         Try
             model = collection.Item(entityName, "Entity")
+
             '            model.Properties.Add()
             Return True
-        Catch
+        Catch exp As Exception
             Return False
         End Try
     End Function
