@@ -12,6 +12,8 @@ namespace ERwin_CA
         public static List<string> GetTrueFilesToProcess(string[] list)
         {
             List<string> nlist = new List<string>();
+            List<string> Direct = new List<string>();
+
             if (list != null)
             {
                 //if (ConfigFile.DEST_FOLD_UNIQUE)
@@ -34,14 +36,24 @@ namespace ERwin_CA
                 if (!(string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim())))
                 {
                     nlist = (from c in list
-                             where c.ToUpper().Contains(ConfigFile.INPUT_FOLDER_NAME.ToUpper())
+                             where c.Contains(ConfigFile.INPUT_FOLDER_NAME)
                              select c).ToList();
                 }
+                int pathLenght = ConfigFile.INPUT_FOLDER_NAME.Length;
+                foreach(string file in nlist)
+                {
+                    FileInfo fileI = new FileInfo(file);
+                    DirectoryInfo dir = fileI.Directory;
+                    string padre = dir.Name.Substring(dir.Name.Length - pathLenght);
+                    if (padre == ConfigFile.INPUT_FOLDER_NAME)
+                        Direct.Add(file);
+                    //if ()
+                }
                 //}
-                if(nlist != null)
-                    nlist = CleanDuplicates(nlist);
+                if(Direct != null)
+                    Direct = CleanDuplicates(nlist);
             }
-            return nlist;
+            return Direct;
         }
 
         public static List<string> CleanDuplicates(List<string> list)
