@@ -260,26 +260,28 @@ namespace ERwin_CA
                             columns += 1;
                             if (ConfigFile._TABELLE[value] != columnsPosition)
                             {
-                                TxtControlloNonPassato = value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
-                                goto ERROR;
+                                TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
+                                //goto ERROR;
                             }
                             //dd.Add(worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text);
                         }
                         else
                         {
                             //worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Value = "";
-                            TxtControlloNonPassato = value + " non è una colonna valida del Foglio " + worksheet.Name;
-                            testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
-                            Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
-                            goto ERROR;
+                            if (string.IsNullOrWhiteSpace(value.Trim()))
+                                value = "[Campo Senza Nome, posizione: " + columnsPosition + "]";
+                            TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name;
+                            //testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
+                            Logger.PrintLC(Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name, 2, ConfigFile.ERROR);
+                            //goto ERROR;
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_TABELLE)
                         columnsFound = true;
                     else
                     {
-                        TxtControlloNonPassato = "colonne mancanti nel Foglio " + worksheet.Name;
-                        goto ERROR;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + "Numero colonne non corretto nel Foglio " + worksheet.Name;
+                        //goto ERROR;
                     }
                 }
 
@@ -300,24 +302,26 @@ namespace ERwin_CA
                             columns += 1;
                             if (ConfigFile._ATTRIBUTI[value] != columnsPosition)
                             {
-                                TxtControlloNonPassato = value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
-                                goto ERROR;
+                                TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
+                                //goto ERROR;
                             }
                         }
                         else
                         {
-                            TxtControlloNonPassato = value + " non è una colonna valida del Foglio " + worksheet.Name;
-                            testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
-                            Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
-                            goto ERROR;
+                            if (string.IsNullOrWhiteSpace(value.Trim()))
+                                value = "[Campo Senza Nome, posizione: " + columnsPosition + "]";
+                            TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name;
+                            //testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
+                            Logger.PrintLC(Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name, 2, ConfigFile.ERROR);
+                            //goto ERROR;
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_ATTRIBUTI)
                         columnsFound = true;
                     else
                     {
-                        TxtControlloNonPassato = "colonne mancanti nel Foglio " + worksheet.Name;
-                        goto ERROR;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + "Numero colonne non corretto nel Foglio " + worksheet.Name;
+                        //goto ERROR;
                     }
                 }
 
@@ -338,24 +342,26 @@ namespace ERwin_CA
                             columns += 1;
                             if (ConfigFile._RELAZIONI[value] != columnsPosition)
                             {
-                                TxtControlloNonPassato = value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
-                                goto ERROR;
+                                TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
+                                //goto ERROR;
                             }
                         }
                         else
                         {
-                            TxtControlloNonPassato = value + " non è una colonna valida del Foglio " + worksheet.Name;
+                            if (string.IsNullOrWhiteSpace(value.Trim()))
+                                value = "[Campo Senza Nome, posizione: " + columnsPosition + "]";
+                            TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name;
                             testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
                             Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
-                            goto ERROR;
+                            //goto ERROR;
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_RELAZIONI)
                         columnsFound = true;
                     else
                     {
-                        TxtControlloNonPassato = "colonne mancanti nel Foglio " + worksheet.Name;
-                        goto ERROR;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + "Numero colonne non corretto nel Foglio " + worksheet.Name;
+                        //goto ERROR;
                     }
                 }
             }
@@ -376,29 +382,65 @@ namespace ERwin_CA
                 FileOps.RemoveAttributes(fileCorrect);
                 File.Delete(fileCorrect);
             }
-            if(check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1)
+            string fileStampa = String.Empty;
+
+            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 || sheetFound != true || columnsFound != true)
+                fileStampa = fileError;
+            else
+                fileStampa = fileCorrect;
+
+            Logger.PrintF(fileStampa, "er_driveup – Caricamento Excel su ERwin", true);
+
+            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1)
             {
-                Logger.PrintLC(fileDaAprire.Name + ": non può essere elaborato: uno dei Fogli non è presente o una delle colonne non è conforme. Errore: " + TxtControlloNonPassato, 2, ConfigFile.ERROR);
-                Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
-                Logger.PrintF(fileError, fileDaAprire.Name + ": non può essere elaborato: uno dei Fogli non è presente o una delle colonne non è conforme. Errore: " + TxtControlloNonPassato, true);
-                if(isXLS == true)
+                Logger.PrintLC(fileDaAprire.Name + ": non può essere elaborato: uno dei Fogli non è presente o una delle colonne non è conforme", 2, ConfigFile.ERROR);
+                Logger.PrintF(fileStampa, fileDaAprire.Name + ": non può essere elaborato: uno o più Fogli non è presente:", true);
+                if (check_sheet[0] != 1)
+                {
+                    Logger.PrintLC("\t\tFoglio Censimento Tabelle non presente.");
+                    Logger.PrintF(fileStampa, "Foglio Censimento Tabelle non presente.", true);
+                }
+                if (check_sheet[1] != 1)
+                {
+                    Logger.PrintF(fileStampa, "Foglio Censimento Attributi non presente.", true);
+                }
+                if (check_sheet[2] != 1)
+                {
+                    Logger.PrintF(fileStampa, "Foglio Relazioni-ModelloDatiLegacy non presente.", true);
+                }
+
+                if (isXLS == true)
                     if (File.Exists(fileDaAprire.FullName))
                         File.Delete(fileDaAprire.FullName);
-                return false;
+                //return false;
             }
             if (sheetFound != true || columnsFound != true)
             {
                 Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: Columns or Sheets are not in the expected format.", 2, ConfigFile.ERROR);
-                Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
-                Logger.PrintF(fileError, "Colonne o Fogli non formattati correttamente.", true);
+                Logger.PrintF(fileStampa, "Colonne o Fogli non formattati correttamente:", true);
+                string[] val = TxtControlloNonPassato.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                if (val.Count() > 0)
+                {
+                    foreach (string valC in val)
+                    {
+                        if (!string.IsNullOrWhiteSpace(valC))
+                            Logger.PrintF(fileStampa, valC, true);
+                    }
+                }
+                else
+                {
+                    Logger.PrintF(fileStampa, TxtControlloNonPassato, true);
+                }
+
                 if (isXLS == true)
                     if (File.Exists(fileDaAprire.FullName))
                         File.Delete(fileDaAprire.FullName);
-                return false;
+                //return false;
             }
+            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 || sheetFound != true || columnsFound != true)
+                return false;
             Logger.PrintLC(fileDaAprire.Name + ": file valid to be processed.", 2, ConfigFile.INFO);
-            Logger.PrintF(fileCorrect, "er_driveup – Caricamento Excel su ERwin", true);
-            Logger.PrintF(fileCorrect, "Colonne e Fogli formattati corretamente.", true);
+            Logger.PrintF(fileStampa, "Colonne e Fogli formattati corretamente.", true);
             return true;
         }
 
