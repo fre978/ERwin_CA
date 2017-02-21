@@ -32,22 +32,39 @@ namespace ERwin_CA
                 */
 
                 //nlist = list.Where(x => x.Contains(ConfigFile.DEST_FOLD_NAME)).ToList();
-
-                if (!(string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim())))
+                bool notFullRecursive = true;
+                //!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim()) ||
+                if (!Directory.Exists(ConfigFile.INPUT_FOLDER_NAME))
+                    ConfigFile.INPUT_FOLDER_NAME = "";
+                if (!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim()))
                 {
+                    notFullRecursive = true;
                     nlist = (from c in list
                              where c.Contains(ConfigFile.INPUT_FOLDER_NAME)
                              select c).ToList();
                 }
-                int pathLenght = ConfigFile.INPUT_FOLDER_NAME.Length;
-                foreach(string file in nlist)
+                else
                 {
-                    FileInfo fileI = new FileInfo(file);
-                    DirectoryInfo dir = fileI.Directory;
-                    string padre = dir.Name.Substring(dir.Name.Length - pathLenght);
-                    if (padre == ConfigFile.INPUT_FOLDER_NAME)
-                        Direct.Add(file);
-                    //if ()
+                    notFullRecursive = false;
+                    nlist = (from c in list
+                             where c.Contains(ConfigFile.ROOT)
+                             select c).ToList();
+                }
+                if (notFullRecursive)
+                {
+                    int pathLenght = ConfigFile.INPUT_FOLDER_NAME.Length;
+                    foreach (string file in nlist)
+                    {
+                        FileInfo fileI = new FileInfo(file);
+                        DirectoryInfo dir = fileI.Directory;
+                        string padre = dir.Name.Substring(dir.Name.Length - pathLenght);
+                        if (padre == ConfigFile.INPUT_FOLDER_NAME)
+                            Direct.Add(file);
+                    }
+                }
+                else
+                {
+                    Direct = nlist;
                 }
                 //}
                 if(Direct != null)
