@@ -1254,6 +1254,8 @@ namespace ERwin_CA
                                 worksheet.Cells[dati.Row, column].Style.Font.Bold = true;
                                 worksheet.Cells[dati.Row, column].Value = "KO";
                                 string mystring = (string)worksheet.Cells[dati.Row, column + 1].Value;
+                                if (mystring == null)
+                                    mystring = "";
                                 if (!(mystring.Contains(dati.History)))
                                 {
                                     worksheet.Cells[dati.Row, column + 1].Value = mystring + dati.History;
@@ -1272,7 +1274,7 @@ namespace ERwin_CA
                                             fileDaAprire.Name +
                                             ". Description: " +
                                             exp.Message, 1, ConfigFile.ERROR);
-                            return false;
+                            //return false;
                         }
                     }
                 }

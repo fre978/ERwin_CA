@@ -175,7 +175,6 @@ namespace ERwin_CA
                                 //rimuovo un eventuale file di errore
                                 FileOps.RemoveAttributes(fileError);
                                 File.Delete(fileError);
-
                             }
                             if (File.Exists(fileCorrect))
                             {
@@ -228,8 +227,6 @@ namespace ERwin_CA
                                 {
                                     connessione.CreateAttributePassOne(dati, TemplateFile);
                                 }
-
-                                
                             }
 
                             //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
@@ -891,8 +888,12 @@ namespace ERwin_CA
                 {
                     if(proc.MainWindowTitle == "")
                     {
-                        proc.Kill();
-                        proc.WaitForExit();
+                        try
+                        {
+                            proc.Kill();
+                            proc.WaitForExit();
+                        }
+                        catch { }
                     }
                 }
             }
