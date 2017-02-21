@@ -311,7 +311,8 @@ namespace ERwin_CA
                                 //    }
                                 //}
                                 //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                                col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                                //col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                                col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1;
                                 Logger.PrintLC("Updating excel file for error on relation creation", 3);
                                 //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
                                 if (ConfigFile.DEST_FOLD_UNIQUE)

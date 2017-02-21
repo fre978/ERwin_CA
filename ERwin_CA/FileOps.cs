@@ -34,9 +34,13 @@ namespace ERwin_CA
                 //nlist = list.Where(x => x.Contains(ConfigFile.DEST_FOLD_NAME)).ToList();
                 bool notFullRecursive = true;
                 //!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim()) ||
-                if (!Directory.Exists(ConfigFile.INPUT_FOLDER_NAME))
-                    ConfigFile.INPUT_FOLDER_NAME = "";
-                if (!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim()))
+                if (!Directory.Exists(Path.Combine(ConfigFile.ROOT, ConfigFile.INPUT_FOLDER_NAME.Trim())))
+                {
+                    Logger.PrintLC("Input Folder Name doesn't exist. Will not proceed.", 2, "ERR: ");
+                    return Direct = null;
+                }
+                    
+                if (!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME))
                 {
                     notFullRecursive = true;
                     nlist = (from c in list
