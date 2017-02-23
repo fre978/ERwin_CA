@@ -9,6 +9,11 @@ namespace ERwin_CA
 {
     class FileOps
     {
+        public static bool isFileOpenable(string file)
+        {
+            return ExcelOps.isFileOpenable(file);
+        }
+
         public static List<string> GetTrueFilesToProcess(string[] list)
         {
             List<string> nlist = new List<string>();
@@ -34,11 +39,12 @@ namespace ERwin_CA
                 //nlist = list.Where(x => x.Contains(ConfigFile.DEST_FOLD_NAME)).ToList();
                 bool notFullRecursive = true;
                 //!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim()) ||
-                if (!Directory.Exists(Path.Combine(ConfigFile.ROOT, ConfigFile.INPUT_FOLDER_NAME.Trim())))
-                {
-                    Logger.PrintLC("Input Folder Name doesn't exist. Will not proceed.", 2, "ERR: ");
-                    return Direct = null;
-                }
+                //string path = Path.Combine(ConfigFile.ROOT, ConfigFile.INPUT_FOLDER_NAME);
+                //if (!Directory.Exists(path))
+                //{
+                //    Logger.PrintLC("Input Folder Name doesn't exist [" + path + "]. Will not proceed.", 2, "ERR: ");
+                //    return Direct = null;
+                //}
                     
                 if (!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME))
                 {
@@ -59,20 +65,29 @@ namespace ERwin_CA
                     int pathLenght = ConfigFile.INPUT_FOLDER_NAME.Length;
                     foreach (string file in nlist)
                     {
-                        FileInfo fileI = new FileInfo(file);
-                        DirectoryInfo dir = fileI.Directory;
-                        string padre = dir.Name.Substring(dir.Name.Length - pathLenght);
-                        if (padre == ConfigFile.INPUT_FOLDER_NAME)
-                            Direct.Add(file);
+
+                        try
+                        {
+
+                            FileInfo fileI = new FileInfo(file);
+                            DirectoryInfo dir = fileI.Directory;
+                            int dirLenght = dir.FullName.Length;
+                            string padre = dir.FullName.Substring(dirLenght - pathLenght);
+                            if (padre == ConfigFile.INPUT_FOLDER_NAME)
+                                Direct.Add(file);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
                     }
                 }
                 else
                 {
                     Direct = nlist;
                 }
-                //}
                 if(Direct != null)
-                    Direct = CleanDuplicates(nlist);
+                    Direct = CleanDuplicates(Direct);
             }
             return Direct;
         }
@@ -131,7 +146,7 @@ namespace ERwin_CA
                     // Make the file RW
                     attributes = RemoveAttribute(attributes, attribute);
                     File.SetAttributes(filePath, attributes);
-                    //Logger.PrintLC(filePath + " is no longer RO.", 3, ConfigFile.INFO);
+                    Logger.PrintLC(filePath + " is no longer RO.", 6, ConfigFile.INFO);
                 }
             }
         }

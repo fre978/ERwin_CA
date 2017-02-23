@@ -20,12 +20,19 @@ namespace ERwin_CA
             try
             {
                 if (ConfigFile.RefreshAll() == true)
-                    Logger.PrintLC("!! Some error occured while parsing the config file. Standard values will be used instead.",1, ConfigFile.WARNING);
+                {
+                    Logger.PrintLC("!! Some error occured while parsing the config file. Standard values will be used instead.", 1, ConfigFile.WARNING);
+                }
                 List<string> FileElaborati = new List<string>();
                 List<ElaboratiT> Elaborati = new List<ElaboratiT>();
                 List<string> FileElaboratiSQL = new List<string>();
                 string[] ElencoExcel = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
-                List<string> FileDaElaborare = FileOps.GetTrueFilesToProcess(ElencoExcel);
+                Logger.PrintLC("Excel files found under " + ConfigFile.ROOT + ": " + ElencoExcel.Count(), 2, "INFO: ");
+                List<string> FileDaElaborareCompleto = FileOps.GetTrueFilesToProcess(ElencoExcel);
+                Logger.PrintLC("Files to validate: " + FileDaElaborareCompleto.Count(), 2, "INFO: ");
+                List<string> FileDaElaborare = Parser.ParseListOfFileNames(FileDaElaborareCompleto);
+                Logger.PrintLC("Files valid to be processed: " + FileDaElaborare.Count(), 2, "INFO: ");
+
                 decimal current = 0;
                 decimal maximum = 0;
                 string message = string.Empty;
@@ -545,7 +552,6 @@ namespace ERwin_CA
                                 if (ExcelOps.ConvertXLSXtoXLS(fInfo.FullName))
                                 {
                                     File.Delete(fInfo.FullName);
-                                    ExcelOps.OpenAndClose(fInfo.FullName);  //Eliminare? Test
                                 }
                             }
                         }
@@ -591,6 +597,8 @@ namespace ERwin_CA
                 }
                 #endregion
 
+                //###################################################################
+                /*
                 foreach (var Elaborato in Elaborati)
                 {
                     string FileElaborato = Elaborato.FileElaborato;
@@ -690,7 +698,10 @@ namespace ERwin_CA
                         {
                             FileDocControlli = Funct.GetFolderDestination2(FileElaborato, new FileInfo(FileDocControlli).Name);
                         }
+                        //###################################################################
+                        //####### STAMPA FILE (da de-commentare)
                         ExcelOps.WriteDocExcelControlli(new FileInfo(FileDocControlli), DocExcelControlli);
+                        //###################################################################
                     }
                     Logger.PrintLC("** FINE ELABORAZIONE CONTROLLI: " + FileElaborato, 2);
                     #endregion
@@ -842,6 +853,9 @@ namespace ERwin_CA
                     #endregion
 
                 }
+                */
+                //###################################################################
+
                 #region SummaryFiles
                 //Stampa elenco completo file presi in considerazione
                 Logger.PrintLC("\n## SOMMARIO DIFFERENZE FILE XLS -> SQL:");

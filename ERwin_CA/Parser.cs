@@ -10,6 +10,21 @@ namespace ERwin_CA
 {
     class Parser
     {
+
+        public static List<string> ParseListOfFileNames(List<string> fileList)
+        {
+            List<string> result = new List<string>();
+            foreach(string file in fileList)
+            {
+                FileT temp = ParseFileName(file);
+                if (temp != null)
+                {
+                    result.Add(file);
+                }
+            }
+            return result;
+        }
+
         public static FileT ParseFileName(string fileName)
         {
             FileT file = new FileT();

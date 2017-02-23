@@ -21,10 +21,10 @@ namespace ERwin_CA
             ExApp = new Excel.ApplicationClass();
         }
 
-        public static bool OpenAndClose(string fileName)
+        public static bool isFileOpenable (string fileName)
         {
             FileInfo fileInfo = new FileInfo(fileName);
-            if (fileInfo.Exists && (fileInfo.Extension == ".xls"))
+            if (fileInfo.Exists)
             {
                 ExApp = new Excel.ApplicationClass();
                 Excel.Worksheet ExWS = new Excel.Worksheet();
@@ -33,17 +33,31 @@ namespace ERwin_CA
                 {
                     ExApp.DisplayAlerts = false;
                     ExWB = null;
+                    FileOps.RemoveAttributes(fileName);
                     ExWB = ExApp.Workbooks.Open(fileName, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-                    FileOps.RemoveAttributes(fileName);
-                    ExWB.SaveAs(fileName, Excel.XlFileFormat.xlExcel8,
-                                                Type.Missing, Type.Missing,
-                                                Type.Missing, Type.Missing,
-                                                Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing,
-                                                Type.Missing, Type.Missing,
-                                                Type.Missing, Type.Missing);
+
+                    if (fileInfo.Extension == ".xls")
+                    {
+                        ExWB.SaveAs(fileName, Excel.XlFileFormat.xlExcel8,
+                                    Type.Missing, Type.Missing,
+                                    Type.Missing, Type.Missing,
+                                    Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing,
+                                    Type.Missing, Type.Missing,
+                                    Type.Missing, Type.Missing);
+                    }
+                    else
+                    {
+                        ExWB.SaveAs(fileName, Excel.XlFileFormat.xlOpenXMLWorkbook,//.xlOpenXMLStrictWorkbook,
+                                    Type.Missing, Type.Missing,
+                                    Type.Missing, Type.Missing,
+                                    Excel.XlSaveAsAccessMode.xlNoChange, Type.Missing,
+                                    Type.Missing, Type.Missing,
+                                    Type.Missing, Type.Missing);
+                    }
+
                     ExWB.Close();
                     ExApp.DisplayAlerts = true;
                     Marshal.FinalReleaseComObject(ExWB);
@@ -196,30 +210,70 @@ namespace ERwin_CA
         public static bool FileValidation(string file)
         {
             //SCAPI.Application testAPP = new SCAPI.Application();
+            int genericError = 0;
             string testoLog = string.Empty;
             string TxtControlloNonPassato = string.Empty;
+
+            bool sheetFoundTabelle = false;
+            bool sheetFoundAttributi = false;
+            bool sheetFoundRelazioni = false;
+            bool columnsFoundTabelle = false;
+            bool columnsFoundAttributi = false;
+            bool columnsFoundRelazioni = false;
+            int columns = 0;
+            int[] check_sheet = new int[3] { 0, 0, 0 };
+            ExcelPackage p = null;
+            ExcelWorkbook WB = null;
+            ExcelWorksheets ws = null;
+
+
             FileInfo fileDaAprire = new FileInfo(file);
             bool isXLS = false;
 
-            //test se il file è un temporaneo
-            char[] opened = fileDaAprire.Name.ToCharArray();
-            if (opened[0] == '~')
+            //SEZIONE TEST D'APERTURA
+            try
             {
-                Logger.PrintLC(fileDaAprire.Name + " è un file temporaneo (probabilmente è già aperto altrove). Non elaboro.", 2, ConfigFile.ERROR);
-                return false;
-            }
+                //test se il file è un temporaneo
+                char[] opened = fileDaAprire.Name.ToCharArray();
+                if (opened[0] == '~')
+                {
+                    Logger.PrintLC(fileDaAprire.Name + " è un file temporaneo (probabilmente è già aperto altrove). Non elaboro.", 2, ConfigFile.ERROR);
+                    genericError = 1;
+                    goto ERROR;
+                    //return false;
+                }
 
-            if (fileDaAprire.Extension == ".xls")
-            {
-                if (!ConvertXLStoXLSX(file))
+                //test se il file apribile
+                if (!FileOps.isFileOpenable(file))
+                {
+                    Logger.PrintLC("Non è possibile aprire il file " + fileDaAprire.Name + ". Non elaboro.", 2, ConfigFile.ERROR);
+                    genericError = 2;
+                    goto ERROR;
+                    //return false;
+                }
+
+                if (fileDaAprire.Extension == ".xls")
+                {
                     if (!ConvertXLStoXLSX(file))
-                        return false;
-                isXLS = true;
-                file = Path.ChangeExtension(file, ".xlsx");
-                fileDaAprire = new FileInfo(file);
+                    {
+                        if (!ConvertXLStoXLSX(file))
+                        {
+                            genericError = 3;
+                            goto ERROR;
+                            //return false;
+                        }
+                    }
+                    isXLS = true;
+                    file = Path.ChangeExtension(file, ".xlsx");
+                    fileDaAprire = new FileInfo(file);
+                }
+            }
+            catch
+            {
+                genericError = 4;
+                goto ERROR;
             }
 
-            ExcelPackage p;
             try
             {
                 ExApp.DisplayAlerts = false;
@@ -232,14 +286,9 @@ namespace ERwin_CA
                 Logger.PrintLC(fileDaAprire.Name + " già aperto da un'altra applicazione. Chiudere e riprovare.", 2, ConfigFile.ERROR);
                 return false;
             }
-            
-            ExcelWorkbook WB = p.Workbook;
-            
-            ExcelWorksheets ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
-            bool sheetFound = false;
-            bool columnsFound = false;
-            int columns = 0;
-            int[] check_sheet = new int[3] { 0, 0, 0 };
+            WB = p.Workbook;
+            ws = WB.Worksheets;
+
             foreach (var worksheet in ws)
             {
                 // SEZIONE TABELLE
@@ -247,9 +296,8 @@ namespace ERwin_CA
                 {
                     columns = 0;
                     check_sheet[0] += 1;
-                    sheetFound = true;
-                    columnsFound = false;
-                    //List<string> dd = new List<string>();
+                    sheetFoundTabelle = true;
+                    columnsFoundTabelle = false;
                     for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_TABELLE; 
                             columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_TABELLE; 
                             columnsPosition++)
@@ -261,27 +309,21 @@ namespace ERwin_CA
                             if (ConfigFile._TABELLE[value] != columnsPosition)
                             {
                                 TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
-                                //goto ERROR;
                             }
-                            //dd.Add(worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Text);
                         }
                         else
                         {
-                            //worksheet.Cells[ConfigFile.HEADER_RIGA, columnsPosition].Value = "";
                             if (string.IsNullOrWhiteSpace(value.Trim()))
                                 value = "[Campo Senza Nome, posizione: " + columnsPosition + "]";
                             TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name;
-                            //testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
-                            Logger.PrintLC(Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name, 2, ConfigFile.ERROR);
-                            //goto ERROR;
+                            Logger.PrintLC(fileDaAprire.Name + ": " + value + " non è una colonna valida del Foglio " + worksheet.Name + ". Il file non può essere elaborato.", 2, ConfigFile.ERROR);
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_TABELLE)
-                        columnsFound = true;
+                        columnsFoundTabelle = true;
                     else
                     {
-                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + "Numero colonne non corretto nel Foglio " + worksheet.Name;
-                        //goto ERROR;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + "non corretto." + worksheet.Name;
                     }
                 }
 
@@ -290,8 +332,8 @@ namespace ERwin_CA
                 {
                     check_sheet[1] += 1;
                     columns = 0;
-                    columnsFound = false;
-                    sheetFound = true;
+                    columnsFoundAttributi = false;
+                    sheetFoundAttributi = true;
                     for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_ATTRIBUTI;
                             columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI;
                             columnsPosition++)
@@ -303,25 +345,25 @@ namespace ERwin_CA
                             if (ConfigFile._ATTRIBUTI[value] != columnsPosition)
                             {
                                 TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
-                                //goto ERROR;
                             }
                         }
                         else
                         {
                             if (string.IsNullOrWhiteSpace(value.Trim()))
+                            {
                                 value = "[Campo Senza Nome, posizione: " + columnsPosition + "]";
+                            }
                             TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name;
-                            //testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
-                            Logger.PrintLC(Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name, 2, ConfigFile.ERROR);
-                            //goto ERROR;
+                            Logger.PrintLC(fileDaAprire.Name + ": " + value + " non è una colonna valida del Foglio " + worksheet.Name + ". Il file non può essere elaborato.", 2, ConfigFile.ERROR);
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_ATTRIBUTI)
-                        columnsFound = true;
+                    {
+                        columnsFoundAttributi = true;
+                    }
                     else
                     {
-                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + "Numero colonne non corretto nel Foglio " + worksheet.Name;
-                        //goto ERROR;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + "non corretto." + worksheet.Name;
                     }
                 }
 
@@ -330,8 +372,8 @@ namespace ERwin_CA
                 {
                     check_sheet[2] += 1;
                     columns = 0;
-                    columnsFound = false;
-                    sheetFound = true;
+                    columnsFoundRelazioni = false;
+                    sheetFoundRelazioni = true;
                     for (int columnsPosition = ConfigFile.HEADER_COLONNA_MIN_RELAZIONI;
                             columnsPosition <= ConfigFile.HEADER_COLONNA_MAX_RELAZIONI;
                             columnsPosition++)
@@ -343,32 +385,41 @@ namespace ERwin_CA
                             if (ConfigFile._RELAZIONI[value] != columnsPosition)
                             {
                                 TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non trovato alla colonna " + columnsPosition + " del Foglio " + worksheet.Name;
-                                //goto ERROR;
                             }
                         }
                         else
                         {
                             if (string.IsNullOrWhiteSpace(value.Trim()))
+                            {
                                 value = "[Campo Senza Nome, posizione: " + columnsPosition + "]";
+                            }
                             TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + value + " non è una colonna valida del Foglio " + worksheet.Name;
-                            testoLog = fileDaAprire.Name + ": Il file non può essere elaborato.";
+                            testoLog = fileDaAprire.Name + ": " + value + " non è una colonna valida del Foglio " + worksheet.Name + ". Il file non può essere elaborato.";
                             Logger.PrintLC(testoLog, 2, ConfigFile.ERROR);
-                            //goto ERROR;
                         }
                     }
                     if (columns == ConfigFile.HEADER_MAX_COLONNE_RELAZIONI)
-                        columnsFound = true;
+                    {
+                        columnsFoundRelazioni = true;
+                    }
                     else
                     {
-                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\t" + "Numero colonne non corretto nel Foglio " + worksheet.Name;
-                        //goto ERROR;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + "non corretto." + worksheet.Name;
                     }
                 }
             }
 
             ERROR:
-            WB.Dispose();
-            p.Dispose();
+            try
+            {
+                WB.Dispose();
+                p.Dispose();
+            }
+            catch
+            {
+
+            }
+            
             //MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
             string fileError = Path.Combine(fileDaAprire.DirectoryName, Path.GetFileNameWithoutExtension(file) + "_KO.txt");
             string fileCorrect = Path.Combine(fileDaAprire.DirectoryName, Path.GetFileNameWithoutExtension(file) + "_OK.txt");
@@ -384,17 +435,53 @@ namespace ERwin_CA
             }
             string fileStampa = String.Empty;
 
-            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 || sheetFound != true || columnsFound != true)
+
+            if (genericError != 0)
+            {
+                Logger.PrintF(fileError, "er_driveup – Caricamento Excel su ERwin", true);
+                switch (genericError)
+                {
+                    case 1:
+                        Logger.PrintF(fileError, "Il file è temporaneo. Non può essere elaborato.", true);
+                        break;
+                    case 2:
+                        Logger.PrintF(fileError, "Il file è non è apribile. Potrebbe essere già aperto altrove. Non può essere elaborato.", true);
+                        break;
+                    case 3:
+                        Logger.PrintF(fileError, "Non è stato possibile convertire il file con estensione '.XLSX'. Non può essere elaborato.", true);
+                        break;
+                    case 4:
+                        Logger.PrintF(fileError, "Si è verificato un errore non previsto durante l'apertura del file. Non può essere elaborato", true);
+                        break;
+                }
+                if (isXLS == true)
+                {
+                    if (File.Exists(fileDaAprire.FullName))
+                    {
+                        File.Delete(fileDaAprire.FullName);
+                    }
+                }
+                return false;
+            }
+
+
+            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 ||
+                sheetFoundTabelle != true || sheetFoundAttributi != true || sheetFoundRelazioni != true ||
+                columnsFoundTabelle != true || columnsFoundAttributi != true || columnsFoundRelazioni != true)
+            {
                 fileStampa = fileError;
+            }
             else
+            {
                 fileStampa = fileCorrect;
+            }
 
             Logger.PrintF(fileStampa, "er_driveup – Caricamento Excel su ERwin", true);
 
             if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1)
             {
                 Logger.PrintLC(fileDaAprire.Name + ": non può essere elaborato: uno dei Fogli non è presente o una delle colonne non è conforme", 2, ConfigFile.ERROR);
-                Logger.PrintF(fileStampa, fileDaAprire.Name + ": non può essere elaborato: uno o più Fogli non è presente:", true);
+                Logger.PrintF(fileStampa, fileDaAprire.Name + ": non può essere elaborato: uno o più Fogli non sono presenti:", true);
                 if (check_sheet[0] != 1)
                 {
                     Logger.PrintLC("\t\tFoglio Censimento Tabelle non presente.");
@@ -402,19 +489,25 @@ namespace ERwin_CA
                 }
                 if (check_sheet[1] != 1)
                 {
+                    Logger.PrintLC("\t\tFoglio Censimento Attributi non presente.");
                     Logger.PrintF(fileStampa, "Foglio Censimento Attributi non presente.", true);
                 }
                 if (check_sheet[2] != 1)
                 {
+                    Logger.PrintLC("\t\tFoglio Relazioni-ModelloDatiLegacy non presente.");
                     Logger.PrintF(fileStampa, "Foglio Relazioni-ModelloDatiLegacy non presente.", true);
                 }
 
                 if (isXLS == true)
+                {
                     if (File.Exists(fileDaAprire.FullName))
+                    {
                         File.Delete(fileDaAprire.FullName);
-                //return false;
+                    }
+                }
             }
-            if (sheetFound != true || columnsFound != true)
+            if (sheetFoundTabelle != true || sheetFoundAttributi != true || sheetFoundRelazioni != true ||
+                columnsFoundTabelle != true || columnsFoundAttributi != true || columnsFoundRelazioni != true)
             {
                 Logger.PrintLC(fileDaAprire.Name + ": file could not be processed: Columns or Sheets are not in the expected format.", 2, ConfigFile.ERROR);
                 Logger.PrintF(fileStampa, "Colonne o Fogli non formattati correttamente:", true);
@@ -432,13 +525,24 @@ namespace ERwin_CA
                     Logger.PrintF(fileStampa, TxtControlloNonPassato, true);
                 }
 
-                if (isXLS == true)
-                    if (File.Exists(fileDaAprire.FullName))
-                        File.Delete(fileDaAprire.FullName);
+                
                 //return false;
             }
-            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 || sheetFound != true || columnsFound != true)
+
+            if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 ||
+                sheetFoundTabelle != true || sheetFoundAttributi != true || sheetFoundRelazioni != true ||
+                columnsFoundTabelle != true || columnsFoundAttributi != true || columnsFoundRelazioni != true)
+            {
+                if (isXLS == true)
+                {
+                    if (File.Exists(fileDaAprire.FullName))
+                    {
+                        File.Delete(fileDaAprire.FullName);
+                    }
+                }
                 return false;
+            }
+
             Logger.PrintLC(fileDaAprire.Name + ": file valid to be processed.", 2, ConfigFile.INFO);
             Logger.PrintF(fileStampa, "Colonne e Fogli formattati corretamente.", true);
             return true;
@@ -465,7 +569,9 @@ namespace ERwin_CA
             if (fileDaAprire.Extension == ".xls")
             {
                 if (!ConvertXLStoXLSX(file))
+                {
                     return listaFile = null;
+                }
                 file = Path.ChangeExtension(file, ".xlsx");
                 fileDaAprire = new FileInfo(file);
             }
