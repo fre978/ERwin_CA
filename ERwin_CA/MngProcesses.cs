@@ -207,7 +207,7 @@ namespace ERwin_CA
                         {
                             fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
                         }
-                        List<AttributeT> AttrFile = null;
+                        List<AttributeT> AttrFile = new List<AttributeT>();
                         if (File.Exists(fInfo.FullName))
                         {
                             AttrFile = ExcelOps.ReadXFileAttribute(fInfo, fileT.TipoDBMS);

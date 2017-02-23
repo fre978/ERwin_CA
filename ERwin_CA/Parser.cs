@@ -45,7 +45,7 @@ namespace ERwin_CA
                     Logger.PrintF(error, "Colonne e Fogli formattati corretamente.", true);
                     Logger.PrintF(error, "Formattazione del nome file errata.", true);
                 }
-                if (fileNameInfo.Extension == ".xls")
+                if (fileNameInfo.Extension.ToUpper() == ".XLS")
                 {
                     string fXLSX = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + ".xlsx");
                     if (File.Exists(fXLSX))
@@ -63,7 +63,7 @@ namespace ERwin_CA
                     Logger.PrintF(error, "Colonne e Fogli formattati corretamente.", true);
                     Logger.PrintF(error, "DB specificato nel nome file non previsto.", true);
                 }
-                if (fileNameInfo.Extension == ".xls")
+                if (fileNameInfo.Extension.ToUpper() == ".XLS")
                 {
                     string fXLSX = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + ".xlsx");
                     if (File.Exists(fXLSX))
@@ -90,7 +90,7 @@ namespace ERwin_CA
                     Logger.PrintF(error, "Colonne e Fogli formattati corretamente.", true);
                     Logger.PrintF(error, "Errore: " + exp.Message, true);
                 }
-                if (fileNameInfo.Extension == ".xls")
+                if (fileNameInfo.Extension.ToUpper() == ".XLS")
                 {
                     string fXLSX = Path.Combine(fileNameInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileNameInfo.FullName) + ".xlsx");
                     if (File.Exists(fXLSX))

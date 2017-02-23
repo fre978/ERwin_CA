@@ -39,7 +39,7 @@ namespace ERwin_CA
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing, Type.Missing);
 
-                    if (fileInfo.Extension == ".xls")
+                    if (fileInfo.Extension.ToUpper() == ".XLS")
                     {
                         ExWB.SaveAs(fileName, Excel.XlFileFormat.xlExcel8,
                                     Type.Missing, Type.Missing,
@@ -109,7 +109,7 @@ namespace ERwin_CA
 
             ExApp = new Excel.ApplicationClass();
             FileInfo fileInfo = new FileInfo(fileName);
-            if (fileInfo.Exists && (fileInfo.Extension == ".xlsx"))
+            if (fileInfo.Exists && (fileInfo.Extension.ToUpper() == ".XLSX"))
             {
                 //Excel.ApplicationClass ExApp = new Excel.ApplicationClass();
                 Excel.Workbook ExWB; // = new Excel.Workbook();
@@ -162,7 +162,7 @@ namespace ERwin_CA
                 return false;
             }
             FileInfo fileInfo = new FileInfo(fileName);
-            if (fileInfo.Exists && (fileInfo.Extension == ".xls"))
+            if (fileInfo.Exists && (fileInfo.Extension.ToUpper() == ".XLS"))
             {
                 //Excel.ApplicationClass ExApp = new Excel.ApplicationClass();
                 Excel.Workbook ExWB; // = new Excel.Workbook();
@@ -251,8 +251,8 @@ namespace ERwin_CA
                     goto ERROR;
                     //return false;
                 }
-
-                if (fileDaAprire.Extension == ".xls")
+                //string extension = fileDaAprire.Extension.ToUpper();
+                if (fileDaAprire.Extension.ToUpper() == ".XLS")
                 {
                     if (!ConvertXLStoXLSX(file))
                     {
@@ -276,14 +276,19 @@ namespace ERwin_CA
 
             try
             {
+                ExApp = new Excel.ApplicationClass();
                 ExApp.DisplayAlerts = false;
                 p = new ExcelPackage(fileDaAprire);
                 ExApp.DisplayAlerts = true;
             }
             catch
             {
-                ExApp.DisplayAlerts = false;
-                Logger.PrintLC(fileDaAprire.Name + " già aperto da un'altra applicazione. Chiudere e riprovare.", 2, ConfigFile.ERROR);
+                try
+                {
+                    ExApp.DisplayAlerts = false;
+                    Logger.PrintLC(fileDaAprire.Name + " già aperto da un'altra applicazione. Chiudere e riprovare.", 2, ConfigFile.ERROR);
+                }
+                catch { }
                 return false;
             }
             WB = p.Workbook;
@@ -566,7 +571,7 @@ namespace ERwin_CA
             }
             FileOps.RemoveAttributes(file);
 
-            if (fileDaAprire.Extension == ".xls")
+            if (fileDaAprire.Extension.ToUpper() == ".XLS")
             {
                 if (!ConvertXLStoXLSX(file))
                 {
@@ -754,7 +759,7 @@ namespace ERwin_CA
             }
             FileOps.RemoveAttributes(file);
 
-            if (fileDaAprire.Extension == ".xls")
+            if (fileDaAprire.Extension.ToUpper() == ".XLS")
             {
                 if (!ConvertXLStoXLSX(file))
                     return listaFile = null;
@@ -1058,7 +1063,7 @@ namespace ERwin_CA
             }
             FileOps.RemoveAttributes(file);
 
-            if (fileDaAprire.Extension == ".xls")
+            if (fileDaAprire.Extension.ToUpper() == ".XLS")
             {
                 if (!ConvertXLStoXLSX(file))
                     return listaFile = null;
@@ -1362,7 +1367,7 @@ namespace ERwin_CA
                     return false;
                 }
                 FileOps.RemoveAttributes(file);
-                if (fileDaAprire.Extension == ".xls")
+                if (fileDaAprire.Extension.ToUpper() == ".XLS")
                 {
                     if (!ConvertXLStoXLSX(file))
                         return false;
@@ -1445,7 +1450,7 @@ namespace ERwin_CA
                     return false;
                 }
                 FileOps.RemoveAttributes(file);
-                if (fileDaAprire.Extension == ".xls")
+                if (fileDaAprire.Extension.ToUpper() == ".XLS")
                 {
                     if (!ConvertXLStoXLSX(file))
                         return false;
@@ -1527,7 +1532,7 @@ namespace ERwin_CA
                     return false;
                 }
                 FileOps.RemoveAttributes(file);
-                if (fileDaAprire.Extension == ".xls")
+                if (fileDaAprire.Extension.ToUpper() == ".XLS")
                 {
                     if (!ConvertXLStoXLSX(file))
                         return false;
@@ -1757,7 +1762,7 @@ namespace ERwin_CA
                     return false;
                 }
                 FileOps.RemoveAttributes(file);
-                if (fileDaAprire.Extension == ".xls")
+                if (fileDaAprire.Extension.ToUpper() == ".XLS")
                 {
                     if (!ConvertXLStoXLSX(file))
                         return false;
