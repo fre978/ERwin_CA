@@ -937,15 +937,30 @@ namespace ERwin_CA
                     {
                         string file = elem.Replace(ConfigFile.LOCAL_DIR_FULL + @"\", ConfigFile.ROOT);
                         FileInfo fileI = new FileInfo(file);
-                        if (fileI.Exists)
+                        FileInfo fileIU = null;
+                        switch (fileI.Extension){
+                            case ".xls":
+                                fileIU = new FileInfo(Path.Combine(fileI.DirectoryName, Path.GetFileNameWithoutExtension(fileI.FullName) + ".XLS"));
+                                //fileI = fileIU;
+                                break;
+                            case ".xlsx":
+                                fileIU = new FileInfo(Path.Combine(fileI.DirectoryName, Path.GetFileNameWithoutExtension(fileI.FullName) + ".XLSX"));
+                                //fileI = fileIU;
+                                break;
+                        }
+                        if (fileI.Exists || fileIU.Exists)
                         {
+                            if (fileIU.Exists)
+                            {
+                                fileI = fileIU;
+                            }
                             string name = fileI.Name;
                             string dir = fileI.DirectoryName;
                             string estensione = string.Empty;
                             string textNameOK = string.Empty;
                             string textNameKO = string.Empty;
-                            FileInfo fileTestoOK = new FileInfo(string.Empty);
-                            FileInfo fileTestoKO = new FileInfo(string.Empty);
+                            FileInfo fileTestoOK = null;
+                            FileInfo fileTestoKO = null;
                             try
                             {
 

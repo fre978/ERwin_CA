@@ -854,17 +854,17 @@ namespace ERwin_CA
                                     break;
                                 case "N:N":
                                     break;
-                                case "(0,1) a (0,1)":
+                                case "(0,1) A (0,1)":
                                     break;
-                                case "(0,1) a (1,M)":
+                                case "(0,1) A (1,M)":
                                     break;
-                                case "(0,1) a (0,1,M)":
+                                case "(0,1) A (0,1,M)":
                                     break;
-                                case "1 a (0,1)":
+                                case "1 A (0,1)":
                                     break;
-                                case "1 a (1,M)":
+                                case "1 A (1,M)":
                                     break;
-                                case "1 a (0,1,M)":
+                                case "1 A (0,1,M)":
                                     break;
                                 default:
                                     incorrect = true;
@@ -927,22 +927,22 @@ namespace ERwin_CA
                                 case "N:N":
                                     ValRiga.History = "CARDINALITA non gestita dall'applicazione";
                                     break;
-                                case "(0,1) a (0,1)":
+                                case "(0,1) A (0,1)":
                                     ValRiga.Cardinalita = -1;
                                     break;
-                                case "(0,1) a (1,M)":
+                                case "(0,1) A (1,M)":
                                     ValRiga.Cardinalita = -2;
                                     break;
-                                case "(0,1) a (0,1,M)":
+                                case "(0,1) A (0,1,M)":
                                     ValRiga.Cardinalita = -3;
                                     break;
-                                case "1 a (0,1)":
+                                case "1 A (0,1)":
                                     ValRiga.Cardinalita = -1;
                                     break;
-                                case "1 a (1,M)":
+                                case "1 A (1,M)":
                                     ValRiga.Cardinalita = -2;
                                     break;
-                                case "1 a (0,1,M)":
+                                case "1 A (0,1,M)":
                                     ValRiga.Cardinalita = -3;
                                     break;
                                 default:
