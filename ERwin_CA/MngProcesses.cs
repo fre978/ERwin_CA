@@ -32,18 +32,67 @@ namespace ERwin_CA
                 Logger.PrintLC("Files to validate: " + FileDaElaborareCompleto.Count(), 2, "INFO: ");
                 List<string> FileDaElaborare = Parser.ParseListOfFileNames(FileDaElaborareCompleto);
                 Logger.PrintLC("Files valid to be processed: " + FileDaElaborare.Count(), 2, "INFO: ");
+                List<string> FileDaElaborareRemoto = new List<string>();
 
                 decimal current = 0;
                 decimal maximum = 0;
                 string message = string.Empty;
-                                
+
+                Funct.PrintList(FileDaElaborare);
+
+                //**************************************
+                //SEZIONE ROMOTO - PROVA
+                if (ConfigFile.COPY_LOCAL)
+                {
+                    try
+                    {
+                        string[] listSQL =  DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.sql");
+                        List<string> listSQLdaCopiare = listSQL.ToList();
+                        DirOps.Copy(ConfigFile.ROOT, ConfigFile.LOCAL_DIR_FULL, FileDaElaborare);
+                        DirOps.Copy(ConfigFile.ROOT, ConfigFile.LOCAL_DIR_FULL, listSQLdaCopiare);
+                    }
+                    catch
+                    {
+                        Logger.PrintLC("Error while copying remote structure to local temporary structure.", 2, ConfigFile.ERROR);
+                        return 5;
+                    }
+                    // SEZIONE AGGIORNAMENTO PATH CARTELLE DI SISTEMA
+                    ConfigFile.TEMP_REMOTE_ROOT = ConfigFile.ROOT;
+                    ConfigFile.FOLDERDESTINATION_GENERAL = Path.Combine(ConfigFile.LOCAL_DIR_FULL, ConfigFile.DEST_FOLD_NAME);
+                    ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, ConfigFile.TIMESTAMPFOLDER);
+                    //###############################################
+                    if (ConfigFile.LOCAL_DIR_FULL.Substring(ConfigFile.LOCAL_DIR_FULL.Length - 1) != @"\")
+                    {
+                        ConfigFile.ROOT = ConfigFile.LOCAL_DIR_FULL + @"\";
+                    }
+                    else
+                    {
+                        ConfigFile.ROOT = ConfigFile.LOCAL_DIR_FULL;
+                    }
+                    
+                    FileDaElaborareRemoto = FileDaElaborare;
+                    string[] elencoLocale = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
+                    List<string> FileDaElaborareCompletoLocale = FileOps.GetTrueFilesToProcess(elencoLocale);
+                    FileDaElaborare = Parser.ParseListOfFileNames(FileDaElaborareCompletoLocale);
+                    //return 4;
+                }
+                else
+                {
+                }
+                //**************************************
+
+
+
                 //####################################
                 //Ciclo MAIN
-                foreach (var file in FileDaElaborare)
+                foreach (var fileC in FileDaElaborare)
                 {
                     #region ProcessingFileExcel
+                    string file = fileC; //assegnazione mantenere inalterato il ciclo e per poter cambiare il valore di file (causa introduzione Copia Locale)
                     Logger.PrintLC("** START PROCESSING EXCEL FILE: " + file, 2);
                     string TemplateFile = null;
+                    string remoteDir = string.Empty;
+                    string remoteFile = string.Empty;
                     if (ExcelOps.FileValidation(file))
                     {
                         FileT fileT = Parser.ParseFileName(file);
@@ -64,8 +113,6 @@ namespace ERwin_CA
                                 default:
                                     Logger.PrintLC(file + ": DB descriptor is invalid. Skipping it.");
                                     continue;
-                                    //TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
-                                    //break;
                             }
                             FileInfo origin = new FileInfo(file);
                             string fileName = Path.GetFileNameWithoutExtension(file);
@@ -152,8 +199,6 @@ namespace ERwin_CA
                             {
                                 ExcelOps.XLSXWriteErrorInCell(fInfo, DatiFile.FindAll(x => !string.IsNullOrEmpty(x.History)), col, 1, ConfigFile.TABELLE);
                             }
-                        
-
                         Logger.PrintLC("** FINISH PROCESSING - TABLES to ERwin Model", 2);
                         #endregion
 
@@ -212,7 +257,6 @@ namespace ERwin_CA
                         {
                             AttrFile = ExcelOps.ReadXFileAttribute(fInfo, fileT.TipoDBMS);
                         }
-
                         Logger.PrintLC("** FINISH PROCESSING - ATTRIBUTES parsing from Excel", 2);
                         #endregion
 
@@ -359,8 +403,6 @@ namespace ERwin_CA
                                     Logger.PrintLC("Impossibile to create a copy of erwin file after RELATIONS to ERwin Model", 4, ConfigFile.ERROR);
                                 }
                             }
-
-
                             Logger.PrintLC("** FINISH PROCESSING - RELATIONS to ERwin Model", 2);
                             #endregion
                         }
@@ -856,6 +898,7 @@ namespace ERwin_CA
                 */
                 //###################################################################
 
+
                 #region SummaryFiles
                 //Stampa elenco completo file presi in considerazione
                 Logger.PrintLC("\n## SOMMARIO DIFFERENZE FILE XLS -> SQL:");
@@ -867,6 +910,74 @@ namespace ERwin_CA
                     Logger.PrintLC(myelemento, 2);
                 }
                 #endregion
+
+                //**************************************
+                //SEZIONE ROMOTO - PROVA
+                if (ConfigFile.COPY_LOCAL)
+                {
+                    Logger.PrintLC("## Copying back files from local to remote.", 2, ConfigFile.INFO);
+
+                    ConfigFile.ROOT = ConfigFile.TEMP_REMOTE_ROOT;
+                    try
+                    {
+                        DirOps.Copy(ConfigFile.LOCAL_DIR_FULL, ConfigFile.ROOT);
+                    }
+                    catch
+                    {
+                        Logger.PrintLC("Error while copying local temporary structure to remote structure.", 2, ConfigFile.ERROR);
+                        return 51;
+                    }
+                    DirectoryInfo local = new DirectoryInfo(ConfigFile.LOCAL_DIR_FULL);
+                    if (local != null)
+                    {
+                        DirOps.TraverseDirectory(local);
+                    }
+
+                    foreach (var elem in FileElaborati)
+                    {
+                        string file = elem.Replace(ConfigFile.LOCAL_DIR_FULL + @"\", ConfigFile.ROOT);
+                        FileInfo fileI = new FileInfo(file);
+                        if (fileI.Exists)
+                        {
+                            string name = fileI.Name;
+                            string dir = fileI.DirectoryName;
+                            string textNameOK = string.Empty;
+                            string textNameKO = string.Empty;
+                            if (fileI.Extension == ".xls")
+                            {
+                                textNameOK = name.Replace(".xls", "_OK.txt");
+                                textNameKO = name.Replace(".xls", "_KO.txt");
+                            }
+                            if (fileI.Extension == ".xlsx")
+                            {
+                                textNameOK = name.Replace(".xlsx", "_OK.txt");
+                                textNameKO = name.Replace(".xlsx", "_KO.txt");
+                            }
+                            if (fileI.Extension == ".XLS")
+                            {
+                                textNameOK = name.Replace(".XLS", "_OK.txt");
+                                textNameKO = name.Replace(".XLS", "_KO.txt");
+                            }
+                            if (fileI.Extension == ".XLSX")
+                            {
+                                textNameOK = name.Replace(".XLS", "_OK.txt");
+                                textNameKO = name.Replace(".XLSX", "_KO.txt");
+                            }
+                            FileInfo fileTestoOK = new FileInfo(Path.Combine(dir, textNameOK));
+                            FileInfo fileTestoKO = new FileInfo(Path.Combine(dir, textNameKO));
+                            if (fileTestoKO.Exists || fileTestoOK.Exists)
+                            {
+                                fileI.Delete();
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                }
+                //**************************************
+
 
                 return 0;
             }

@@ -39,8 +39,18 @@ namespace ERwin_CA
             switch (result)
             {
                 case 0:
+                    Logger.PrintLC("Process exited successfully.", 1);
                     break;
                 case 1:
+                    break;
+                case 4:
+                    Logger.PrintLC("Finished copying process.", 1);
+                    break;
+                case 5:
+                    Logger.PrintLC("Program exited without execution because it wasn't possible to copy remote structure locally.", 1, ConfigFile.ERROR);
+                    break;
+                case 51:
+                    Logger.PrintLC("Program exited without copying files from local to remote structure.", 1, ConfigFile.ERROR);
                     break;
                 case 6:
                     Logger.PrintLC("Program stopped abruptly.",1, ConfigFile.ERROR);

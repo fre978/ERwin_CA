@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,6 +45,61 @@ namespace ERwin_CA
         public static string PERCORSOCOPIEERWIN = APP_PATH + @"\" + ConfigurationSettings.AppSettings["PERCORSOCOPIEERWIN"] + @"\";
         public static string PERCORSOCOPIEERWINDESTINATION;
 
+        // Sezione file remoti
+        public static string COPY_TO_LOCAL = ConfigurationSettings.AppSettings["Copy to Local"];
+        public static string LOCAL_TEMP_DIR = ConfigurationSettings.AppSettings["Local Folder Name"];
+        public static bool COPY_LOCAL = false;
+        public static string LOCAL_DIR_FULL = null;
+        public static string TEMP_REMOTE_FILE = null;
+        public static string TEMP_REMOTE_ROOT = null;
+        //public static string 
+        
+        public static bool RefreshLocal()
+        {
+            try
+            {
+                if (COPY_TO_LOCAL.Trim().ToUpper() == "TRUE")
+                {
+                    COPY_LOCAL = true;
+                }
+                else
+                {
+                    COPY_LOCAL = false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(LOCAL_TEMP_DIR))
+                {
+                    string tempDir = Path.Combine(APP_PATH, LOCAL_TEMP_DIR);
+                    DirectoryInfo localTemp = new DirectoryInfo(tempDir);
+                    if (!localTemp.Exists)
+                    {
+                        try
+                        {
+                            Directory.CreateDirectory(tempDir);
+                        }
+                        catch
+                        {
+                            COPY_LOCAL = false;
+                            LOCAL_DIR_FULL = string.Empty;
+                            return false;
+                        }
+                    }
+                    LOCAL_DIR_FULL = localTemp.FullName;
+                }
+                else
+                {
+                    COPY_LOCAL = false;
+                    LOCAL_DIR_FULL = string.Empty;
+                    return true;
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         // SEZIONE DATABASE
         public static string ERWIN_TEMPLATE_DB2 = APP_PATH + @"\Template\Template_DB2_LF.erwin";
         public static string ERWIN_TEMPLATE_ORACLE = APP_PATH + @"\Template\Template_Oracle_LF.erwin";
@@ -59,13 +115,13 @@ namespace ERwin_CA
         //public static string dd = AppDomain.CurrentDomain.BaseDirectory;
 
         // SEZIONE FILE
-        public static string LOG_FILE = APP_PATH +@"\" + ConfigurationSettings.AppSettings["PERCORSOLOG"] + @"\Log.txt";
+        public static string LOG_FILE = APP_PATH + @"\" + ConfigurationSettings.AppSettings["PERCORSOLOG"] + @"\Log.txt";
         public static string ROOT = SEARCH_PATH;
 
         // SEZIONE CARTELLE
         public static string DEST_FOLD_NAME = ConfigurationSettings.AppSettings["Destination Folder Name"];
         public static bool DEST_FOLD_UNIQUE = (ConfigurationSettings.AppSettings["Destination Folder Unique"] == "true") ? true : false;
-        public static string FOLDERDESTINATION_GENERAL = ROOT + DEST_FOLD_NAME;
+        public static string FOLDERDESTINATION_GENERAL = Path.Combine(ROOT, DEST_FOLD_NAME);
         public static string FOLDERDESTINATION;
         public static string TIMESTAMPFOLDER;
 
@@ -229,6 +285,8 @@ namespace ERwin_CA
             if (!RefreshDatatypeSQLSERVER_FOR())
                 response = true;
             if (!RefreshColumns())
+                response = true;
+            if (!RefreshLocal())
                 response = true;
             return response;
         }

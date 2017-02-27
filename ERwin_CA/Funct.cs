@@ -11,6 +11,15 @@ namespace ERwin_CA
     class Funct
     {
 
+        public static void PrintList(List<string> list)
+        {
+            Logger.PrintLC("List of elements: ",2);
+            foreach (string inList in list)
+            {
+                Logger.PrintLC(inList, 3);
+            }
+        }
+
         public static List<string> DetermineElaborated(List<string> completi, List<string> elaborati)
         {
             List<string> restituzione = new List<string>();
