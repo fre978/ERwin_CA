@@ -941,33 +941,92 @@ namespace ERwin_CA
                         {
                             string name = fileI.Name;
                             string dir = fileI.DirectoryName;
+                            string estensione = string.Empty;
                             string textNameOK = string.Empty;
                             string textNameKO = string.Empty;
-                            if (fileI.Extension == ".xls")
+                            FileInfo fileTestoOK = new FileInfo(string.Empty);
+                            FileInfo fileTestoKO = new FileInfo(string.Empty);
+                            try
                             {
-                                textNameOK = name.Replace(".xls", "_OK.txt");
-                                textNameKO = name.Replace(".xls", "_KO.txt");
+
+                                if (fileI.Extension == ".xls")
+                                {
+                                    estensione = ".xls";
+                                    textNameOK = name.Replace(".xls", "_OK.txt");
+                                    textNameKO = name.Replace(".xls", "_KO.txt");
+                                }
+                                if (fileI.Extension == ".xlsx")
+                                {
+                                    estensione = ".xlsx";
+                                    textNameOK = name.Replace(".xlsx", "_OK.txt");
+                                    textNameKO = name.Replace(".xlsx", "_KO.txt");
+                                }
+                                if (fileI.Extension == ".XLS")
+                                {
+                                    estensione = ".XLS";
+                                    textNameOK = name.Replace(".XLS", "_OK.txt");
+                                    textNameKO = name.Replace(".XLS", "_KO.txt");
+                                }
+                                if (fileI.Extension == ".XLSX")
+                                {
+                                    estensione = ".XLSX";
+                                    textNameOK = name.Replace(".XLS", "_OK.txt");
+                                    textNameKO = name.Replace(".XLSX", "_KO.txt");
+                                }
+                                fileTestoOK = new FileInfo(Path.Combine(dir, textNameOK));
+                                fileTestoKO = new FileInfo(Path.Combine(dir, textNameKO));
                             }
-                            if (fileI.Extension == ".xlsx")
+                            catch(Exception exp)
                             {
-                                textNameOK = name.Replace(".xlsx", "_OK.txt");
-                                textNameKO = name.Replace(".xlsx", "_KO.txt");
+                                Logger.PrintLC("Errore 9: " + exp.Message);
+                                continue;
                             }
-                            if (fileI.Extension == ".XLS")
+                            if (fileTestoKO.Exists)
                             {
-                                textNameOK = name.Replace(".XLS", "_OK.txt");
-                                textNameKO = name.Replace(".XLS", "_KO.txt");
+                                if (!ConfigFile.DEST_FOLD_UNIQUE)
+                                {
+                                    try
+                                    {
+                                        string dirDestinationKO = Funct.GetFolderDestination(fileI.FullName, estensione);
+                                        FileInfo fileCopiare = new FileInfo(dirDestinationKO);
+                                        if (!fileCopiare.Exists)
+                                        {
+                                            fileI.MoveTo(fileCopiare.DirectoryName);
+                                        }
+                                        //else
+                                        //{
+                                        //    fileCopiare.Delete();
+                                        //    fileI.MoveTo(fileCopiare.DirectoryName);
+                                        //}
+                                    }
+                                    catch(Exception exp)
+                                    {
+                                        Logger.PrintLC("Errore 10: " + exp.Message);
+                                    }
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        fileI.MoveTo(Path.Combine(ConfigFile.ROOT, ConfigFile.DEST_FOLD_NAME));
+                                    }
+                                    catch(Exception exp)
+                                    {
+                                        Logger.PrintLC("Errore 11: " + exp.Message);
+                                    }
+                                    
+                                }
                             }
-                            if (fileI.Extension == ".XLSX")
+                            if (fileTestoOK.Exists)
                             {
-                                textNameOK = name.Replace(".XLS", "_OK.txt");
-                                textNameKO = name.Replace(".XLSX", "_KO.txt");
-                            }
-                            FileInfo fileTestoOK = new FileInfo(Path.Combine(dir, textNameOK));
-                            FileInfo fileTestoKO = new FileInfo(Path.Combine(dir, textNameKO));
-                            if (fileTestoKO.Exists || fileTestoOK.Exists)
-                            {
-                                fileI.Delete();
+                                try
+                                {
+                                    fileI.Delete();
+                                }
+                                catch(Exception exp)
+                                {
+                                    Logger.PrintLC("Errore 12: " + exp.Message);
+                                }
                             }
                         }
                     }
