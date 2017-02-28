@@ -117,7 +117,7 @@ namespace ERwin_CA
                 {
                     if (fileIU.Exists)
                     {
-                        fileI = fileIU;
+                        //fileI = fileIU;
                     }
                     string name = fileI.Name;
                     string dir = fileI.DirectoryName;
@@ -169,10 +169,44 @@ namespace ERwin_CA
                             {
                                 string dirDestinationKO = Funct.GetFolderDestination(fileI.FullName, estensione);
                                 FileInfo fileCopiare = new FileInfo(dirDestinationKO);
-                                if (!fileCopiare.Exists)
+                                try
                                 {
-                                    fileI.MoveTo(fileCopiare.DirectoryName);
+                                    fileI.IsReadOnly = false;
+                                    //fileI.MoveTo(fileCopiare.DirectoryName);
+                                    fileI.MoveTo(dirDestinationKO);
+                                    //fileI.Delete();
                                 }
+                                catch(Exception exp)
+                                {
+                                    try
+                                    {
+                                        if (exp.Message == "Impossibile creare un file, se il file esiste già.\r\n")
+                                            fileI.Delete();
+                                    }
+                                    catch { }
+                                }
+
+
+                                try
+                                {
+                                    fileIU.IsReadOnly = false;
+                                    fileIU.MoveTo(fileCopiare.DirectoryName + @"\");
+                                    fileIU.Delete();
+                                }
+                                catch (Exception exp)
+                                {
+                                    try
+                                    {
+                                        //fileIU.Delete();
+                                    }
+                                    catch { }
+                                }
+
+
+                                //if (!fileCopiare.Exists)
+                                //{
+                                //    fileI.MoveTo(fileCopiare.DirectoryName);
+                                //}
                                 //else
                                 //{
                                 //    fileCopiare.Delete();
