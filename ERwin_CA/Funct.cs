@@ -11,6 +11,209 @@ namespace ERwin_CA
     class Funct
     {
 
+        public static string GetTemplate(FileT file)
+        {
+            string TemplateFile = string.Empty;
+            switch (file.TipoDBMS)
+            {
+                case ConfigFile.DB2_NAME:
+                    TemplateFile = ConfigFile.ERWIN_TEMPLATE_DB2;
+                    break;
+                case ConfigFile.ORACLE:
+                    TemplateFile = ConfigFile.ERWIN_TEMPLATE_ORACLE;
+                    break;
+                case ConfigFile.SQLSERVER:
+                    TemplateFile = ConfigFile.ERWIN_TEMPLATE_SQLSERVER;
+                    break;
+                default:
+                    string fileName = file.SSA + "_" + file.Acronimo + "_" + file.NomeModello + "_" + file.TipoDBMS + "_" + file.Estensione;
+                    Logger.PrintLC(fileName + ": DB descriptor is invalid. Skipping it.");
+                    TemplateFile = null;
+                    break;
+            }
+            return TemplateFile;
+        }
+
+        public static List<string> RemoteGet(List<string> FileDaElaborare)
+        {
+            Logger.PrintLC("## Starting elaboration of remote/local file structure.", 2, ConfigFile.INFO);
+            try
+            {
+                string[] listSQL = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.sql");
+                List<string> listSQLdaCopiare = listSQL.ToList();
+                DirOps.Copy(ConfigFile.ROOT, ConfigFile.LOCAL_DIR_FULL, FileDaElaborare);
+                DirOps.Copy(ConfigFile.ROOT, ConfigFile.LOCAL_DIR_FULL, listSQLdaCopiare);
+            }
+            catch
+            {
+                Logger.PrintLC("Error while copying remote structure to local temporary structure.", 2, ConfigFile.ERROR);
+                return new List<string>();
+            }
+            // SEZIONE AGGIORNAMENTO PATH CARTELLE DI SISTEMA
+            ConfigFile.TEMP_REMOTE_ROOT = ConfigFile.ROOT;
+            ConfigFile.FOLDERDESTINATION_GENERAL = Path.Combine(ConfigFile.LOCAL_DIR_FULL, ConfigFile.DEST_FOLD_NAME);
+            ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, ConfigFile.TIMESTAMPFOLDER);
+            //###############################################
+            if (ConfigFile.LOCAL_DIR_FULL.Substring(ConfigFile.LOCAL_DIR_FULL.Length - 1) != @"\")
+            {
+                ConfigFile.ROOT = ConfigFile.LOCAL_DIR_FULL + @"\";
+            }
+            else
+            {
+                ConfigFile.ROOT = ConfigFile.LOCAL_DIR_FULL;
+            }
+
+            //FileDaElaborareRemoto = FileDaElaborare;
+            string[] elencoLocale = DirOps.GetFilesToProcess(ConfigFile.ROOT, "*.xls|.xlsx");
+            List<string> FileDaElaborareCompletoLocale = FileOps.GetTrueFilesToProcess(elencoLocale);
+            FileDaElaborare = Parser.ParseListOfFileNames(FileDaElaborareCompletoLocale);
+            Logger.PrintLC("## Finished elaboration of remote/local file structure.", 2, ConfigFile.INFO);
+            return FileDaElaborare;
+        }
+
+        /// <summary>
+        /// Copy the LOCAL structure of files and directories TO the original remote location,
+        /// eliminating superflous Excel files.
+        /// </summary>
+        /// <param name="FileElaborati">List of files originally intended to be elaborated</param>
+        /// <returns>State of the elaboration</returns>
+        public static bool RemoteSet(List<string> FileElaborati)
+        {
+            Logger.PrintLC("## Copying back files from local to remote.", 2, ConfigFile.INFO);
+
+            //ConfigFile.ROOT = ConfigFile.TEMP_REMOTE_ROOT;
+            try
+            {
+                DirOps.Copy(ConfigFile.LOCAL_DIR_FULL, ConfigFile.TEMP_REMOTE_ROOT);
+            }
+            catch
+            {
+                Logger.PrintLC("Error while copying local temporary structure to remote structure.", 2, ConfigFile.ERROR);
+                return false;
+            }
+            DirectoryInfo local = new DirectoryInfo(ConfigFile.LOCAL_DIR_FULL);
+            if (local != null)
+            {
+                DirOps.TraverseDirectory(local);
+            }
+
+            foreach (var elem in FileElaborati)
+            {
+                string file = elem.Replace(ConfigFile.LOCAL_DIR_FULL + @"\", ConfigFile.TEMP_REMOTE_ROOT);
+                FileInfo fileI = new FileInfo(file);
+                FileInfo fileIU = null;
+                switch (fileI.Extension)
+                {
+                    case ".xls":
+                        fileIU = new FileInfo(Path.Combine(fileI.DirectoryName, Path.GetFileNameWithoutExtension(fileI.FullName) + ".XLS"));
+                        //fileI = fileIU;
+                        break;
+                    case ".xlsx":
+                        fileIU = new FileInfo(Path.Combine(fileI.DirectoryName, Path.GetFileNameWithoutExtension(fileI.FullName) + ".XLSX"));
+                        //fileI = fileIU;
+                        break;
+                }
+                if (fileI.Exists || fileIU.Exists)
+                {
+                    if (fileIU.Exists)
+                    {
+                        fileI = fileIU;
+                    }
+                    string name = fileI.Name;
+                    string dir = fileI.DirectoryName;
+                    string estensione = string.Empty;
+                    string textNameOK = string.Empty;
+                    string textNameKO = string.Empty;
+                    FileInfo fileTestoOK = null;
+                    FileInfo fileTestoKO = null;
+                    try
+                    {
+
+                        if (fileI.Extension == ".xls")
+                        {
+                            estensione = ".xls";
+                            textNameOK = name.Replace(".xls", "_OK.txt");
+                            textNameKO = name.Replace(".xls", "_KO.txt");
+                        }
+                        if (fileI.Extension == ".xlsx")
+                        {
+                            estensione = ".xlsx";
+                            textNameOK = name.Replace(".xlsx", "_OK.txt");
+                            textNameKO = name.Replace(".xlsx", "_KO.txt");
+                        }
+                        if (fileI.Extension == ".XLS")
+                        {
+                            estensione = ".XLS";
+                            textNameOK = name.Replace(".XLS", "_OK.txt");
+                            textNameKO = name.Replace(".XLS", "_KO.txt");
+                        }
+                        if (fileI.Extension == ".XLSX")
+                        {
+                            estensione = ".XLSX";
+                            textNameOK = name.Replace(".XLS", "_OK.txt");
+                            textNameKO = name.Replace(".XLSX", "_KO.txt");
+                        }
+                        fileTestoOK = new FileInfo(Path.Combine(dir, textNameOK));
+                        fileTestoKO = new FileInfo(Path.Combine(dir, textNameKO));
+                    }
+                    catch (Exception exp)
+                    {
+                        Logger.PrintLC("Errore 9: " + exp.Message);
+                        continue;
+                    }
+                    if (fileTestoKO.Exists)
+                    {
+                        if (!ConfigFile.DEST_FOLD_UNIQUE)
+                        {
+                            try
+                            {
+                                string dirDestinationKO = Funct.GetFolderDestination(fileI.FullName, estensione);
+                                FileInfo fileCopiare = new FileInfo(dirDestinationKO);
+                                if (!fileCopiare.Exists)
+                                {
+                                    fileI.MoveTo(fileCopiare.DirectoryName);
+                                }
+                                //else
+                                //{
+                                //    fileCopiare.Delete();
+                                //    fileI.MoveTo(fileCopiare.DirectoryName);
+                                //}
+                            }
+                            catch (Exception exp)
+                            {
+                                Logger.PrintLC("Errore 10: " + exp.Message);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                fileI.MoveTo(Path.Combine(ConfigFile.ROOT, ConfigFile.DEST_FOLD_NAME));
+                            }
+                            catch (Exception exp)
+                            {
+                                Logger.PrintLC("Errore 11: " + exp.Message);
+                            }
+
+                        }
+                    }
+                    if (fileTestoOK.Exists)
+                    {
+                        try
+                        {
+                            fileI.Delete();
+                        }
+                        catch (Exception exp)
+                        {
+                            Logger.PrintLC("Errore 12: " + exp.Message);
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+
         public static void PrintList(List<string> list)
         {
             Logger.PrintLC("List of elements: ",2);

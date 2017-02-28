@@ -43,6 +43,9 @@ namespace ERwin_CA
                     break;
                 case 1:
                     break;
+                case 2:
+                    Logger.PrintLC("Exited because no file was found to be processed.", 1, ConfigFile.WARNING);
+                    break;
                 case 4:
                     Logger.PrintLC("Finished copying process.", 1);
                     break;

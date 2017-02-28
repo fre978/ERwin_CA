@@ -16,8 +16,8 @@ namespace ERwin_CA
             List<string> result = new List<string>();
             foreach(string file in fileList)
             {
-                FileT temp = ParseFileName(file);
-                if (temp != null)
+                FileT parsedResult = ParseFileName(file);
+                if (parsedResult != null)
                 {
                     result.Add(file);
                 }

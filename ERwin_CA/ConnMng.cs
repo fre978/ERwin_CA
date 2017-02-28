@@ -350,9 +350,10 @@ namespace ERwin_CA
                     }
 
                 //##################################################
-                //## Controllo esistenza DB ed eventuale aggiunta ##
+                //** Controllo esistenza DB ed eventuale aggiunta **
                 //** Qui vanno aggiunti eventuali altri DB da     **
-                //** prendere in considerazione oltre a DB2 e ORACLE e SQL SERVER
+                //** prendere in considerazione oltre a DB2,      **
+                //** ORACLE e SQL SERVER                          **
                 if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
                 {
                     if (entity.DB == "DB2")
@@ -373,17 +374,31 @@ namespace ERwin_CA
                             }
 
                             if (!string.IsNullOrWhiteSpace(entity.HostName))
+                            {
                                 if (con.AssignToObjModel(ref scDB, ConfigFile._TAB_NAME["Nome host"], entity.HostName))
                                     Logger.PrintLC("Added Host Name to " + scDB.Name, 3, ConfigFile.INFO);
                                 else
                                 {
                                     //errore = "Error adding Host Name to " + scDB.Name;
-                                    errore = "Errore riscontrato aggiungendo "+ ConfigFile._TAB_NAME["Nome host"] + " a " + scDB.Name;
+                                    errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host"] + " a " + scDB.Name;
                                     if (entity.History != null)
                                         errore = "\n" + errore;
                                     entity.History += errore;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 }
+                                //TESTUNO
+                                if (con.AssignToObjModel(ref scDB, "Entity.Physical.NOME_HOST", entity.HostName))
+                                    Logger.PrintLC("Added Host Name DB2 to " + scDB.Name, 3, ConfigFile.INFO);
+                                else
+                                {
+                                    //errore = "Error adding Host Name to " + scDB.Name;
+                                    errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host DB2_SQL"] + " a " + scDB.Name;
+                                    if (entity.History != null)
+                                        errore = "\n" + errore;
+                                    entity.History += errore;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                }
+                            }
                             DatabaseN.Add(entity.DatabaseName);
                         }
                     }
