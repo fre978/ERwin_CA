@@ -247,6 +247,26 @@ namespace ERwin_CA
                         {
                             Logger.PrintLC("Errore 12: " + exp.Message);
                         }
+                        try
+                        {
+                            string fileXLSX = Path.GetFileNameWithoutExtension(fileI.FullName);
+                            FileInfo fileIxls = new FileInfo( Path.Combine(fileI.DirectoryName, fileXLSX + ".xlsx"));
+                            FileInfo fileIXLSX = new FileInfo(Path.Combine(fileI.DirectoryName, fileXLSX + ".XLSX"));
+                            try
+                            {
+                                fileIxls.Delete();
+                            }
+                            catch { }
+                            try
+                            {
+                                fileIXLSX.Delete();
+                            }
+                            catch { }
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }

@@ -387,6 +387,38 @@ namespace ERwin_CA
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 }
                             }
+                            //************************************************
+                            //TEST assegnazione HostName DB2
+                            //TESTUNO
+                            if (!string.IsNullOrWhiteSpace(entity.HostName))
+                            {
+                                if (con.AssignToObjModel(ref scItem, "Entity.Physical.NOME_HOST", entity.HostName))
+                                    Logger.PrintLC("Added Host Name DB2 to " + scItem.Name, 3, ConfigFile.INFO);
+                                else
+                                {
+                                    //errore = "Error adding Host Name to " + scDB.Name;
+                                    errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host DB2_SQL"] + " a " + scDB.Name;
+                                    if (entity.History != null)
+                                        errore = "\n" + errore;
+                                    entity.History += errore;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                }
+                            }
+                            if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
+                            {
+                                if (con.AssignToObjModel(ref scItem, "Entity.Physical.NOME_DATABASE", entity.HostName))
+                                    Logger.PrintLC("Added Database Name DB2 to " + scItem.Name, 3, ConfigFile.INFO);
+                                else
+                                {
+                                    //errore = "Error adding Host Name to " + scDB.Name;
+                                    errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host DB2_SQL"] + " a " + scDB.Name;
+                                    if (entity.History != null)
+                                        errore = "\n" + errore;
+                                    entity.History += errore;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                }
+                            }
+                            //************************************************
                             DatabaseN.Add(entity.DatabaseName);
                         }
                     }
@@ -421,6 +453,38 @@ namespace ERwin_CA
                                 entity.History += errore;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                             }
+                        //************************************************
+                        //TEST assegnazione HostName DB2
+                        //TESTUNO
+                        if (!string.IsNullOrWhiteSpace(entity.HostName))
+                        {
+                            if (con.AssignToObjModel(ref scItem, "Entity.Physical.NOME_HOST", entity.HostName))
+                                Logger.PrintLC("Added Host Name SQLServer to " + scItem.Name, 3, ConfigFile.INFO);
+                            else
+                            {
+                                //errore = "Error adding Host Name to " + scDB.Name;
+                                errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host DB2_SQL"] + " a " + scDB.Name;
+                                if (entity.History != null)
+                                    errore = "\n" + errore;
+                                entity.History += errore;
+                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                            }
+                        }
+                        if (!string.IsNullOrWhiteSpace(entity.DatabaseName))
+                        {
+                            if (con.AssignToObjModel(ref scItem, "Entity.Physical.NOME_DATABASE", entity.HostName))
+                                Logger.PrintLC("Added Database Name SQLServer to " + scItem.Name, 3, ConfigFile.INFO);
+                            else
+                            {
+                                //errore = "Error adding Host Name to " + scDB.Name;
+                                errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host DB2_SQL"] + " a " + scDB.Name;
+                                if (entity.History != null)
+                                    errore = "\n" + errore;
+                                entity.History += errore;
+                                Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                            }
+                        }
+                        //************************************************
                         DatabaseN.Add(entity.DatabaseName);
                     }
 
@@ -465,23 +529,6 @@ namespace ERwin_CA
                 //** Aggiungere qui eventuali altri casi DB oltre a DB2/ORACLE
                 if ((entity.DB == "DB2") || (entity.DB == "SQLSERVER"))
                 {
-                    //TESTUNO
-                    if (!string.IsNullOrWhiteSpace(entity.HostName))
-                    {
-                        if (con.AssignToObjModel(ref scDB, "Physical.NOME_HOST", entity.HostName))
-                            Logger.PrintLC("Added Host Name DB2 to " + scDB.Name, 3, ConfigFile.INFO);
-                        else
-                        {
-                            //errore = "Error adding Host Name to " + scDB.Name;
-                            errore = "Errore riscontrato aggiungendo " + ConfigFile._TAB_NAME["Nome host DB2_SQL"] + " a " + scDB.Name;
-                            if (entity.History != null)
-                                errore = "\n" + errore;
-                            entity.History += errore;
-                            Logger.PrintLC(errore, 3, ConfigFile.ERROR);
-                        }
-                    }
-
-
                     if (!string.IsNullOrWhiteSpace(entity.Schema))
                     {
                         if (!SchemaN.Contains(entity.Schema))

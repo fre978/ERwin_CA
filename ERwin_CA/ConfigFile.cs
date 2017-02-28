@@ -391,6 +391,7 @@ namespace ERwin_CA
             //{"Schema", "Name_Qualifier" },
             {"Schema", "Schema_Ref" },
             {"Nome host DB2_SQL", "Entity.Physical.NOME_HOST" },
+            {"Nome Database DB2_SQL", "Entity.Physical.NOME_DATABASE" },
             //Sezione ORACLE
             {"Nome host Oracle", "Entity.Physical.NOME_HOST" },
             {"Nome Database Oracle", "Entity.Physical.NOME_DATABASE" },
