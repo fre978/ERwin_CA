@@ -36,6 +36,10 @@ namespace ERwin_CA
 
         public static List<string> RemoteGet(List<string> FileDaElaborare)
         {
+            DirectoryInfo local = new DirectoryInfo(ConfigFile.LOCAL_DIR_FULL);
+            if (local.Exists)
+                DirOps.TraverseDirectory(local);
+
             Logger.PrintLC("## Starting elaboration of remote/local file structure.", 2, ConfigFile.INFO);
             try
             {
@@ -180,8 +184,10 @@ namespace ERwin_CA
                                 {
                                     try
                                     {
-                                        if (exp.Message == "Impossibile creare un file, se il file esiste già.\r\n")
+                                        if(exp.HResult == -2147024713)
                                             fileI.Delete();
+                                        //if (exp.Message == "Impossibile creare un file, se il file esiste già.\r\n")
+                                        //    fileI.Delete();
                                     }
                                     catch { }
                                 }
