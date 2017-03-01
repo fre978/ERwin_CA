@@ -633,6 +633,7 @@ namespace ERwin_CA
                     List<AttributeT> AttributiElaborati = Elaborato.AttributiElaborati;
                     GlobalRelationStrut RelazioniElaborate = Elaborato.RelazioniElaborate;
                     List<string> ListaControlliTempistiche = new List<string>();
+                    List<string> ListaControlliCompleta = new List<string>();
 
                     #region DocExcelControlli
                     List<string> DocExcelControlli = new List<string>();
@@ -675,6 +676,7 @@ namespace ERwin_CA
                                     //Lista funzionale al file "ControlloTempistiche"
                                     if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
                                         ListaControlliTempistiche.Add(CodLocaleControllo);
+                                    ListaControlliCompleta.Add(CodLocaleControllo);
                                 }
                                 if (A.MandatoryFlag == 1)
                                 {
@@ -688,6 +690,7 @@ namespace ERwin_CA
                                     //Lista funzionale al file "ControlloTempistiche"
                                     if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
                                         ListaControlliTempistiche.Add(CodLocaleControllo);
+                                    ListaControlliCompleta.Add(CodLocaleControllo);
                                 }
                                 if (Funct.ParseDataType(phisical_data_type, "DB2", true))
                                 {
@@ -701,6 +704,7 @@ namespace ERwin_CA
                                     //Lista funzionale al file "ControlloTempistiche"
                                     if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
                                         ListaControlliTempistiche.Add(CodLocaleControllo);
+                                    ListaControlliCompleta.Add(CodLocaleControllo);
                                 }
                                 foreach (RelationStrut SRelazioniBFD in LRelazioniBFD)
                                 {
@@ -717,6 +721,7 @@ namespace ERwin_CA
                                         //Lista funzionale al file "ControlloTempistiche"
                                         if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
                                             ListaControlliTempistiche.Add(CodLocaleControllo);
+                                        ListaControlliCompleta.Add(CodLocaleControllo);
 
                                         NomeStrutturaInformativa = Relazione.TabellaPadre.ToUpper();
                                         NomeCampo = Relazione.CampoPadre.ToUpper();
@@ -728,6 +733,7 @@ namespace ERwin_CA
                                         //Lista funzionale al file "ControlloTempistiche"
                                         if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
                                             ListaControlliTempistiche.Add(CodLocaleControllo);
+                                        ListaControlliCompleta.Add(CodLocaleControllo);
                                     }
                                 }
                             }

@@ -104,7 +104,8 @@ namespace ERwin_CA
         public static string ERWIN_TEMPLATE_DB2 = APP_PATH + @"\Template\Template_DB2_LF.erwin";
         public static string ERWIN_TEMPLATE_ORACLE = APP_PATH + @"\Template\Template_Oracle_LF.erwin";
         public static string ERWIN_TEMPLATE_SQLSERVER = APP_PATH + @"\Template\Template_SqlServer_LF.erwin";
-        public static string CONTROLLI_TEMPLATE = APP_PATH + @"\Template\Controlli_Campi_v4.xlsx";
+        public static string CONTROLLI_CAMPI_TEMPLATE = APP_PATH + @"\Template\Controlli_Campi_v4.xlsx";
+        public static string CONTROLLI_TEMPISTICHE_TEMPLATE = APP_PATH + @"\Template\Controlli_Tempistiche_v7.xlsx";
 
         private static string tempString = ConfigurationSettings.AppSettings["DBS"].ToUpper();
         public static List<string> DBS = tempString.Split(',').ToList(); //new List<string> { "DB2", "ORACLE", "SQLSERVER }; //Sempre Upper case

@@ -2028,13 +2028,25 @@ namespace ERwin_CA
 
         public static bool WriteDocExcelControlliTempistiche(FileInfo filedaAprire, List<string> ListCodLocaleControllo)
         {
-
+            string TemplateFile = null;
+            if (!string.IsNullOrWhiteSpace(ConfigFile.CONTROLLI_TEMPISTICHE_TEMPLATE))
+            {
+                TemplateFile = ConfigFile.CONTROLLI_TEMPISTICHE_TEMPLATE;
+            }
+            else
+            {
+                Logger.PrintLC("Value of 'ControlliTempistiche Template' is not valid. Will not valorize.", 2, ConfigFile.ERROR);
+                return false;
+            }
+            //string file
+            
+            
             return true;
         }
 
         public static bool WriteDocExcelControlli(FileInfo fileDaAprire, List<String> ExcelControlli)
         {
-            string TemplateFile = ConfigFile.CONTROLLI_TEMPLATE;
+            string TemplateFile = ConfigFile.CONTROLLI_CAMPI_TEMPLATE;
             
             try
             {
