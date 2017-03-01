@@ -24,10 +24,10 @@ namespace ERwin_CA.T
         public int? NullOptionType { get; set; }
 
 
-public RelationT( int row, string db, 
-    string identificativoRelazione = null, string tabellaPadre = null, string tabellaFiglia = null, int? cardinalita = null, 
-    string campoPadre = null, string campoFiglio = null, int? identificativa = null, 
-    string eccezioni = null, bool? tipoRelazione = null, string note = null, string history = null, int? nullOptionType = null)
+        public RelationT( int row, string db, 
+            string identificativoRelazione = null, string tabellaPadre = null, string tabellaFiglia = null, int? cardinalita = null, 
+            string campoPadre = null, string campoFiglio = null, int? identificativa = null, 
+            string eccezioni = null, bool? tipoRelazione = null, string note = null, string history = null, int? nullOptionType = null )
         {
             Row = row;
             DB = db;
@@ -43,11 +43,6 @@ public RelationT( int row, string db,
             Note = note;
             History = history;
             NullOptionType = nullOptionType;
-
-
-
-
-
         }
     }
 }

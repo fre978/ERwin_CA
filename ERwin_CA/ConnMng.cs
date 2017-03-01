@@ -1061,7 +1061,7 @@ namespace ERwin_CA
                             //La relazione ha passato i controlli erwin e può essere creata
                             #region assegnaIdentificativoRelazione
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Identificativo relazione"], R.IdentificativoRelazione))
-                                Logger.PrintLC("Added Relation Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3, ConfigFile.INFO);
+                                Logger.PrintLC("Added Relation's Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3, ConfigFile.INFO);
                             else
                             {
                                 //errore = "Error adding Relation Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId;
@@ -1077,7 +1077,7 @@ namespace ERwin_CA
                             #endregion
                             #region assegnaTabellaPadre
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Padre"], R.TabellaPadre.ToUpper()))
-                                Logger.PrintLC("Added Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                Logger.PrintLC("Added Relation's Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
                                 //errore = "Error adding Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name;
@@ -1093,7 +1093,7 @@ namespace ERwin_CA
                             #endregion
                             #region assegnaTabellaFiglia
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Figlia"], R.TabellaFiglia.ToUpper()))
-                                Logger.PrintLC("Added Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                Logger.PrintLC("Added Relation's Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
                                 //errore = "Error adding Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name;
@@ -1109,7 +1109,7 @@ namespace ERwin_CA
                             #endregion
                             #region assegnaIdentificativa
                             if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Identificativa"], (int)R.Identificativa))
-                                Logger.PrintLC("Added Relation Identifiable (" + R.Identificativa + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                Logger.PrintLC("Added Relation's Identifiable (" + R.Identificativa + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
                                 //errore = "Error adding Relation Identifiable (" + R.Identificativa + ") to " + scItem.Name;
@@ -1126,7 +1126,7 @@ namespace ERwin_CA
                             #region assegnaCardinalita
                             int myInt = (R.Cardinalita == null) ? 0 : (int)R.Cardinalita;
                             if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Cardinalita"], myInt))
-                                Logger.PrintLC("Added Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                Logger.PrintLC("Added Relation's Cardinality (" + R.Cardinalita + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
                                 //errore = "Error adding Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name;
@@ -1145,7 +1145,7 @@ namespace ERwin_CA
                             {
                                 int myNullOT = (R.NullOptionType == null) ? 0 : (int)R.NullOptionType;
                                 if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Null Option Type"], myNullOT))
-                                    Logger.PrintLC("Added Relation Null Option Type (" + myNullOT + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                    Logger.PrintLC("Added Relation's Null Option Type (" + myNullOT + ") to " + scItem.Name, 3, ConfigFile.INFO);
                                 else
                                 {
                                     //errore = "Error adding Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name;
@@ -1163,7 +1163,7 @@ namespace ERwin_CA
                             #region assegnaTipoRelazione
                             string mystring = (R.TipoRelazione == true) ? "true" : "false";
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tipo Relazione"], mystring))
-                                Logger.PrintLC("Added Relation Type (" + R.TipoRelazione + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                Logger.PrintLC("Added Relation's Type (" + R.TipoRelazione + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
                                 //errore = "Error adding Relation Type (" + R.TipoRelazione + ") to " + scItem.Name;
@@ -1181,7 +1181,7 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(R.Note))
                             {
                                 if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Note"], R.Note))
-                                    Logger.PrintLC("Added Relation Note (" + R.Note + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                    Logger.PrintLC("Added Relation's Note (" + R.Note + ") to " + scItem.Name, 3, ConfigFile.INFO);
                                 else
                                 {
                                     //errore = "Error adding Relation Note (" + R.Note + ") to " + scItem.Name;
@@ -1200,7 +1200,7 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(R.Eccezioni))
                             {
                                 if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Eccezioni"], R.Eccezioni))
-                                    Logger.PrintLC("Added Relation Exceptions (" + R.Eccezioni + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                    Logger.PrintLC("Added Relation's Exceptions (" + R.Eccezioni + ") to " + scItem.Name, 3, ConfigFile.INFO);
                                 else
                                 {
                                     //errore = "Error adding Relation Exceptions (" + R.Eccezioni + ") to " + scItem.Name;
