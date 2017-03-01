@@ -347,7 +347,8 @@ namespace ERwin_CA
         public const string RELAZIONI = "Relazioni-ModelloDatiLegacy";
         public const string TABELLE_DIFF = "Differenze Tabelle";
         public const string ATTRIBUTI_DIFF = "Differenze Attributi";
-        public const string CONTROLLI = "Controlli_campi";
+        public const string CONTROLLI_CAMPI = "Controlli_campi";
+        public const string CONTROLLI_TEMPISTICHE = "Controlli_tempistiche";
 
 
         public static string COLONNA_01 = "SSA";

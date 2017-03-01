@@ -738,6 +738,7 @@ namespace ERwin_CA
                                 }
                             }
                         }
+                        /*
                         string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliCampi.xlsx";
                         //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
                         if (ConfigFile.DEST_FOLD_UNIQUE)
@@ -750,8 +751,9 @@ namespace ERwin_CA
                         }
                         //###################################################################
                         //####### STAMPA FILE (da de-commentare)
-                        ExcelOps.WriteDocExcelControlli(new FileInfo(FileDocControlli), DocExcelControlli);
+                        ExcelOps.WriteDocExcelControlliCampi(new FileInfo(FileDocControlli), DocExcelControlli);
                         //###################################################################
+                        */
                     }
                     Logger.PrintLC("** FINE ELABORAZIONE CONTROLLI: " + FileElaborato, 2);
                     #endregion

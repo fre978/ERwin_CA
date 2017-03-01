@@ -580,7 +580,7 @@ namespace ERwin_CA
                 file = Path.ChangeExtension(file, ".xlsx");
                 fileDaAprire = new FileInfo(file);
             }
-
+            ExApp = new Excel.ApplicationClass();
             ExcelPackage p = null;
             ExcelWorkbook WB = null;
             ExcelWorksheets ws = null;
@@ -766,7 +766,7 @@ namespace ERwin_CA
                 file = Path.ChangeExtension(file, ".xlsx");
                 fileDaAprire = new FileInfo(file);
             }
-
+            ExApp = new Excel.ApplicationClass();
             ExcelPackage p = null;
             ExcelWorkbook WB = null;
             ExcelWorksheets ws = null;
@@ -1080,7 +1080,7 @@ namespace ERwin_CA
                 file = Path.ChangeExtension(file, ".xlsx");
                 fileDaAprire = new FileInfo(file);
             }
-
+            ExApp = new Excel.ApplicationClass();
             ExcelPackage p = null;
             ExcelWorkbook WB = null;
             ExcelWorksheets ws = null;
@@ -1384,6 +1384,7 @@ namespace ERwin_CA
                     file = Path.ChangeExtension(file, ".xlsx");
                     fileDaAprire = new FileInfo(file);
                 }
+                ExApp = new Excel.ApplicationClass();
                 ExcelPackage p = null;
                 ExcelWorkbook WB = null;
                 ExcelWorksheets ws = null;
@@ -1467,6 +1468,7 @@ namespace ERwin_CA
                     file = Path.ChangeExtension(file, ".xlsx");
                     fileDaAprire = new FileInfo(file);
                 }
+                ExApp = new Excel.ApplicationClass();
                 ExcelPackage p = null;
                 ExcelWorkbook WB = null;
                 ExcelWorksheets ws = null;
@@ -1549,6 +1551,7 @@ namespace ERwin_CA
                     file = Path.ChangeExtension(file, ".xlsx");
                     fileDaAprire = new FileInfo(file);
                 }
+                ExApp = new Excel.ApplicationClass();
                 ExcelPackage p = null;
                 ExcelWorkbook WB = null;
                 ExcelWorksheets ws = null;
@@ -1618,7 +1621,7 @@ namespace ERwin_CA
             try
             {
                 string file = fileDaAprire.FullName;
-                
+                ExApp = new Excel.ApplicationClass();
                 ExcelPackage p = null;
                 ExcelWorkbook WB = null;
                 ExcelWorksheets ws = null;
@@ -1779,6 +1782,7 @@ namespace ERwin_CA
                     file = Path.ChangeExtension(file, ".xlsx");
                     fileDaAprire = new FileInfo(file);
                 }
+                ExApp = new Excel.ApplicationClass();
                 ExcelPackage p = null;
                 ExcelWorkbook WB = null;
                 ExcelWorksheets ws = null;
@@ -2025,8 +2029,14 @@ namespace ERwin_CA
             }
         }
 
-
-        public static bool WriteDocExcelControlliTempistiche(FileInfo filedaAprire, List<string> ListCodLocaleControllo)
+        /// <summary>
+        /// Write on specific 'ControlliTempistiche' file a
+        /// list of value.
+        /// </summary>
+        /// <param name="fileDaAprire"></param>
+        /// <param name="ListCodLocaleControllo"></param>
+        /// <returns></returns>
+        public static bool WriteDocExcelControlliTempistiche(FileInfo fileDaAprire, List<string> ListCodLocaleControllo)
         {
             string TemplateFile = null;
             if (!string.IsNullOrWhiteSpace(ConfigFile.CONTROLLI_TEMPISTICHE_TEMPLATE))
@@ -2035,22 +2045,12 @@ namespace ERwin_CA
             }
             else
             {
-                Logger.PrintLC("Value of 'ControlliTempistiche Template' is not valid. Will not valorize.", 2, ConfigFile.ERROR);
+                Logger.PrintLC("Value of 'ControlliTempistiche Template' is not valid. Will not valorize its content.", 2, ConfigFile.ERROR);
                 return false;
             }
-            //string file
-            
-            
-            return true;
-        }
-
-        public static bool WriteDocExcelControlli(FileInfo fileDaAprire, List<String> ExcelControlli)
-        {
-            string TemplateFile = ConfigFile.CONTROLLI_CAMPI_TEMPLATE;
-            
+            string file = fileDaAprire.FullName;
             try
             {
-                string file = fileDaAprire.FullName;
                 if (!File.Exists(TemplateFile))
                 {
                     Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", 1, ConfigFile.ERROR);
@@ -2061,7 +2061,54 @@ namespace ERwin_CA
                     File.Copy(TemplateFile, file);
                 }
                 FileOps.RemoveAttributes(file);
-                
+            }
+            catch
+            {
+            }
+
+            ExApp = new Excel.ApplicationClass();
+            ExcelPackage p = null;
+            ExcelWorkbook WB = null;
+            ExcelWorksheets ws = null;
+            try
+            {
+                ExApp.DisplayAlerts = false;
+                p = new ExcelPackage(fileDaAprire);
+                ExApp.DisplayAlerts = true;
+                WB = p.Workbook;
+                ws = WB.Worksheets;
+                //ws.Add(ConfigFile.CONTROLLI);
+            }
+            catch (Exception exp)
+            {
+                Logger.PrintLC("Error while opening: " + fileDaAprire.FullName + ". Will not valorize its content.", 2, ConfigFile.ERROR);
+                return false;
+            }
+            var worksheet = ws[ConfigFile.CONTROLLI_CAMPI];
+            Logger.PrintLC("Inizio compilazione file excel", 4, ConfigFile.INFO);
+
+            return true;
+        }
+
+        public static bool WriteDocExcelControlliCampi(FileInfo fileDaAprire, List<string> ExcelControlli)
+        {
+            string TemplateFile = ConfigFile.CONTROLLI_CAMPI_TEMPLATE;
+            
+            try
+            {
+                string file = fileDaAprire.FullName;
+                if (!File.Exists(TemplateFile))
+                {
+                    Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", 2, ConfigFile.ERROR);
+                    return false;
+                }
+                else
+                {
+                    File.Copy(TemplateFile, file);
+                }
+                FileOps.RemoveAttributes(file);
+
+                ExApp = new Excel.ApplicationClass();
                 ExcelPackage p = null;
                 ExcelWorkbook WB = null;
                 ExcelWorksheets ws = null;
@@ -2076,11 +2123,11 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Errore durante la scrittura di: " + fileDaAprire.Name + ": impossibile aprire il file in " + fileDaAprire.DirectoryName, 1, ConfigFile.ERROR);
+                    Logger.PrintLC("Errore durante la scrittura di: " + fileDaAprire.Name + ": impossibile aprire il file in " + fileDaAprire.DirectoryName, 2, ConfigFile.ERROR);
                     return false;
                 }
 
-                var worksheet = ws[ConfigFile.CONTROLLI];
+                var worksheet = ws[ConfigFile.CONTROLLI_CAMPI];
 
                 Logger.PrintLC("Inizio compilazione file excel", 4, ConfigFile.INFO);
 
