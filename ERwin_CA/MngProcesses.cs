@@ -618,14 +618,21 @@ namespace ERwin_CA
                 }
                 #endregion
 
+
                 //###################################################################
-                /*
+                //###################################################################
+                //###################################################################
+                //###################################################################
+                //###################################################################
+                //###################################################################
+
                 foreach (var Elaborato in Elaborati)
                 {
                     string FileElaborato = Elaborato.FileElaborato;
                     List<EntityT> EntityElaborate = Elaborato.EntityElaborate;
                     List<AttributeT> AttributiElaborati = Elaborato.AttributiElaborati;
                     GlobalRelationStrut RelazioniElaborate = Elaborato.RelazioniElaborate;
+                    List<string> ListaControlliTempistiche = new List<string>();
 
                     #region DocExcelControlli
                     List<string> DocExcelControlli = new List<string>();
@@ -650,7 +657,8 @@ namespace ERwin_CA
                                 string RuoloCampo = string.Empty;
                                 string Ambito = "BFDL1";
                                 string CC = "LI";
-                                string DD = E.DB;
+                                //string DD = E.DB;
+                                string DD = E.SSA;  //CORRETTO RISPETTO A PRIMA IMPLEMENTAZIONE
                                 string mydb = E.DatabaseName;
                                 string alfanum = "00000000000000";
                                 alfanum = alfanum.Substring(mydb.Length, alfanum.Length - myprogr.ToString().Length - mydb.Length);
@@ -664,6 +672,9 @@ namespace ERwin_CA
                                     RuoloCampo = "OggettoControllo";
                                     if (!(DocExcelControlli.Exists(x=> x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                         DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                    //Lista funzionale al file "ControlloTempistiche"
+                                    if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
+                                        ListaControlliTempistiche.Add(CodLocaleControllo);
                                 }
                                 if (A.MandatoryFlag == 1)
                                 {
@@ -674,6 +685,9 @@ namespace ERwin_CA
                                     RuoloCampo = "OggettoControllo";
                                     if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                         DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                    //Lista funzionale al file "ControlloTempistiche"
+                                    if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
+                                        ListaControlliTempistiche.Add(CodLocaleControllo);
                                 }
                                 if (Funct.ParseDataType(phisical_data_type, "DB2", true))
                                 {
@@ -684,6 +698,9 @@ namespace ERwin_CA
                                     RuoloCampo = "OggettoControllo";
                                     if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                         DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                    //Lista funzionale al file "ControlloTempistiche"
+                                    if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
+                                        ListaControlliTempistiche.Add(CodLocaleControllo);
                                 }
                                 foreach (RelationStrut SRelazioniBFD in LRelazioniBFD)
                                 {
@@ -697,6 +714,9 @@ namespace ERwin_CA
                                         RuoloCampo = "OggettoControllo";
                                         if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                             DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                        //Lista funzionale al file "ControlloTempistiche"
+                                        if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
+                                            ListaControlliTempistiche.Add(CodLocaleControllo);
 
                                         NomeStrutturaInformativa = Relazione.TabellaPadre.ToUpper();
                                         NomeCampo = Relazione.CampoPadre.ToUpper();
@@ -705,11 +725,14 @@ namespace ERwin_CA
                                         RuoloCampo = "CampoConfronto";
                                         if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                             DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
+                                        //Lista funzionale al file "ControlloTempistiche"
+                                        if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
+                                            ListaControlliTempistiche.Add(CodLocaleControllo);
                                     }
                                 }
                             }
                         }
-                        string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliTempistiche.xlsx";
+                        string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliCampi.xlsx";
                         //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
                         if (ConfigFile.DEST_FOLD_UNIQUE)
                         {
@@ -874,8 +897,17 @@ namespace ERwin_CA
                     #endregion
 
                 }
-                */
                 //###################################################################
+                //###################################################################
+                //###################################################################
+                //###################################################################
+                //###################################################################
+                //###################################################################
+                //###################################################################
+
+
+
+
 
 
                 #region SummaryFiles
@@ -896,7 +928,7 @@ namespace ERwin_CA
                 {
                     if (!Funct.RemoteSet(FileDaElaborare))
                     {
-                        Logger.PrintLC("Some errore occured while copying or ", 2, ConfigFile.ERROR);
+                        Logger.PrintLC("Some error occured while copying or ", 2, ConfigFile.ERROR);
                     }
                 }
                 else

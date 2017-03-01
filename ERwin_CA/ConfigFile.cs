@@ -485,6 +485,7 @@ namespace ERwin_CA
             {"Tabella Padre", "Parent_Entity_Ref" },
             {"Tabella Figlia", "Child_Entity_Ref" },
             {"Cardinalita", "Cardinality" },
+            {"Null Option Type", "Null_Option_Type" },
             {"Identificativa", "Type" },
             {"Eccezioni", "Relationship.Physical.ECCEZIONI" },
             {"Tipo Relazione", "Do_Not_Generate" },

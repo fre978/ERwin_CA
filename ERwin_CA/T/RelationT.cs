@@ -21,12 +21,13 @@ namespace ERwin_CA.T
         public bool? TipoRelazione { get; set; }
         public string Note { get; set; }
         public string History { get; set; }
+        public int? NullOptionType { get; set; }
 
 
 public RelationT( int row, string db, 
     string identificativoRelazione = null, string tabellaPadre = null, string tabellaFiglia = null, int? cardinalita = null, 
     string campoPadre = null, string campoFiglio = null, int? identificativa = null, 
-    string eccezioni = null, bool? tipoRelazione = null, string note = null, string history = null)
+    string eccezioni = null, bool? tipoRelazione = null, string note = null, string history = null, int? nullOptionType = null)
         {
             Row = row;
             DB = db;
@@ -41,7 +42,7 @@ public RelationT( int row, string db,
             TipoRelazione = tipoRelazione;
             Note = note;
             History = history;
-
+            NullOptionType = nullOptionType;
 
 
 

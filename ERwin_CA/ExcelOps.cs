@@ -920,33 +920,43 @@ namespace ERwin_CA
                             {
                                 case "1:1":
                                     ValRiga.Cardinalita = -1;
+                                    ValRiga.NullOptionType = 101;
                                     break;
                                 case "1:N":
                                     ValRiga.Cardinalita = -2;
+                                    ValRiga.NullOptionType = 101;
                                     break;
                                 case "N:N":
                                     ValRiga.History = "CARDINALITA non gestita dall'applicazione";
+                                    ValRiga.NullOptionType = null;
                                     break;
                                 case "(0,1) A (0,1)":
                                     ValRiga.Cardinalita = -1;
+                                    ValRiga.NullOptionType = 100;
                                     break;
                                 case "(0,1) A (1,M)":
                                     ValRiga.Cardinalita = -2;
+                                    ValRiga.NullOptionType = 100;
                                     break;
                                 case "(0,1) A (0,1,M)":
                                     ValRiga.Cardinalita = -3;
+                                    ValRiga.NullOptionType = 100;
                                     break;
                                 case "1 A (0,1)":
                                     ValRiga.Cardinalita = -1;
+                                    ValRiga.NullOptionType = 101;
                                     break;
                                 case "1 A (1,M)":
                                     ValRiga.Cardinalita = -2;
+                                    ValRiga.NullOptionType = 101;
                                     break;
                                 case "1 A (0,1,M)":
                                     ValRiga.Cardinalita = -3;
+                                    ValRiga.NullOptionType = 101;
                                     break;
                                 default:
                                     ValRiga.History = "CARDINALITA non conforme";
+                                    ValRiga.NullOptionType = null;
                                     break;
                             }
 
@@ -2015,6 +2025,13 @@ namespace ERwin_CA
             }
         }
 
+
+        public static bool WriteDocExcelControlliTempistiche(FileInfo filedaAprire, List<string> ListCodLocaleControllo)
+        {
+
+            return true;
+        }
+
         public static bool WriteDocExcelControlli(FileInfo fileDaAprire, List<String> ExcelControlli)
         {
             string TemplateFile = ConfigFile.CONTROLLI_TEMPLATE;
@@ -2047,7 +2064,7 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Errore durante la scrittura di: " + fileDaAprire.Name + ": impossibile aprire il file " + fileDaAprire.DirectoryName, 1, ConfigFile.ERROR);
+                    Logger.PrintLC("Errore durante la scrittura di: " + fileDaAprire.Name + ": impossibile aprire il file in " + fileDaAprire.DirectoryName, 1, ConfigFile.ERROR);
                     return false;
                 }
 

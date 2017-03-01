@@ -1140,6 +1140,26 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+                            #region NullOptionType
+                            if (R.NullOptionType != null)
+                            {
+                                int myNullOT = (R.NullOptionType == null) ? 0 : (int)R.NullOptionType;
+                                if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Null Option Type"], myNullOT))
+                                    Logger.PrintLC("Added Relation Null Option Type (" + myNullOT + ") to " + scItem.Name, 3, ConfigFile.INFO);
+                                else
+                                {
+                                    //errore = "Error adding Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name;
+                                    errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Null Option Type"] + " (" + myNullOT + ") a " + scItem.Name;
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    if (R.History != null)
+                                        errore = "\n" + errore;
+                                    R.History += errore;
+                                    CommitAndSave(trID);
+                                    //return scItem;
+                                    continue;
+                                }
+                            }
+                            #endregion
                             #region assegnaTipoRelazione
                             string mystring = (R.TipoRelazione == true) ? "true" : "false";
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tipo Relazione"], mystring))
