@@ -11,10 +11,6 @@ namespace ERwin_CA
 {
     static class MngProcesses
     {
-        /// <summary>
-        /// MAIN process
-        /// </summary>
-        /// <returns></returns>
         public static int StartProcess()
         {
             try
@@ -73,7 +69,6 @@ namespace ERwin_CA
                             TemplateFile = Funct.GetTemplate(fileT);
                             if (TemplateFile == null)
                             {
-
                                 continue;
                             }
 
@@ -588,6 +583,27 @@ namespace ERwin_CA
                         Elaborati.Add(Elaborato);
                         
                     }
+                    else
+                    {
+                        string destFile = null;
+                        FileInfo origin = new FileInfo(file);
+                        //string fileName = Path.GetFileNameWithoutExtension(file);
+                        string fileName = origin.Name;
+                        
+                        
+                        if (ConfigFile.DEST_FOLD_UNIQUE)
+                        {
+                            destFile = Path.Combine(ConfigFile.FOLDERDESTINATION, fileName);
+                        }
+                        else
+                        {
+                            destFile = Funct.GetFolderDestination(file, origin.Extension);
+                        }
+                        if (!FileOps.CopyFile(file, destFile))
+                            continue;
+                        else
+                            origin.Delete();
+                    }
                     //Fine processi
                     Logger.PrintLC("** FINISH PROCESSING EXCEL FILE: " + file, 2);
                     #endregion
@@ -878,7 +894,7 @@ namespace ERwin_CA
                 //SEZIONE ROMOTO - PROVA
                 if (ConfigFile.COPY_LOCAL)
                 {
-                    if (!Funct.RemoteSet(FileElaborati))
+                    if (!Funct.RemoteSet(FileDaElaborare))
                     {
                         Logger.PrintLC("Some errore occured while copying or ", 2, ConfigFile.ERROR);
                     }

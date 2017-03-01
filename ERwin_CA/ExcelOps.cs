@@ -328,7 +328,7 @@ namespace ERwin_CA
                         columnsFoundTabelle = true;
                     else
                     {
-                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + "non corretto." + worksheet.Name;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + " non corretto." + worksheet.Name;
                     }
                 }
 
@@ -368,7 +368,7 @@ namespace ERwin_CA
                     }
                     else
                     {
-                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + "non corretto." + worksheet.Name;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + " non corretto." + worksheet.Name;
                     }
                 }
 
@@ -409,7 +409,7 @@ namespace ERwin_CA
                     }
                     else
                     {
-                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + "non corretto." + worksheet.Name;
+                        TxtControlloNonPassato = TxtControlloNonPassato + Environment.NewLine + "\t\tNumero colonne nel Foglio " + worksheet.Name + " non corretto." + worksheet.Name;
                     }
                 }
             }

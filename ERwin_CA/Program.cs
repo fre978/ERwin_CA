@@ -18,16 +18,6 @@ namespace ERwin_CA
     {
         static void Main(string[] args)
         {
-
-            //// setup - there you put the path to the config file
-            //AppDomainSetup setup = new AppDomainSetup();
-            //setup.ApplicationBase = System.Environment.CurrentDirectory;
-            //setup.ConfigurationFile = Path.Combine(setup.ApplicationBase, "Config");
-
-            //// Create the application domain.
-            //AppDomain domain = AppDomain.CreateDomain("MyDomain", null, setup);
-
-
             Logger.Initialize(ConfigFile.LOG_FILE);
             ConfigFile.TIMESTAMPFOLDER = Timer.GetTimestampFolder(DateTime.Now);
             ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, ConfigFile.TIMESTAMPFOLDER);
@@ -61,17 +51,10 @@ namespace ERwin_CA
                 default:
                     break;
             }
-
-            //####################################
-
             MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
-
             Logger.PrintLC("** FINISHED EXECUTION **");
             Timer.SetSecondTime(DateTime.Now);
             Logger.PrintLC("Execution time: " + Timer.GetTimeLapseFormatted(Timer.GetFirstTime(), Timer.GetSecondTime()) + Environment.NewLine);
-
-            //// Unload the application domain.
-            //AppDomain.Unload(domain);
         }
     }
 }

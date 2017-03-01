@@ -442,7 +442,7 @@ namespace ERwin_CA
             { 
                 decimal percent = (current / maximum) * 100;
                 message = decimal.Round(percent,3) + "% (" + current + " su " + maximum + ") " + message;
-                Logger.PrintF(fileCorrect, message, true, ConfigFile.INFO);
+                //Logger.PrintF(fileCorrect, message, true, ConfigFile.INFO);
                 Logger.PrintLC(message, 2, ConfigFile.INFO);
                 return true;
             }
@@ -458,9 +458,6 @@ namespace ERwin_CA
             GlobalRelationStrut GStrut = new GlobalRelationStrut();
             GStrut = CreaGlobalRelationStrutGrezze(relazioni);
             GStrut = CleanGlobalRelationStrut(GStrut);
-            
-            // verifica formale dei dati
-
             return GStrut;
         }
 
@@ -469,7 +466,6 @@ namespace ERwin_CA
             GlobalRelationStrut Gstrut = new GlobalRelationStrut();
             if (relazioni == null)
                 return Gstrut = null;
-
             try
             { 
                 foreach (var rel in relazioni)

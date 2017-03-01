@@ -123,7 +123,6 @@
     <Compile Include="T\ElaboratiT.cs" />
     <Compile Include="T\GlobalRelationStrut.cs" />
     <Compile Include="T\RelationStrut.cs" />
-    <Compile Include="T\DatabaseT.cs" />
     <Compile Include="T\RelationT.cs" />
     <Compile Include="T\EntityT.cs" />
     <Compile Include="T\FileT.cs" />

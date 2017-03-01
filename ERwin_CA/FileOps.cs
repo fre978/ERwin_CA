@@ -21,31 +21,7 @@ namespace ERwin_CA
 
             if (list != null)
             {
-                //if (ConfigFile.DEST_FOLD_UNIQUE)
-                //{
-                //    nlist = (from c in list
-                //         where !c.Contains(ConfigFile.FOLDERDESTINATION_GENERAL)
-                //         select c).ToList();
-                //}
-                //else
-                //{
-
-                /*
-                nlist = (from c in list
-                         where !c.Contains(ConfigFile.DEST_FOLD_NAME)
-                         select c).ToList();
-                */
-
-                //nlist = list.Where(x => x.Contains(ConfigFile.DEST_FOLD_NAME)).ToList();
                 bool notFullRecursive = true;
-                //!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME.Trim()) ||
-                //string path = Path.Combine(ConfigFile.ROOT, ConfigFile.INPUT_FOLDER_NAME);
-                //if (!Directory.Exists(path))
-                //{
-                //    Logger.PrintLC("Input Folder Name doesn't exist [" + path + "]. Will not proceed.", 2, "ERR: ");
-                //    return Direct = null;
-                //}
-                    
                 if (!string.IsNullOrEmpty(ConfigFile.INPUT_FOLDER_NAME))
                 {
                     notFullRecursive = true;
@@ -98,12 +74,6 @@ namespace ERwin_CA
             List<string> trueList = new List<string>();
             if (list != null)
             {
-                //foreach(var x in list)
-                //{
-                //    nlist.Add(Path.GetDirectoryName(x) + Path.GetFileNameWithoutExtension(x));
-                //}
-                //nlist = nlist.Distinct().ToList();
-
                 foreach(var x in list)
                 {
                     string XLS = Path.Combine(Path.GetDirectoryName(x), Path.GetFileNameWithoutExtension(x) + ".xls");
