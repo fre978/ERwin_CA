@@ -671,21 +671,24 @@ namespace ERwin_CA
                                     CodLocaleControllo = "DUP";
                                     CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
                                     RuoloCampo = "OggettoControllo";
-                                    if (!(DocExcelControlli.Exists(x=> x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                    //if (!(DocExcelControlli.Exists(x=> x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                         DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
                                     //Lista funzionale al file "ControlloTempistiche"
                                     if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
                                         ListaControlliTempistiche.Add(CodLocaleControllo);
                                     ListaControlliCompleta.Add(CodLocaleControllo);
                                 }
-                                if (A.MandatoryFlag == 1)
-                                {
-                                    NomeStrutturaInformativa = E.TableName.ToUpper();
+                                //########################################################################
+                                //TEST
+                                //if (A.MandatoryFlag == 1 || (A.MandatoryFlag == 0 && A.Chiave == 0))
+                                if (A.MandatoryFlag == 1 || A.Chiave == 0)
+                                    {
+                                        NomeStrutturaInformativa = E.TableName.ToUpper();
                                     NomeCampo = A.NomeCampoLegacy.ToUpper();
                                     CodLocaleControllo = "NUL";
                                     CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
                                     RuoloCampo = "OggettoControllo";
-                                    if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                    //if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                         DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
                                     //Lista funzionale al file "ControlloTempistiche"
                                     if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
@@ -699,7 +702,7 @@ namespace ERwin_CA
                                     CodLocaleControllo = "FOR";
                                     CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
                                     RuoloCampo = "OggettoControllo";
-                                    if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                    //if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                         DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
                                     //Lista funzionale al file "ControlloTempistiche"
                                     if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
@@ -716,7 +719,7 @@ namespace ERwin_CA
                                         CodLocaleControllo = "DRI";
                                         CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
                                         RuoloCampo = "OggettoControllo";
-                                        if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                        //if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                             DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
                                         //Lista funzionale al file "ControlloTempistiche"
                                         if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
