@@ -332,6 +332,10 @@ namespace ERwin_CA
 
         public static bool ParseDataType(string value, string databaseType, bool OnlyFormal = false)
         {
+            if (value.ToUpper().Contains("NUMBER"))
+            {
+                //Logger.PrintLC("TROVATO");
+            }
             string[] actualDB = null;
             if (!ConfigFile.DBS.Contains(databaseType))
                 return false;

@@ -692,7 +692,7 @@ namespace ERwin_CA
                                         ListaControlliTempistiche.Add(CodLocaleControllo);
                                     ListaControlliCompleta.Add(CodLocaleControllo);
                                 }
-                                if (Funct.ParseDataType(phisical_data_type, "DB2", true))
+                                if (Funct.ParseDataType(phisical_data_type, A.DB, true))
                                 {
                                     NomeStrutturaInformativa = E.TableName.ToUpper();
                                     NomeCampo = A.NomeCampoLegacy.ToUpper();
