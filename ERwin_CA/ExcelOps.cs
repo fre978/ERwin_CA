@@ -422,9 +422,8 @@ namespace ERwin_CA
             }
             catch
             {
-
             }
-            
+
             //MngProcesses.KillAllOf(MngProcesses.ProcList("EXCEL"));
             string fileError = Path.Combine(fileDaAprire.DirectoryName, Path.GetFileNameWithoutExtension(file) + "_KO.txt");
             string fileCorrect = Path.Combine(fileDaAprire.DirectoryName, Path.GetFileNameWithoutExtension(file) + "_OK.txt");
@@ -2084,11 +2083,225 @@ namespace ERwin_CA
                 Logger.PrintLC("Error while opening: " + fileDaAprire.FullName + ". Will not valorize its content.", 2, ConfigFile.ERROR);
                 return false;
             }
-            var worksheet = ws[ConfigFile.CONTROLLI_CAMPI];
-            Logger.PrintLC("Inizio compilazione file excel", 4, ConfigFile.INFO);
 
+
+
+            /*
+            ExcelWorksheet worksheet = null;
+            try
+            {
+                worksheet = ws[ConfigFile.CONTROLLI_TEMPISTICHE];
+            }
+            catch
+            {
+                Logger.PrintLC("Could not find sheet \"" + ConfigFile.CONTROLLI_TEMPISTICHE + "\" in " + file +
+                    ". Will not valorize its content.", 4, ConfigFile.INFO);
+            }
+            Logger.PrintLC("Inizio compilazione file excel", 4, ConfigFile.INFO);
+            */
+
+
+            //bool ExcelVuoto = true;
+            foreach (var worksheet in ws)
+            {
+                if(worksheet.Name == ConfigFile.CONTROLLI_TEMPISTICHE) { 
+                int row = 2;
+                bool pair = true;
+                    foreach (var element in ListCodLocaleControllo)
+                    {
+                        //worksheet.Row(row).Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+                        string[] elementi = element.Split('|');
+                        if (elementi.Count() == 4)
+                        {
+                            worksheet.Cells[row, 12].Value = "errore nella comparazione dell'elemento: " + element;
+                            //ExcelVuoto = false;
+                            continue;
+                        }
+                        //ExcelVuoto = false;
+                        worksheet.Cells[row, 12].Value = element.ToString();
+
+                        //if (pair)
+                        //{
+                        //    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.White);
+                        //}
+                        //else
+                        //{
+                        //    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                        //}
+                        Logger.PrintLC("Riga " + row + " scritta nel file excel", 6, ConfigFile.INFO);
+                        row += 1;
+                        pair = !pair;
+                    }
+                }
+            }
+            fileDaAprire.IsReadOnly = false;
+
+            try
+            {
+                p.Save();
+                //p.SaveAs(fileDaAprire);
+
+                if (ws != null)
+                {
+                    try
+                    {
+                        Marshal.FinalReleaseComObject(ws);
+                    }
+                    catch { }
+                }
+                if (WB != null)
+                {
+                    try
+                    {
+                        Marshal.FinalReleaseComObject(WB);
+                    }
+                    catch { }
+                }
+                if (ExApp != null)
+                {
+                    try
+                    {
+                        Marshal.FinalReleaseComObject(ExApp);
+                    }
+                    catch { }
+                }
+                if (p != null)
+                {
+                    try
+                    {
+                        Marshal.FinalReleaseComObject(p);
+                    }
+                    catch { }
+                }
+            }
+            catch(Exception exp)
+            {
+                Logger.PrintLC("Error while closing Excel application. Will continue without notice.", 5, ConfigFile.ERROR);
+            }
             return true;
         }
+
+
+
+
+
+
+
+        public static bool WriteDocExcelControlliCampiX(FileInfo fileDaAprire, List<string> ExcelControlli)
+        {
+            string TemplateFile = ConfigFile.CONTROLLI_TEMPISTICHE_TEMPLATE;
+
+            string file = fileDaAprire.FullName;
+            if (!File.Exists(TemplateFile))
+            {
+                Logger.PrintLC("Trying to find File " + fileDaAprire.Name + ": doesn't exist.", 2, ConfigFile.ERROR);
+                return false;
+            }
+            else
+            {
+                File.Copy(TemplateFile, file);
+            }
+            fileDaAprire = new FileInfo(file);
+            //FileOps.RemoveAttributes(file);
+
+            ExApp = new Excel.ApplicationClass();
+            ExcelPackage p = new ExcelPackage(fileDaAprire);
+            ExcelWorkbook WB = p.Workbook;
+            ExcelWorksheets ws = WB.Worksheets;
+
+            //ExcelWorkbook WB = null;
+            //ExcelWorksheets ws = null;
+            //try
+            //{
+            //ExApp.DisplayAlerts = false;
+            //p = new ExcelPackage(fileDaAprire);
+            //ExApp.DisplayAlerts = true;
+            //ws.Add(ConfigFile.CONTROLLI);
+            //}
+
+            var worksheet = ws[ConfigFile.CONTROLLI_TEMPISTICHE];
+            bool isProtect = worksheet.Protection.IsProtected;
+            Logger.PrintLC("Inizio compilazione file excel", 4, ConfigFile.INFO);
+
+            worksheet.Row(1).Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheet.Row(1).Style.Font.Bold = true;
+            worksheet.Row(1).Style.Fill.BackgroundColor.SetColor(Color.White);
+            worksheet.Row(1).Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            worksheet.Column(4).Width = 45;
+            worksheet.Column(5).Width = 45;
+            worksheet.Column(6).Width = 45;
+            worksheet.Column(7).Width = 45;
+            worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Cells[1, 3].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Cells[1, 4].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Cells[1, 5].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Cells[1, 6].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Cells[1, 7].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+            worksheet.Column(4).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            worksheet.Column(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            worksheet.Column(6).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Column(7).Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            worksheet.Column(4).Style.WrapText = true;
+            worksheet.Column(5).Style.WrapText = true;
+            worksheet.Column(6).Style.WrapText = true;
+            worksheet.Column(7).Style.WrapText = true;
+            worksheet.View.FreezePanes(2, 1);
+
+            bool ExcelVuoto = true;
+
+            int row = 2;
+            bool pair = true;
+            foreach (var element in ExcelControlli)
+            {
+                worksheet.Row(row).Style.Fill.PatternType = ExcelFillStyle.Solid;
+
+                string[] elementi = element.Split('|');
+                if (elementi.Count() == 2)
+                {
+                    worksheet.Cells[row, 1].Value = "errore nella comparazione dell'elemento: " + element;
+                    ExcelVuoto = false;
+                    continue;
+                }
+                ExcelVuoto = false;
+                worksheet.Cells[row, 12].Value = elementi[0];
+
+                if (pair)
+                {
+                    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.White);
+                }
+                else
+                {
+                    worksheet.Row(row).Style.Fill.BackgroundColor.SetColor(Color.WhiteSmoke);
+                }
+                row += 1;
+                pair = !pair;
+
+                Logger.PrintLC("Riga " + row + " scritta nel file excel", 5, ConfigFile.INFO);
+            }
+
+            if (ExcelVuoto)
+            {
+                worksheet.Row(2).Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Row(2).Style.Fill.BackgroundColor.SetColor(Color.White);
+                worksheet.Cells[2, 1].Value = "Nessuna Controllo Riscontrato";
+
+            }
+
+            Logger.PrintLC("Fine compilazione file excel controlli", 4, ConfigFile.INFO);
+            ExcelProtectedRangeCollection range = worksheet.ProtectedRanges;
+            p.Save();
+            p.Dispose();
+            Logger.PrintLC(fileDaAprire + " Salvato", 4, ConfigFile.INFO);
+            return true;
+        }
+
+
+
+
+
+
 
         public static bool WriteDocExcelControlliCampi(FileInfo fileDaAprire, List<string> ExcelControlli)
         {
@@ -2099,7 +2312,7 @@ namespace ERwin_CA
                 string file = fileDaAprire.FullName;
                 if (!File.Exists(TemplateFile))
                 {
-                    Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", 2, ConfigFile.ERROR);
+                    Logger.PrintLC("Trying to find File " + fileDaAprire.Name + ": doesn't exist.", 2, ConfigFile.ERROR);
                     return false;
                 }
                 else
@@ -2211,7 +2424,7 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                Logger.PrintLC("Errore durante la scrittura del file excel controlli. Errore: " + exp.Message, 4, ConfigFile.ERROR);
+                Logger.PrintLC("Errore durante la scrittura del file excel ControlliCampi. Errore: " + exp.Message, 4, ConfigFile.ERROR);
                 return false;
             }
         }

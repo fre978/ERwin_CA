@@ -728,7 +728,8 @@ namespace ERwin_CA
                                         CodLocaleControllo = "DRI";
                                         CodLocaleControllo = Ambito + "_" + CC + "_" + DD + "_" + CodLocaleControllo + "_" + alfanum.ToUpper();
                                         RuoloCampo = "CampoConfronto";
-                                        if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
+                                        //Da DE-COMMENTARE
+                                        //if (!(DocExcelControlli.Exists(x => x == NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo)))
                                             DocExcelControlli.Add(NomeStrutturaInformativa + "|" + NomeCampo + "|" + CodLocaleControllo + "|" + RuoloCampo);
                                         //Lista funzionale al file "ControlloTempistiche"
                                         if (!ListaControlliTempistiche.Contains(CodLocaleControllo))
@@ -738,7 +739,7 @@ namespace ERwin_CA
                                 }
                             }
                         }
-                        /*
+                        
                         string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliCampi.xlsx";
                         //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
                         if (ConfigFile.DEST_FOLD_UNIQUE)
@@ -753,8 +754,23 @@ namespace ERwin_CA
                         //####### STAMPA FILE (da de-commentare)
                         ExcelOps.WriteDocExcelControlliCampi(new FileInfo(FileDocControlli), DocExcelControlli);
                         //###################################################################
-                        */
+
+
+                        string FileDocControlliTempistiche = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliTempistiche.xlsx";
+                        //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
+                        if (ConfigFile.DEST_FOLD_UNIQUE)
+                        {
+                            FileDocControlliTempistiche = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlliTempistiche);
+                        }
+                        else
+                        {
+                            FileDocControlliTempistiche = Funct.GetFolderDestination2(FileElaborato, new FileInfo(FileDocControlliTempistiche).Name);
+                        }
+                        ExcelOps.WriteDocExcelControlliTempistiche(new FileInfo(FileDocControlliTempistiche), ListaControlliTempistiche);
+                        //ExcelOps.WriteDocExcelControlliCampiX(new FileInfo(FileDocControlliTempistiche), ListaControlliTempistiche);
+
                     }
+
                     Logger.PrintLC("** FINE ELABORAZIONE CONTROLLI: " + FileElaborato, 2);
                     #endregion
 
@@ -949,7 +965,7 @@ namespace ERwin_CA
             }
             catch (Exception exp)
             {
-                //return exp.HResult;
+                Logger.PrintLC("UNEXPECTED ERROR: " + exp.Message, 1);//return exp.HResult;
                 return 6;
             }
         }
