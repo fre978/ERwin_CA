@@ -601,5 +601,44 @@ namespace ERwin_CA
             }
             return GStrut;
         }
+
+        // OLD VALIDATION PROCESS
+        // CODE 66
+        //public static bool ValidateDatabaseName(string val)
+        //{
+        //    if (!string.IsNullOrWhiteSpace(val))
+        //    {
+        //        char[] charVal = val.ToCharArray();
+        //        int len = 0;
+        //        foreach(char single in charVal)
+        //        {
+        //            if (char.IsLetterOrDigit(single))
+        //            {
+        //                len++;
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                if (single == '-' || single == ' ' || single == '_')
+        //                {
+        //                    len++;
+        //                    continue;
+        //                }
+        //            }
+        //        }
+        //        if (val.Length == len)
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
     }
 }

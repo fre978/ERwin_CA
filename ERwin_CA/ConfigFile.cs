@@ -127,6 +127,30 @@ namespace ERwin_CA
         public static string TIMESTAMPFOLDER;
 
         // SEZIONE GENERALE
+        public static char[] DELIMITER_DATABASE_NAME = new char[10];
+        public static bool RefreshDatabaseDelimiters()
+        {
+            try
+            {
+                List<string> lista = ConfigurationSettings.AppSettings["Database Name Delimiter"].Split('|').ToList();
+                if (lista.Count > 10)
+                    lista.RemoveRange(10, lista.Count - 10);
+                string[] newLista = lista.ToArray();
+                int x = 0;
+                foreach (string elemento in lista)
+                {
+                    DELIMITER_DATABASE_NAME[x] = elemento[0];
+                    x++;
+                }
+                return true;
+            }
+            catch
+            {
+                DELIMITER_DATABASE_NAME[0] = '-';
+                return false;
+            }
+        }
+
         public static char[] DELIMITER_NAME_FILE = new char[10];
         public static bool RefreshDelimiters()
         {
@@ -272,6 +296,8 @@ namespace ERwin_CA
             if (!RefreshLogLevel())
                 response = true;
             if (!RefreshDelimiters())
+                response = true;
+            if (!RefreshDatabaseDelimiters())
                 response = true;
             if (!RefreshDatatypeDB2())
                 response = true;

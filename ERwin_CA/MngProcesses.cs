@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
+
 
 namespace ERwin_CA
 {
@@ -658,10 +660,18 @@ namespace ERwin_CA
                                 string RuoloCampo = string.Empty;
                                 string Ambito = "BFDL1";
                                 string CC = "LI";
-                                //string DD = E.DB;
-                                string DD = E.SSA;  //CORRETTO RISPETTO A PRIMA IMPLEMENTAZIONE
+                                string DD = E.SSA;
                                 string mydb = E.DatabaseName;
                                 string alfanum = "00000000000000";
+                                if (mydb.Length > 10)
+                                {
+                                    mydb = mydb.Substring(0, 10);
+                                    //CODE 66
+                                    //if(mydb.EndsWith(",") || mydb.EndsWith(" ") || mydb.EndsWith("-"))
+                                    //{
+                                    //    mydb = mydb.Substring(0, 9);
+                                    //}
+                                }
                                 alfanum = alfanum.Substring(mydb.Length, alfanum.Length - myprogr.ToString().Length - mydb.Length);
                                 alfanum = mydb + alfanum + myprogr;
                                 if (type == 0)
