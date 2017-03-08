@@ -48,6 +48,9 @@ namespace ERwin_CA
                 case 6:
                     Logger.PrintLC("Program stopped abruptly.",1, ConfigFile.ERROR);
                     break;
+                case 7:
+                    Logger.PrintLC("Templates are missing. Clean exit.", 1, ConfigFile.ERROR);
+                    break;
                 default:
                     break;
             }

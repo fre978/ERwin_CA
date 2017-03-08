@@ -153,8 +153,45 @@ namespace ERwin_CA
                 Logger.PrintLC("Error recovering " + originFile + ". File doesn't exist.", 2, ConfigFile.ERROR);
                 return false;
             }
-                
         }
+
+
+        public static bool CopyFile(string originFile, string destinationFile, bool bloccante)
+        {
+            if (File.Exists(originFile))
+            {
+                FileInfo fileOriginInfo = new FileInfo(originFile);
+                FileInfo fileDestinationInfo = new FileInfo(destinationFile);
+                try
+                {
+                    if (!Directory.Exists(fileDestinationInfo.DirectoryName))
+                    {
+                        Directory.CreateDirectory(fileDestinationInfo.DirectoryName);
+                    }
+                    RemoveAttributes(originFile);
+                    if (File.Exists(destinationFile))
+                        RemoveAttributes(destinationFile);
+                    File.Copy(originFile, destinationFile, true);
+                    Logger.PrintLC(originFile + " copied to " +
+                                   fileDestinationInfo.DirectoryName + " with the name: " +
+                                   fileDestinationInfo.Name, 2, ConfigFile.INFO);
+                    return true;
+                }
+                catch (Exception exp)
+                {
+                    Logger.PrintLC("Could not copy file " + fileOriginInfo.FullName + " - Error: " + exp.Message, 2, ConfigFile.ERROR);
+                    return false;
+                }
+            }
+            else
+            {
+                Logger.PrintLC("Error recovering " + originFile + ". File doesn't exist.", 2, ConfigFile.ERROR);
+                return false;
+            }
+        }
+
+
+
 
         /// <summary>
         /// Legge tutte le righe del file specificato e restituisce una collezione di righe

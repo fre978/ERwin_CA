@@ -21,6 +21,8 @@ namespace ERwin_CA
                 {
                     Logger.PrintLC("!! Some error occured while parsing the config file. Standard values will be used instead.", 1, ConfigFile.WARNING);
                 }
+                if (!Funct.VerifyTemplate())
+                    return 7;
                 List<string> FileElaborati = new List<string>();
                 List<ElaboratiT> Elaborati = new List<ElaboratiT>();
                 List<string> FileElaboratiSQL = new List<string>();

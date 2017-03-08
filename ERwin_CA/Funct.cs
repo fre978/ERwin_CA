@@ -11,6 +11,27 @@ namespace ERwin_CA
     class Funct
     {
 
+        public static bool VerifyTemplate()
+        {
+            FileInfo ErDB2 = new FileInfo(Path.Combine(ConfigFile.APP_PATH, "Template\\Template_DB2_LF.erwin"));
+            if (!ErDB2.Exists)
+                return false;
+            FileInfo ErOracle = new FileInfo(Path.Combine(ConfigFile.APP_PATH, "Template\\Template_Oracle_LF.erwin"));
+            if (!ErOracle.Exists)
+                return false;
+            FileInfo ErSQL = new FileInfo(Path.Combine(ConfigFile.APP_PATH, "Template\\Template_SqlServer_LF.erwin"));
+            if (!ErSQL.Exists)
+                return false;
+            FileInfo ExCampi = new FileInfo(Path.Combine(ConfigFile.APP_PATH, "Template\\Controlli_Campi_v4.xlsx"));
+            if (!ExCampi.Exists)
+                return false;
+            FileInfo ExTempistiche = new FileInfo(Path.Combine(ConfigFile.APP_PATH, "Template\\Controlli_Tempistiche_v7.xlsx"));
+            if (!ExTempistiche.Exists)
+                return false;
+            return true;
+        }
+
+
         public static string GetTemplate(FileT file)
         {
             string TemplateFile = string.Empty;
