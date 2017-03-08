@@ -661,21 +661,31 @@ namespace ERwin_CA
                                 string Ambito = "BFDL1";
                                 string CC = "LI";
                                 string DD = E.SSA;
-                                string mydb = E.DatabaseName;
-                                string alfanum = "00000000000000";
+                                string mydb = string.Empty;
+                                if (string.IsNullOrWhiteSpace(E.DatabaseName))
+                                {
+                                    Logger.PrintLC("DATABASE NAME in Table: " + A.NomeTabellaLegacy + ", Field: "
+                                        + A.NomeCampoLegacy + " is void or null. Skipping Field.", 3, ConfigFile.ERROR);
+                                    continue;
+                                }
+                                else
+                                {
+                                    mydb = E.DatabaseName;
+                                }
+                                if (mydb.Contains('_'))
+                                {
+                                    mydb = mydb.Split('_')[0];
+                                }
                                 if (mydb.Length > 10)
                                 {
                                     mydb = mydb.Substring(0, 10);
-                                    if (mydb.Contains('_'))
-                                    {
-                                        mydb = mydb.Split('_')[0];
-                                    }
                                     // CODE 66
-                                    //if(mydb.EndsWith(",") || mydb.EndsWith(" ") || mydb.EndsWith("-"))
-                                    //{
-                                    //    mydb = mydb.Substring(0, 9);
-                                    //}
+                                    if (mydb.EndsWith(",") || mydb.EndsWith(" ") || mydb.EndsWith("-") || mydb.EndsWith(";"))
+                                    {
+                                        mydb = mydb.Substring(0, mydb.Length -1);
+                                    }
                                 }
+                                string alfanum = "00000000000000";
                                 alfanum = alfanum.Substring(mydb.Length, alfanum.Length - myprogr.ToString().Length - mydb.Length);
                                 alfanum = mydb + alfanum + myprogr;
                                 if (type == 0)
