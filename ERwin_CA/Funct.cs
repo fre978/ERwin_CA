@@ -619,7 +619,7 @@ namespace ERwin_CA
                     }
                     else
                     {
-                        if (single == '-' || single == ' ' || single == '_')
+                        if (single == '-' || single == '_')
                         {
                             len++;
                             continue;
