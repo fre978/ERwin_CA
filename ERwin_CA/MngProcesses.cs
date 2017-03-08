@@ -680,11 +680,13 @@ namespace ERwin_CA
                                 {
                                     mydb = mydb.Substring(0, 10);
                                     // CODE 66
-                                    if (mydb.EndsWith(",") || mydb.EndsWith(" ") || mydb.EndsWith("-") || mydb.EndsWith(";"))
-                                    {
-                                        mydb = mydb.Substring(0, mydb.Length -1);
-                                    }
                                 }
+                                //if (mydb.EndsWith(",") || mydb.EndsWith(" ") || mydb.EndsWith("-") || mydb.EndsWith(";"))
+                                if (mydb.EndsWith("-"))
+                                {
+                                        mydb = mydb.Substring(0, mydb.Length - 1);
+                                }
+
                                 string alfanum = "00000000000000";
                                 alfanum = alfanum.Substring(mydb.Length, alfanum.Length - myprogr.ToString().Length - mydb.Length);
                                 alfanum = mydb + alfanum + myprogr;
