@@ -670,7 +670,7 @@ namespace ERwin_CA
                                     {
                                         mydb = mydb.Split('_')[0];
                                     }
-                                    //CODE 66
+                                    // CODE 66
                                     //if(mydb.EndsWith(",") || mydb.EndsWith(" ") || mydb.EndsWith("-"))
                                     //{
                                     //    mydb = mydb.Substring(0, 9);

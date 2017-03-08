@@ -10,11 +10,6 @@ namespace ERwin_CA
 {
     public static class ConfigFile //: IDisposable
     {
-        //void IDisposable.Dispose()
-        //{
-
-        //}
-
         // SEZIONE ESECUZIONE
         private static int LOG_LEVEL_DEFAULT = 4;
         public static int LOG_LEVEL = LOG_LEVEL_DEFAULT;
@@ -45,7 +40,7 @@ namespace ERwin_CA
         public static string PERCORSOCOPIEERWIN = APP_PATH + @"\" + ConfigurationSettings.AppSettings["PERCORSOCOPIEERWIN"] + @"\";
         public static string PERCORSOCOPIEERWINDESTINATION;
 
-        // Sezione file remoti
+        // SEZIONE file remoti
         public static string COPY_TO_LOCAL = ConfigurationSettings.AppSettings["Copy to Local"];
         public static string LOCAL_TEMP_DIR = ConfigurationSettings.AppSettings["Local Folder Name"];
         public static bool COPY_LOCAL = false;
