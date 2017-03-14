@@ -649,6 +649,8 @@ namespace ERwin_CA
 
                     foreach (var R in relation.Relazioni)
                     {
+                        erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+                        string isRelKey = string.Empty;
                         errore = string.Empty;
                         tabellaPadre = null;
                         tabellaFiglio = null;
@@ -745,7 +747,6 @@ namespace ERwin_CA
                                         continue;
                                     }
                                 }
-
                             }
                             #endregion
 
@@ -887,6 +888,14 @@ namespace ERwin_CA
                             }
                             else
                             {
+                                //code 77
+                                if (con.RetrieveFromObjModel(campoFiglio, "Type", ref isRelKey))
+                                {
+                                    if (isRelKey == "0")
+                                        R.CampoFiglioKey = true;
+                                    else
+                                        R.CampoFiglioKey = false;
+                                }
                                 // Se la relazione è di tipo identificativa
                                 if (R.Identificativa == 2)
                                 {
@@ -943,6 +952,11 @@ namespace ERwin_CA
                                         if (isKey != "0")
                                         {
                                             isNotIdentificativa = true;
+                                            //R.CampoFiglioKey = true;
+                                        }
+                                        else
+                                        {
+                                            //R.CampoFiglioKey = false;
                                         }
                                     }
                                 }
@@ -1000,12 +1014,10 @@ namespace ERwin_CA
                             #endregion
                             
                             #endregion
-
+                            // Code 77 Input
                             PrimoGiro = false;
                             RelazioniOk.Add(R.IdentificativoRelazione);
                         }
-                        
-                        
                     }
 
                     if (relation.Relazioni.Exists(x => x.History != null))
@@ -1219,7 +1231,7 @@ namespace ERwin_CA
                             OpenTransaction();
                             #region RinominaFisica
                             //***************************************
-                            //Rename Campo Padre nella Tabella Figlia
+                            //Rename Campo Padre nella Tabella Figlia #1
                             if (R.CampoFiglio != R.CampoPadre)
                             {
                                 //Recuperiamo nuovamente la Tabella Figlio
@@ -1259,7 +1271,7 @@ namespace ERwin_CA
                                     else
                                     {
                                         //errore = "Failed Rename (phisical): could not find rename with name Child Field(" + R.CampoFiglio + ") to Child Name: " + scItem.ObjectId;
-                                        errore = "Rinominazione fallita (fisica): impossibile trovare Parent Field " + R.CampoFiglio + " all'interno della Child Table " + scItem.ObjectId + " per la relazione ID " + relation.ID;
+                                        errore = "Rinomina fallita (fisica): impossibile trovare Parent Field " + R.CampoFiglio + " all'interno della Child Table " + scItem.ObjectId + " per la relazione ID " + relation.ID;
                                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                         if (R.History != null)
                                             errore = "\n" + errore;
@@ -1267,6 +1279,20 @@ namespace ERwin_CA
                                         CommitAndSave(trID);
                                         //return scItem;
                                         continue;
+                                    }
+                                    //Code 77 #1
+                                    // Se il campo era Chiave, proviamo a risettarlo Chiave
+                                    if (R.CampoFiglioKey)
+                                    {
+                                        if (con.AssignToObjModelInt(ref campoFiglio, ConfigFile._ATT_NAME["Chiave"], 0))
+                                            Logger.PrintLC("Set child field " + R.CampoFiglio + " as Key.", 4, ConfigFile.INFO);
+                                        else
+                                        {
+                                            Logger.PrintLC("Could not set child field " + R.CampoFiglio + " as Key. Continue.", 4, ConfigFile.INFO);
+                                            if (R.History != null)
+                                                errore = "\n" + "Impossibile risettare il Campo Figlio " + R.CampoFiglio + " come Chiave";
+                                            continue;
+                                        }
                                     }
                                 }
                                 //    CommitAndSave(trID);
@@ -1277,7 +1303,7 @@ namespace ERwin_CA
                             OpenTransaction();
                             #region RinominaLogica
                             //***************************************
-                            //Rename Campo Padre nella Tabella Figlia
+                            //Rename Campo Padre nella Tabella Figlia #2
                             if (R.CampoFiglio != R.CampoPadre)
                             {
                                 //Recuperiamo nuovamente la Tabella Figlio
@@ -1299,7 +1325,7 @@ namespace ERwin_CA
                                 if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
                                     //errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                                    errore = "Rinominazione fallita: impossibile trovare Parent Field " + R.CampoPadre + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
+                                    errore = "Rinomina fallita: impossibile trovare Parent Field " + R.CampoPadre + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
@@ -1311,7 +1337,9 @@ namespace ERwin_CA
                                 else
                                 {
                                     if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                    {
                                         Logger.PrintLC("Renamed Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    }
                                     else
                                     {
                                         //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
@@ -1325,6 +1353,20 @@ namespace ERwin_CA
                                         continue;
                                     }
 
+                                    //Code 77 #2
+                                    // Se il campo era Chiave, proviamo a risettarlo Chiave
+                                    if (R.CampoFiglioKey)
+                                    {
+                                        if (con.AssignToObjModelInt(ref campoFiglio, ConfigFile._ATT_NAME["Chiave"], 0))
+                                            Logger.PrintLC("Set child field " + R.CampoFiglio + " as Key.", 4, ConfigFile.INFO);
+                                        else
+                                        {
+                                            Logger.PrintLC("Could not set child field " + R.CampoFiglio + " as Key. Continue.", 4, ConfigFile.INFO);
+                                            if (R.History != null)
+                                                errore = "\n" + "Impossibile risettare il Campo Figlio " + R.CampoFiglio + " come Chiave";
+                                            continue;
+                                        }
+                                    }
                                 }
 
                             }
@@ -1613,6 +1655,7 @@ namespace ERwin_CA
                 }
                 erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
 
+                //Code 77
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                     if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy.ToUpper()))
                     {

@@ -299,32 +299,10 @@ namespace ERwin_CA
                         {
                             #region EsameRelazioniErwin
                             Logger.PrintLC("** START PROCESSING - RELATIONS to ERwin Model", 2);
-                            //object temp = connessione.trID;
-                            //connessione.CommitAndSave(temp);
                             foreach (var dati in globalRelationStrut.GlobalRelazioni)
                             {
                                 connessione.CreateRelation(dati, TemplateFile);
 
-                                //if (string.IsNullOrEmpty(dato.History))
-                                //{
-                                //    col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1;
-                                //    Logger.PrintLC("Updating excel file for error on relation creation for the field '" + dato.IdentificativoRelazione + "' in erwin. Error: " + dato.History, 3);
-                                //    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                //    if (ConfigFile.DEST_FOLD_UNIQUE)
-                                //    {
-                                //        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                //    }
-                                //    else
-                                //    {
-                                //        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                                //    }
-                                //    if (File.Exists(fInfo.FullName))
-                                //    {
-                                //        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Relazioni, col, 1, dato.History, ConfigFile.RELAZIONI);
-                                //    }
-                                //}
-                                //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                                //col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
                                 col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1;
                                 Logger.PrintLC("Updating excel file for error on relation creation", 3);
                                 //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
@@ -387,27 +365,6 @@ namespace ERwin_CA
                                 {
                                     connessione.CreateAttributePassTwo(dati, TemplateFile);
                                 }
-
-                                ////aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                                //if (!string.IsNullOrEmpty(dati.History) && (dati.Step == 2))
-                                //{
-                                //    col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
-                                //    Logger.PrintLC("Updating excel file for error on attributes creation (pass two) for the field '" + dati.NomeCampoLegacy + "' in erwin. Error: " + dati.History, 3);
-                                //    //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                //    if (ConfigFile.DEST_FOLD_UNIQUE)
-                                //    {
-                                //        fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                                //    }
-                                //    else
-                                //    {
-                                //        fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                                //    }
-                                //    if (File.Exists(fInfo.FullName))
-                                //    {
-                                //        ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Row, col, 1, dati.History, ConfigFile.ATTRIBUTI);
-                                //    }
-                                //}
-
                             }
                             //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
                             col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
