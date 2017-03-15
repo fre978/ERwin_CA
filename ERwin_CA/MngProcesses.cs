@@ -728,6 +728,7 @@ namespace ERwin_CA
                             }
                         }
                         
+
                         string FileDocControlli = Path.GetFileNameWithoutExtension(FileElaborato) + "_ControlliCampi.xlsx";
                         //FileDocControlli = Path.Combine(ConfigFile.FOLDERDESTINATION, FileDocControlli);
                         if (ConfigFile.DEST_FOLD_UNIQUE)
