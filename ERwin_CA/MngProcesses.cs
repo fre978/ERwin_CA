@@ -764,7 +764,6 @@ namespace ERwin_CA
 
                     #region ProcessingFileSQL
                     Logger.PrintLC("** INIZIO ELABORAZIONE DDL: " + FileElaborato, 2);
-
                     
                     #region ElaborazioneCoppieXlsDdl
                     string fullNameSQL = Path.GetFileNameWithoutExtension(FileElaborato) + ".sql";
