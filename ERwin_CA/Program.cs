@@ -7,9 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
-//using Interop.ERXMLLib;
-//using Interop.SCAPI;
-
 
 namespace ERwin_CA
 {
@@ -22,7 +19,7 @@ namespace ERwin_CA
             ConfigFile.FOLDERDESTINATION = Path.Combine(ConfigFile.FOLDERDESTINATION_GENERAL, ConfigFile.TIMESTAMPFOLDER);
             ConfigFile.PERCORSOCOPIEERWINDESTINATION = Path.Combine(ConfigFile.PERCORSOCOPIEERWIN, Timer.GetTimestampFolder(DateTime.Now));
             Logger.PrintLC("** STARTING EXECUTION **");
-            ExcelOps Accesso = new ExcelOps();
+            //ExcelOps Accesso = new ExcelOps();
 
             int result = MngProcesses.StartProcess();
             switch (result)

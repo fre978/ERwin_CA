@@ -188,7 +188,9 @@ namespace ERwin_CA
                         try
                         {
                             Logger.PrintLC("Copying " + Path.Combine(target.FullName, fi.Name), 3);
-                            fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                            FileInfo fileTest = fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                            if(!fileTest.Exists)
+                                Logger.PrintLC("Could not copy file " + fi.FullName + ", or it doesn't exist. Skipping it.", 1, ConfigFile.WARNING);
                         }
                         catch
                         {
@@ -234,7 +236,9 @@ namespace ERwin_CA
                     try
                     {
                         Logger.PrintLC("Copying " + Path.Combine(target.FullName,  fi.Name), 3);
-                        fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                        FileInfo fileTest = fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                        if (!fileTest.Exists)
+                            Logger.PrintLC("Could not copy file " + fi.FullName + ", or it doesn't exist. Skipping it.", 1, ConfigFile.WARNING);
                     }
                     catch
                     {

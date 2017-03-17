@@ -41,7 +41,7 @@ namespace ERwin_CA
                 Funct.PrintList(FileDaElaborare);
 
                 //**************************************
-                //SEZIONE ROMOTO - PROVA
+                //SEZIONE ROMOTO - GET
                 if (ConfigFile.COPY_LOCAL)
                 {
                     FileDaElaborare = Funct.RemoteGet(FileDaElaborare);
@@ -299,9 +299,27 @@ namespace ERwin_CA
                         {
                             #region EsameRelazioniErwin
                             Logger.PrintLC("** START PROCESSING - RELATIONS to ERwin Model", 2);
+
+
+                            //List<string> listaIdentificativa = new List<string>();
+                            //RelationStrut relationStruct = new RelationStrut();
+                            //foreach(RelationStrut listStruct in globalRelationStrut.GlobalRelazioni)
+                            //{
+                            //    foreach(var x in listStruct.Relazioni)
+                            //    {
+                            //        if(x.Identificativa == 2)
+                            //        {
+
+                            //            if(!listaIdentificativa.Contains(x.IdentificativoRelazione))
+                            //                listaIdentificativa.Add(x.IdentificativoRelazione);
+                            //        }
+                            //    }
+                            //}
+                            
+
                             foreach (var dati in globalRelationStrut.GlobalRelazioni)
                             {
-                                connessione.CreateRelation(dati, TemplateFile);
+                                connessione.CreateRelation(dati, TemplateFile, globalRelationStrut);
 
                                 col = ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1;
                                 Logger.PrintLC("Updating excel file for error on relation creation", 3);
@@ -935,7 +953,7 @@ namespace ERwin_CA
                 #endregion
 
                 //**************************************
-                //SEZIONE ROMOTO - PROVA
+                //SEZIONE ROMOTO - SET
                 if (ConfigFile.COPY_LOCAL)
                 {
                     if (!Funct.RemoteSet(FileDaElaborare))

@@ -48,6 +48,8 @@ namespace ERwin_CA
         public static string LOCAL_DIR_FULL = null;
         public static string TEMP_REMOTE_FILE = null;
         public static string TEMP_REMOTE_ROOT = null;
+        private static string READ_REMOVE_LOCAL = ConfigurationSettings.AppSettings["Delete Local Folder"];
+        public static bool REMOVE_LOCAL = false;
         //public static string 
         
         public static bool RefreshLocal()
@@ -57,10 +59,19 @@ namespace ERwin_CA
                 if (COPY_TO_LOCAL.Trim().ToUpper() == "TRUE")
                 {
                     COPY_LOCAL = true;
+                    if(READ_REMOVE_LOCAL.Trim().ToUpper() == "TRUE")
+                    {
+                        REMOVE_LOCAL = true;
+                    }
+                    else
+                    {
+                        REMOVE_LOCAL = false;
+                    }
                 }
                 else
                 {
                     COPY_LOCAL = false;
+                    REMOVE_LOCAL = false;
                 }
 
                 if (!string.IsNullOrWhiteSpace(LOCAL_TEMP_DIR))

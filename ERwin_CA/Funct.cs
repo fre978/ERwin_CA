@@ -119,7 +119,8 @@ namespace ERwin_CA
             DirectoryInfo local = new DirectoryInfo(ConfigFile.LOCAL_DIR_FULL);
             if (local != null)
             {
-                DirOps.TraverseDirectory(local);
+                if(ConfigFile.REMOVE_LOCAL)
+                    DirOps.TraverseDirectory(local);
             }
 
             foreach (var elem in FileElaborati)

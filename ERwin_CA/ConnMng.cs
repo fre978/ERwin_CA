@@ -600,7 +600,7 @@ namespace ERwin_CA
             return scItem;
         }
 
-        public SCAPI.ModelObject CreateRelation(RelationStrut relation, string db)
+        public SCAPI.ModelObject CreateRelation(RelationStrut relation, string db, GlobalRelationStrut globalRelation)
         {
             //test esistenza file erwin
             SCAPI.ModelObject ret = null;
@@ -774,10 +774,14 @@ namespace ERwin_CA
                                 campoPadreTrovato = "N";
 
                                 //scandaglio tutte gli attributi dell'entity padre
-
+                                int contatore = 0;
+                                int contaPadre = 0;
+                                //Code 78
+                                //countKey = 0;
                                 #region cicloAttributiTabellaPadre
                                 foreach (SCAPI.ModelObject attributo in erAttributesPadre)
                                 {
+                                    contatore++;
                                     // ogni colonna deve avere un valore chiave
                                     if (!con.RetrieveFromObjModel(attributo, "Type", ref isKey))
                                     {
@@ -788,7 +792,6 @@ namespace ERwin_CA
                                             errore = "\n" + errore;
                                         R.History += errore;
                                         CommitAndSave(trID);
-                                        //return ret = null;
                                         continue;
                                     }
                                     else
@@ -796,12 +799,17 @@ namespace ERwin_CA
                                         //se è chiave primaria verifico che sia quella della colonna che sto cercando
                                         if (isKey == "0")
                                         {
-                                            //se siamo al primo giro contiamo le chiavi, dai giri successivi lo sappiamo.
-                                            if (PrimoGiro)
-                                                countKey += 1;
+                                            string testPhysicalOrder = null;
+                                            if (con.RetrieveFromObjModel(attributo, "Physical_Order", ref testPhysicalOrder))
+                                            {
+                                                //se siamo al primo giro contiamo le chiavi, dai giri successivi lo sappiamo.
+                                                if (PrimoGiro)
+                                                    countKey += 1;
+                                            }
 
                                             if (attributo.Name == _CampoPadre)
                                             {
+                                                contaPadre++;
                                                 campoPadreTrovato = "S";
                                                 //bypasso il ciclo perche ho trovato l'attributo di cui desideravo verificare la chiave ma solo dal secondo giro del ciclo
                                                 if (!(PrimoGiro))
@@ -952,8 +960,16 @@ namespace ERwin_CA
                                         //se almeno uno dei campi della relazione non identificativa non è key la relazione può essere tracciata
                                         if (isKey != "0")
                                         {
+                                            string testPhysicalOrder = null;
+                                            if (con.RetrieveFromObjModel(campoFiglio, "Physical_Order", ref testPhysicalOrder))
+                                            {
+                                                //se siamo al primo giro contiamo le chiavi, dai giri successivi lo sappiamo.
+                                                isNotIdentificativa = true;
+                                            }
+
+                                            /* ORIGINALE (eliminare le 6 righe precedenti)
                                             isNotIdentificativa = true;
-                                            //R.CampoFiglioKey = true;
+                                            */
                                         }
                                         else
                                         {
@@ -1064,6 +1080,8 @@ namespace ERwin_CA
                     scItem = erRootObjCol.Add("Relationship");
                     foreach (var R in relation.Relazioni)
                     {
+                        if (R.IdentificativoRelazione == "4")
+                            Logger.PrintC("CIAO");
                         errore = string.Empty;
                         tabellaPadre = null;
                         tabellaFiglio = null;
@@ -1265,9 +1283,10 @@ namespace ERwin_CA
                                 }
                                 else
                                 {
+                                    //Code 78 - PHYSICAL NAME
                                     if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
                                     { 
-                                        Logger.PrintLC("Renamed (phisical) Child Field with name (" + R.CampoFiglio + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                        Logger.PrintLC("Renamed (phisical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
                                     }
                                     else
                                     {
@@ -1281,6 +1300,28 @@ namespace ERwin_CA
                                         //return scItem;
                                         continue;
                                     }
+
+                                    //Code 78 - LOGICAL NAME
+                                    //SCAPI.ModelObject campoFiglioVerifica = null;
+                                    //if (con.RetriveAttribute(ref campoFiglioVerifica, erAttributesFigliox, R.CampoPadre.ToUpper()))
+                                    //{
+                                    //    if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                    //    {
+                                    //        Logger.PrintLC("Renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //    }
+                                    //    else
+                                    //    {
+                                    //        //errore = "Failed Rename (phisical): could not find rename with name Child Field(" + R.CampoFiglio + ") to Child Name: " + scItem.ObjectId;
+                                    //        errore = "Rinomina fallita (logica): impossibile trovare Parent Field " + R.CampoFiglio + " all'interno della Child Table " + scItem.ObjectId + " per la relazione ID " + relation.ID;
+                                    //        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //        if (R.History != null)
+                                    //            errore = "\n" + errore;
+                                    //        R.History += errore;
+                                    //        CommitAndSave(trID);
+                                    //        //return scItem;
+                                    //        continue;
+                                    //    }
+                                    //}
                                     //Code 77 #1
                                     // Se il campo era Chiave, proviamo a risettarlo Chiave
                                     if (R.CampoFiglioKey)
@@ -1292,6 +1333,7 @@ namespace ERwin_CA
                                             Logger.PrintLC("Could not set child field " + R.CampoFiglio + " as Key. Continue.", 4, ConfigFile.INFO);
                                             if (R.History != null)
                                                 errore = "\n" + "Impossibile risettare il Campo Figlio " + R.CampoFiglio + " come Chiave";
+                                            CommitAndSave(trID);
                                             continue;
                                         }
                                     }
@@ -1364,13 +1406,15 @@ namespace ERwin_CA
                                         {
                                             Logger.PrintLC("Could not set child field " + R.CampoFiglio + " as Key. Continue.", 4, ConfigFile.INFO);
                                             if (R.History != null)
-                                                errore = "\n" + "Impossibile risettare il Campo Figlio " + R.CampoFiglio + " come Chiave";
+                                                errore = "\n" + "Impossibile resettare il Campo Figlio " + R.CampoFiglio + " come Chiave";
                                             continue;
                                         }
                                     }
                                 }
 
                             }
+                            CommitAndSave(trID);
+                            OpenTransaction();
                             #endregion
                         }
                         else
@@ -1399,6 +1443,24 @@ namespace ERwin_CA
             }
             return ret;
         }
+
+        public bool RefreshTables(GlobalRelationStrut globalRelation)
+        {
+            foreach(RelationStrut relationGroup in globalRelation.GlobalRelazioni)
+            {
+                foreach(var relation in relationGroup.Relazioni)
+                {
+                    string TabellaPadre = relation.TabellaPadre;
+                    string TabellaFiglio = relation.TabellaFiglia;
+                    string CampoPadre = relation.CampoPadre;
+                    string CampoFiglio = relation.CampoFiglio;
+
+
+                }
+            }
+            return true;
+        }
+
 
         public SCAPI.ModelObject CreateAttributePassOne(AttributeT entity, string db)
         {
