@@ -144,7 +144,7 @@ namespace ERwin_CA
                 }
                 catch (Exception exp)
                 {
-                    Logger.PrintLC("Error: " + exp.Message, 2, ConfigFile.ERROR);
+                    Logger.PrintLC("Error converting XLSX to XLS: " + exp.Message, 2, ConfigFile.ERROR);
                     return false;
                 }
             }

@@ -74,6 +74,8 @@ namespace ERwin_CA
                     line = line + "    ";
                 }
                 line = line + type + text;
+                if (line.Contains("ERR: Error: Eccezione da HRESULT: 0x800A03EC"))
+                    PrintLC("lll");
                 Console.WriteLine(line);
                 using (StreamWriter StrWr = File.AppendText(FileNameStream))
                 {

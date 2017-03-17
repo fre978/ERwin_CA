@@ -1,2 +1,137 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram /> 
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ERwin_CA.ConfigFile">
+    <Position X="0.5" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>GGJQAQhhywARwgiDiYQjGBKAhTWpgQwaEwjgRAgCGpo=</HashCode>
+      <FileName>ConfigFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.ConnMng">
+    <Position X="3.5" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AOAAADAANMAAkAgoACoGABABGgAAAQIAAAEAQYBIAAE=</HashCode>
+      <FileName>ConnMng.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.DirOps">
+    <Position X="6" Y="6.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAAAAQQAAAgAgAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>DirOps.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.ExcelOps">
+    <Position X="6" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAQAgAEAAAAAAAGAAAAIARAAAMACACAA=</HashCode>
+      <FileName>ExcelOps.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.FileOps">
+    <Position X="3.5" Y="14.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAEAAAAEAAACBAQAAAAAABAAAAAA=</HashCode>
+      <FileName>FileOps.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.Funct">
+    <Position X="3.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ADAAAAEAEQQAAAAAAAAAAAAEQBAAAAAABEgAAABEAAA=</HashCode>
+      <FileName>Funct.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.Logger">
+    <Position X="6" Y="8.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAQAAAABAAAAAAAAAAAAAAEAAAABEAAA=</HashCode>
+      <FileName>Logger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.MngProcesses">
+    <Position X="6" Y="10.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAABAAAAAAA=</HashCode>
+      <FileName>MngProcesses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.Parser">
+    <Position X="3.5" Y="4.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABABAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Parser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.Program">
+    <Position X="3.5" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.SqlOps">
+    <Position X="6" Y="4.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgCAAIAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SqlOps.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.Timer">
+    <Position X="6" Y="12.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AGAAAAAAAAAAgAAQAAAABiAAIAAgAAAAAAIAAAAAAJA=</HashCode>
+      <FileName>Timer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.AttributeT">
+    <Position X="8.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAIAQAICMAAgAAQAAACAAApAAAAgAAIAACAQEAABE=</HashCode>
+      <FileName>T\AttributeT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.ElaboratiT">
+    <Position X="8.75" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAACAAAAAAAAABAAAABAAAA=</HashCode>
+      <FileName>T\ElaboratiT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.EntityT">
+    <Position X="11.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>kAgAABAAABAAAAAAAABAAABEAAAAAgACAAACAQABABQ=</HashCode>
+      <FileName>T\EntityT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.FileT">
+    <Position X="8.75" Y="7.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>EAAAAIAAAAAAAgAAAAAAAAAAAABAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>T\FileT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.GlobalRelationStrut">
+    <Position X="8.75" Y="14" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>T\GlobalRelationStrut.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.RelationStrut">
+    <Position X="11.25" Y="4.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>T\RelationStrut.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ERwin_CA.T.RelationT">
+    <Position X="8.75" Y="10" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAACAAAIAAAAMQAAAAAAAAAACgAAAAACACEAATA=</HashCode>
+      <FileName>T\RelationT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.4" />
+</ClassDiagram>

@@ -336,8 +336,6 @@ namespace ERwin_CA
                                 {
                                     ExcelOps.XLSXWriteErrorInCell(fInfo, dati.Relazioni.FindAll(x => !string.IsNullOrEmpty(x.History)), col, 1, ConfigFile.RELAZIONI);
                                 }
-
-
                             }
                             if (ConfigFile.CREACOPIEERWIN == "true")
                             {
@@ -403,7 +401,6 @@ namespace ERwin_CA
                             Logger.PrintLC("** FINISH PROCESSING - ATTRIBUTES to ERwin model (pass two)", 2);
                             #endregion
                         }
-
                         if (EntitaCreate != 0)
                         {
                             #region StatsAttributi
@@ -498,7 +495,6 @@ namespace ERwin_CA
                             message = "relazioni con almeno un errore";
                             Funct.Stats(current, maximum, message, fileCorrect);
                             #endregion
-                            
                         }
 
                         //Chiusura connessione per il file attuale.
