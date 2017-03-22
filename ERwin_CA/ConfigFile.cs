@@ -14,6 +14,7 @@ namespace ERwin_CA
         // SEZIONE ESECUZIONE
         private static int LOG_LEVEL_DEFAULT = 4;
         public static int LOG_LEVEL = LOG_LEVEL_DEFAULT;
+
         public static bool RefreshLogLevel()
         {
             try
@@ -134,6 +135,7 @@ namespace ERwin_CA
         public static string TIMESTAMPFOLDER;
 
         // SEZIONE GENERALE
+        public static string PARENT_NOT_CHILD = "_DRIVEUP";
         public static char[] DELIMITER_DATABASE_NAME = new char[10];
         public static bool RefreshDatabaseDelimiters()
         {
@@ -529,6 +531,6 @@ namespace ERwin_CA
 
         // ##############################
 
-        public static bool DDL_Show_Right_Rows = (ConfigurationSettings.AppSettings["DDL Show Right Rows"] == "true") ? true : false;
+        public static bool DDL_Show_Right_Rows = ConfigurationSettings.AppSettings["DDL Show Right Rows"] == "true" ? true : false;
     }
 }

@@ -1074,7 +1074,7 @@ namespace ERwin_CA
 
                     if (trID != lastIdCommitted)
                         CommitAndSave(trID);
-                    
+
                     OpenTransaction();
                     
                     #region creazionerelazioni;
@@ -1092,8 +1092,96 @@ namespace ERwin_CA
                         tabellaFiglio = null;
                         campoPadre = null;
                         campoFiglio = null;
+                        string ifParentNotChildName = string.Empty;
+                        //DEBUG
+                        if (R.IdentificativoRelazione == "25")
+                            Logger.PrintC("DEBUG 91");
                         if (RelazioniOk.Exists(x => x == R.IdentificativoRelazione))
                         {
+
+                            #region Check Padre != Figlio per rinomina
+                            if (R.CampoPadre != R.CampoFiglio)
+                            {
+                                erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+                                SCAPI.ModelObject tabPadreBV = null;
+                                SCAPI.ModelObject tabFiglioBV = null;
+                                if (!con.RetriveEntity(ref tabPadreBV, erObjectCollection, R.TabellaPadre.ToUpper()))
+                                {
+                                    errore = "Search-Parent-in-Child fase: could not find Parent table " + R.TabellaPadre + " inside Erwin model (Relation ID " + R.IdentificativoRelazione+ ").";
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    if (R.History != null)
+                                        errore = "\n" + errore;
+                                    R.History += errore;
+                                    CommitAndSave(trID);
+                                    continue;
+                                }
+                                if (!con.RetriveEntity(ref tabFiglioBV, erObjectCollection, R.TabellaFiglia.ToUpper()))
+                                {
+                                    errore = "Search-Parent-in-Child fase: could not find Child table " + R.TabellaFiglia + " inside Erwin model (Relation ID " + R.IdentificativoRelazione + ").";
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    if (R.History != null)
+                                        errore = "\n" + errore;
+                                    R.History += errore;
+                                    CommitAndSave(trID);
+                                    continue;
+                                }
+                                SCAPI.ModelObjects erAttributesFiglioBV = scSession.ModelObjects.Collect(tabFiglioBV, "Attribute");
+                                SCAPI.ModelObject campoFiglioBV = null;
+                                if (con.RetriveAttribute(ref campoFiglioBV, erAttributesFiglioBV, R.CampoPadre.ToUpper()))
+                                {
+                                    try
+                                    {
+                                        string isFK = string.Empty;
+                                        if (!con.RetrieveFromObjModel(campoFiglioBV, "Parent_Attribute_Ref", ref isFK))
+                                        {
+                                            ifParentNotChildName = R.CampoPadre.ToUpper() + ConfigFile.PARENT_NOT_CHILD;
+
+                                            if (con.AssignToObjModel(ref campoFiglioBV, ConfigFile._ATT_NAME["Nome Campo Legacy"], ifParentNotChildName))
+                                            {
+                                                Logger.PrintLC("Search-Parent-in-Child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + ifParentNotChildName, 4, ConfigFile.INFO);
+                                            }
+                                            else
+                                            {
+                                                //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
+                                                errore = "Search-Parent-in-Child fase: (physical) rename failed: could not rename Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                                Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                                if (R.History != null)
+                                                    errore = "\n" + errore;
+                                                R.History += errore;
+                                                CommitAndSave(trID);
+                                                return ret;
+                                            }
+                                            if (con.AssignToObjModel(ref campoFiglioBV, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], ifParentNotChildName))
+                                            {
+                                                Logger.PrintLC("Seach-Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + ifParentNotChildName, 4, ConfigFile.INFO);
+                                            }
+                                            else
+                                            {
+                                                //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
+                                                errore = "Search-Parent-in-child fase: (logical) rename failed: could not rename Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                                Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                                if (R.History != null)
+                                                    errore = "\n" + errore;
+                                                R.History += errore;
+                                                CommitAndSave(trID);
+                                                return ret;
+                                            }
+                                        }
+                                    }
+                                    catch(Exception exp)
+                                    {
+                                        Logger.PrintLC("Unexpected error while searching Parent Field inside Child Table (Search-Parent-in-Child fase): " + exp.Message, 2, ConfigFile.ERROR);
+                                        errore = "Errore inatteso mentre si rinominava il Campo Figlio con il nome Campo Padre nella Tabella Figlia (Search-Parent-in-child fase).";
+                                        if (R.History != null)
+                                            errore = "\n" + errore;
+                                        R.History += errore;
+                                        CommitAndSave(trID);
+                                        return ret;
+                                    }
+                                }
+                            }
+                            #endregion
+
                             //La relazione ha passato i controlli erwin e può essere creata
                             #region assegnaIdentificativoRelazione
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Identificativo relazione"], R.IdentificativoRelazione))
@@ -1111,6 +1199,7 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+
                             #region assegnaTabellaPadre
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Padre"], R.TabellaPadre.ToUpper()))
                                 Logger.PrintLC("Added Relation's Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3, ConfigFile.INFO);
@@ -1127,6 +1216,7 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+
                             #region assegnaTabellaFiglia
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tabella Figlia"], R.TabellaFiglia.ToUpper()))
                                 Logger.PrintLC("Added Relation's Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3, ConfigFile.INFO);
@@ -1143,6 +1233,7 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+
                             #region assegnaIdentificativa
                             if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Identificativa"], (int)R.Identificativa))
                                 Logger.PrintLC("Added Relation's Identifiable (" + R.Identificativa + ") to " + scItem.Name, 3, ConfigFile.INFO);
@@ -1159,6 +1250,7 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+
                             #region assegnaCardinalita
                             int myInt = (R.Cardinalita == null) ? 0 : (int)R.Cardinalita;
                             if (con.AssignToObjModelInt(ref scItem, ConfigFile._REL_NAME["Cardinalita"], myInt))
@@ -1176,6 +1268,7 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+
                             #region NullOptionType
                             if (R.NullOptionType != null)
                             {
@@ -1196,13 +1289,13 @@ namespace ERwin_CA
                                 }
                             }
                             #endregion
+
                             #region assegnaTipoRelazione
                             string mystring = (R.TipoRelazione == true) ? "true" : "false";
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Tipo Relazione"], mystring))
                                 Logger.PrintLC("Added Relation's Type (" + R.TipoRelazione + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Relation Type (" + R.TipoRelazione + ") to " + scItem.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Tipo Relazione"] + " (" + R.TipoRelazione + ") a " + scItem.Name;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
@@ -1213,6 +1306,7 @@ namespace ERwin_CA
                                 continue;
                             }
                             #endregion
+
                             #region assegnaNote
                             if (!string.IsNullOrWhiteSpace(R.Note))
                             {
@@ -1232,6 +1326,7 @@ namespace ERwin_CA
                                 }
                             }
                             #endregion
+
                             #region assegnaEccezioni
                             if (!string.IsNullOrWhiteSpace(R.Eccezioni))
                             {
@@ -1251,8 +1346,10 @@ namespace ERwin_CA
                                 }
                             }
                             #endregion
+
                             CommitAndSave(trID);
                             OpenTransaction();
+
                             #region RinominaFisica
                             //***************************************
                             //Rename Campo Padre nella Tabella Figlia #1
@@ -1339,7 +1436,7 @@ namespace ERwin_CA
                                 if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
                                     //errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
-                                    errore = "Relazione ignorata: Impossibile trovare la tabella " + R.TabellaFiglia + " nel foglio tabelle";
+                                    errore = "Relation ignored: could not find table " + R.TabellaFiglia + " inside Erwin model.";
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
@@ -1353,7 +1450,7 @@ namespace ERwin_CA
                                 if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
                                     //errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                                    errore = "Rinomina (logica) fallita: impossibile trovare Parent Field " + R.CampoPadre + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
+                                    errore = "Rename failed: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " for relation ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
@@ -1398,13 +1495,13 @@ namespace ERwin_CA
                                 }
 
                                 //Code 79
-                                // Nascondiamo nuovamente gli eventuali Attributi che erano in Hide
+                                // rinominiamo gli attributi che erano in Hide e che tornano attivi dopo la prima rinomina (regolare)
                                 CommitAndSave(trID);
                                 OpenTransaction();
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                                 if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
-                                    errore = "Fase controllo campi nascosti: impossibile trovare la tabella " + R.TabellaFiglia + " nel foglio tabelle. Anomalia.";
+                                    errore = "Rename Parent-in-child fase: could not find table" + R.TabellaFiglia + " in Erwin model. Exiting relationship with ID: " + R.IdentificativoRelazione;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
@@ -1419,12 +1516,12 @@ namespace ERwin_CA
                                     {
                                         if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
                                         {
-                                            Logger.PrintLC("Rename Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                            Logger.PrintLC("Rename Parent-in-child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
                                         }
                                         else
                                         {
                                             //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
-                                            errore = "Rename Parent-in-child fase: Rinomina (Physical) fallita: impossibile trovare il Child Field(" + R.CampoPadre + ") per la Child Table: " + scItem.ObjectId;
+                                            errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
                                                 errore = "\n" + errore;
@@ -1440,7 +1537,7 @@ namespace ERwin_CA
                                         else
                                         {
                                             //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
-                                            errore = "Rename Parent-in-child fase: Rinomina (logica) fallita: impossibile trovare il Child Field(" + R.CampoPadre + ") per la Child Table: " + scItem.ObjectId;
+                                            errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
                                                 errore = "\n" + errore;
@@ -1452,9 +1549,91 @@ namespace ERwin_CA
                                     }
                                 }
                             }
+                            #endregion
+
                             CommitAndSave(trID);
                             OpenTransaction();
+
+                            #region Contro Rinomina Check Padre != Figlio
+                            if (!string.IsNullOrWhiteSpace(ifParentNotChildName))
+                            {
+                                erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
+                                SCAPI.ModelObject tabPadreBV = null;
+                                SCAPI.ModelObject tabFiglioBV = null;
+                                if (!con.RetriveEntity(ref tabPadreBV, erObjectCollection, R.TabellaPadre.ToUpper()))
+                                {
+                                    errore = "Search-Parent-in-Child fase: could not find Parent table " + R.TabellaPadre + " inside Erwin model (Relation ID " + R.IdentificativoRelazione + ").";
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    if (R.History != null)
+                                        errore = "\n" + errore;
+                                    R.History += errore;
+                                    CommitAndSave(trID);
+                                    continue;
+                                }
+                                if (!con.RetriveEntity(ref tabFiglioBV, erObjectCollection, R.TabellaFiglia.ToUpper()))
+                                {
+                                    errore = "Search-Parent-in-Child fase: could not find Child table " + R.TabellaFiglia + " inside Erwin model (Relation ID " + R.IdentificativoRelazione + ").";
+                                    Logger.PrintLC(errore, 3, ConfigFile.ERROR);
+                                    if (R.History != null)
+                                        errore = "\n" + errore;
+                                    R.History += errore;
+                                    CommitAndSave(trID);
+                                    continue;
+                                }
+                                SCAPI.ModelObjects erAttributesFiglioBV = scSession.ModelObjects.Collect(tabFiglioBV, "Attribute");
+                                SCAPI.ModelObject campoFiglioBV = null;
+                                if (con.RetriveAttribute(ref campoFiglioBV, erAttributesFiglioBV, ifParentNotChildName))
+                                {
+                                    //ifParentNotChildName = R.CampoPadre.ToUpper() + ConfigFile.PARENT_NOT_CHILD;
+                                    try
+                                    {
+                                        if (con.AssignToObjModel(ref campoFiglioBV, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoPadre.ToUpper()))
+                                        {
+                                            Logger.PrintLC("Search-Parent-in-Child fase: renamed (physical) Child Field with name (" + ifParentNotChildName + ") to Child Field Name: " + R.CampoPadre.ToUpper(), 4, ConfigFile.INFO);
+                                        }
+                                        else
+                                        {
+                                            //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
+                                            errore = "Search-Parent-in-Child fase: (physical) rename failed: could not rename Child Field(" + ifParentNotChildName + ") for Child Table: " + scItem.ObjectId;
+                                            Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                            if (R.History != null)
+                                                errore = "\n" + errore;
+                                            R.History += errore;
+                                            CommitAndSave(trID);
+                                            return ret;
+                                        }
+                                        if (con.AssignToObjModel(ref campoFiglioBV, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoPadre.ToUpper()))
+                                        {
+                                            Logger.PrintLC("Seach-Parent-in-child fase: renamed (logical) Child Field with name (" + ifParentNotChildName + ") to Child Field Name: " + R.CampoPadre, 4, ConfigFile.INFO);
+                                        }
+                                        else
+                                        {
+                                            //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
+                                            errore = "Search-Parent-in-child fase: (logical) rename failed: could not rename Child Field(" + ifParentNotChildName + ") in Child Table: " + scItem.ObjectId;
+                                            Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                            if (R.History != null)
+                                                errore = "\n" + errore;
+                                            R.History += errore;
+                                            CommitAndSave(trID);
+                                            return ret;
+                                        }
+                                    }
+                                    catch (Exception exp)
+                                    {
+                                        Logger.PrintLC("Unexpected error while searching Parent Field inside Child Table (Search-Parent-in-Child fase): " + exp.Message, 2, ConfigFile.ERROR);
+                                        errore = "Errore inatteso mentre si rinominava il Campo Figlio con il nome Campo Padre nella Tabella Figlia (Search-Parent-in-child fase).";
+                                        if (R.History != null)
+                                            errore = "\n" + errore;
+                                        R.History += errore;
+                                        CommitAndSave(trID);
+                                        return ret;
+                                    }
+                                }
+                                CommitAndSave(trID);
+                                OpenTransaction();
+                            }
                             #endregion
+
                         }
                         else
                         {
@@ -1472,7 +1651,6 @@ namespace ERwin_CA
                     CommitAndSave(trID);
                     return scItem;
                     #endregion
-                    
                 }
                 catch (Exception exc)
                 {

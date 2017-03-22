@@ -82,7 +82,7 @@ namespace ERwin_CA
                         {
                             Marshal.FinalReleaseComObject(ExApp);
                         }
-                        Logger.PrintC("Errore: " + ex.Message);
+                        Logger.PrintLC("Errore: " + ex.Message, 2, ConfigFile.ERROR);
                         return false;
                     }
                     catch
@@ -450,7 +450,7 @@ namespace ERwin_CA
                         Logger.PrintF(fileError, "Il file è temporaneo. Non può essere elaborato.", true);
                         break;
                     case 2:
-                        Logger.PrintF(fileError, "Il file è non è apribile. Potrebbe essere già aperto altrove. Non può essere elaborato.", true);
+                        Logger.PrintF(fileError, "Il file non è apribile. Potrebbe essere già aperto altrove. Non può essere elaborato.", true);
                         break;
                     case 3:
                         Logger.PrintF(fileError, "Non è stato possibile convertire il file con estensione '.XLSX'. Non può essere elaborato.", true);
