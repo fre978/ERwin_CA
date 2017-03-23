@@ -90,5 +90,16 @@
         End Try
     End Function
 
+    Public Function RetriveRelation(ByRef model As SCAPI.ModelObject,
+                                  collection As SCAPI.ModelObjects,
+                                  entityName As String) As Boolean
+        Try
+            model = collection.Item(entityName, "Relationship")
+            '            model.Properties.Add()
+            Return True
+        Catch exp As Exception
+            Return False
+        End Try
+    End Function
 
 End Class

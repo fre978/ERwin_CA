@@ -1094,7 +1094,7 @@ namespace ERwin_CA
                         campoFiglio = null;
                         string ifParentNotChildName = string.Empty;
                         //DEBUG
-                        if (R.IdentificativoRelazione == "25")
+                        if (R.IdentificativoRelazione == "9")
                             Logger.PrintC("DEBUG 91");
 
                         SCAPI.ModelObject tabPadreBV = null;
@@ -1201,7 +1201,7 @@ namespace ERwin_CA
 
                             // (aggiunta che permette le rinomine)
                             SCAPI.ModelObjects erRelCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Relationship");
-                            if (!con.RetriveEntity(ref scItem, erRelCollection, R.IdentificativoRelazione))
+                            if (!con.RetriveRelation(ref scItem, erRelCollection, R.IdentificativoRelazione))
                             {
                                 scItem = erRootObjCol.Add("Relationship");
                             }
