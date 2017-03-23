@@ -1084,7 +1084,7 @@ namespace ERwin_CA
                     SetRootCollection();
 
 
-                    scItem = erRootObjCol.Add("Relationship");
+                    //scItem = erRootObjCol.Add("Relationship");
                     foreach (var R in relation.Relazioni)
                     {
                         errore = string.Empty;
@@ -1096,15 +1096,23 @@ namespace ERwin_CA
                         //DEBUG
                         if (R.IdentificativoRelazione == "25")
                             Logger.PrintC("DEBUG 91");
+
+                        SCAPI.ModelObject tabPadreBV = null;
+                        SCAPI.ModelObject tabFiglioBV = null;
+                        SCAPI.ModelObjects erAttributesFiglioBV = null;
+                        SCAPI.ModelObject campoFiglioBV = null;
+
                         if (RelazioniOk.Exists(x => x == R.IdentificativoRelazione))
                         {
 
+                            // Rinomina di un campo nella Tabella Figlia nel caso in cui sia omonimo di un Campo Padre
+                            tabPadreBV = null;
+                            tabFiglioBV = null;
                             #region Check Padre != Figlio per rinomina
                             if (R.CampoPadre != R.CampoFiglio)
                             {
+                                //RECUPERO
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
-                                SCAPI.ModelObject tabPadreBV = null;
-                                SCAPI.ModelObject tabFiglioBV = null;
                                 if (!con.RetriveEntity(ref tabPadreBV, erObjectCollection, R.TabellaPadre.ToUpper()))
                                 {
                                     errore = "Search-Parent-in-Child fase: could not find Parent table " + R.TabellaPadre + " inside Erwin model (Relation ID " + R.IdentificativoRelazione+ ").";
@@ -1125,8 +1133,8 @@ namespace ERwin_CA
                                     CommitAndSave(trID);
                                     continue;
                                 }
-                                SCAPI.ModelObjects erAttributesFiglioBV = scSession.ModelObjects.Collect(tabFiglioBV, "Attribute");
-                                SCAPI.ModelObject campoFiglioBV = null;
+                                erAttributesFiglioBV = scSession.ModelObjects.Collect(tabFiglioBV, "Attribute");
+                                campoFiglioBV = null;
                                 if (con.RetriveAttribute(ref campoFiglioBV, erAttributesFiglioBV, R.CampoPadre.ToUpper()))
                                 {
                                     try
@@ -1182,7 +1190,23 @@ namespace ERwin_CA
                             }
                             #endregion
 
+                            CommitAndSave(trID);
+                            OpenTransaction();
+
+                            //unsafe
+                            //{
+                            //    SCAPI.ModelObject* x = &scItem;
+                            //}
                             //La relazione ha passato i controlli erwin e può essere creata
+
+                            // (aggiunta che permette le rinomine)
+                            SCAPI.ModelObjects erRelCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Relationship");
+                            if (!con.RetriveEntity(ref scItem, erRelCollection, R.IdentificativoRelazione))
+                            {
+                                scItem = erRootObjCol.Add("Relationship");
+                            }
+                            //////////////////////////////////////
+
                             #region assegnaIdentificativoRelazione
                             if (con.AssignToObjModel(ref scItem, ConfigFile._REL_NAME["Identificativo relazione"], R.IdentificativoRelazione))
                                 Logger.PrintLC("Added Relation's Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3, ConfigFile.INFO);
@@ -1374,7 +1398,7 @@ namespace ERwin_CA
                                 if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
                                     //errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
-                                    errore = "Rinominazione fallita: impossibile trovare Parent Field " + R.CampoPadre + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
+                                    errore = "Rinomina fallita: impossibile trovare Parent Field " + R.CampoPadre + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
@@ -1498,6 +1522,7 @@ namespace ERwin_CA
                                 // rinominiamo gli attributi che erano in Hide e che tornano attivi dopo la prima rinomina (regolare)
                                 CommitAndSave(trID);
                                 OpenTransaction();
+
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                                 if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
@@ -1557,9 +1582,10 @@ namespace ERwin_CA
                             #region Contro Rinomina Check Padre != Figlio
                             if (!string.IsNullOrWhiteSpace(ifParentNotChildName))
                             {
+                                Logger.PrintLC("## Inizio controllo Parent-In_Child", 2, ConfigFile.INFO);
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
-                                SCAPI.ModelObject tabPadreBV = null;
-                                SCAPI.ModelObject tabFiglioBV = null;
+                                tabPadreBV = null;
+                                tabFiglioBV = null;
                                 if (!con.RetriveEntity(ref tabPadreBV, erObjectCollection, R.TabellaPadre.ToUpper()))
                                 {
                                     errore = "Search-Parent-in-Child fase: could not find Parent table " + R.TabellaPadre + " inside Erwin model (Relation ID " + R.IdentificativoRelazione + ").";
@@ -1580,10 +1606,11 @@ namespace ERwin_CA
                                     CommitAndSave(trID);
                                     continue;
                                 }
-                                SCAPI.ModelObjects erAttributesFiglioBV = scSession.ModelObjects.Collect(tabFiglioBV, "Attribute");
-                                SCAPI.ModelObject campoFiglioBV = null;
+                                erAttributesFiglioBV = scSession.ModelObjects.Collect(tabFiglioBV, "Attribute");
+                                campoFiglioBV = null;
                                 if (con.RetriveAttribute(ref campoFiglioBV, erAttributesFiglioBV, ifParentNotChildName))
                                 {
+                                    Logger.PrintLC("## Trovato _DRIVEUP in Tabella Figlio (Parent-In_Child)", 2, ConfigFile.INFO);
                                     //ifParentNotChildName = R.CampoPadre.ToUpper() + ConfigFile.PARENT_NOT_CHILD;
                                     try
                                     {
@@ -1641,8 +1668,8 @@ namespace ERwin_CA
                             {
                                 //R.History = "\n" + "Relation Ignored: another element of the same relation is wrong";
                                 if (R.History != null)
-                                    errore = "\n" + "Relazione ignorata: un altro elemento della stessa relazione è errato";
-                                R.History += "Relazione ignorata: un altro elemento della stessa relazione è errato";
+                                    errore = "\n"; //+ "Relazione ignorata: un altro elemento della stessa relazione è errato";
+                                R.History += errore + "Relazione ignorata: un altro elemento della stessa relazione è errato";
                                 //R.History = "\n" + "Relazione ignorata: un altro elemento della stessa relazione è errato";
                                 continue;
                             }
