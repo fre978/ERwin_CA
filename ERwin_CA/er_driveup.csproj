@@ -125,6 +125,7 @@
     <Compile Include="Timer.cs" />
     <Compile Include="T\AttributeT.cs" />
     <Compile Include="T\ElaboratiT.cs" />
+    <Compile Include="T\GenericTypeT.cs" />
     <Compile Include="T\GlobalRelationStrut.cs" />
     <Compile Include="T\RelationStrut.cs" />
     <Compile Include="T\RelationT.cs" />

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERwin_CA.T
+namespace ERwin_CA
 {
-    class RelationT
+    class RelationT : GenericTypeT
     {
-        public int Row { get; set; }
+        //public int Row { get; set; }
         public string DB { get; set; }
         public string IdentificativoRelazione { get; set; }
         public string TabellaPadre { get; set; }
@@ -20,10 +20,14 @@ namespace ERwin_CA.T
         public string Eccezioni { get; set; }
         public bool? TipoRelazione { get; set; }
         public string Note { get; set; }
-        public string History { get; set; }
+        //public string History { get; set; }
         public int? NullOptionType { get; set; }
         public bool CampoFiglioKey { get; set; } = false;
 
+        public RelationT()
+        {
+
+        }
 
         public RelationT( int row, string db, 
             string identificativoRelazione = null, string tabellaPadre = null, string tabellaFiglia = null, int? cardinalita = null, 

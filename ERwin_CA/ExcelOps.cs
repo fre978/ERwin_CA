@@ -9,7 +9,6 @@ using Excel = Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
-using ERwin_CA.T;
 
 
 namespace ERwin_CA
@@ -95,7 +94,7 @@ namespace ERwin_CA
         }
 
         /// <summary>
-        /// Converts a Open Office (xlsx) file to the proprietary MS old format (xls).
+        /// Converts an Open Office (.xlsx) file to the proprietary MS old format (.xls).
         /// -A.Amato, 2016 11
         /// </summary>
         /// <param name="fileName">Path and file name to convert.</param>
@@ -112,7 +111,6 @@ namespace ERwin_CA
             FileInfo fileInfo = new FileInfo(fileName);
             if (fileInfo.Exists && (fileInfo.Extension.ToUpper() == ".XLSX"))
             {
-                //Excel.ApplicationClass ExApp = new Excel.ApplicationClass();
                 Excel.Workbook ExWB; // = new Excel.Workbook();
                 try
                 {
@@ -151,7 +149,7 @@ namespace ERwin_CA
             return true;
         }
         /// <summary>
-        /// Converts a proprietary MS old format (xls) to the Open Office (xlsx).
+        /// Converts a proprietary MS old format (.xls) to the Open Office (.xlsx).
         /// -A.Amato, 2016 11
         /// </summary>
         /// <param name="fileName">Path and file name to convert.</param>
@@ -165,14 +163,11 @@ namespace ERwin_CA
             FileInfo fileInfo = new FileInfo(fileName);
             if (fileInfo.Exists && (fileInfo.Extension.ToUpper() == ".XLS"))
             {
-                //Excel.ApplicationClass ExApp = new Excel.ApplicationClass();
                 Excel.Workbook ExWB; // = new Excel.Workbook();
                 try
                 {
                     Excel.Worksheet ExWS = new Excel.Worksheet();
                     ExApp = new Excel.ApplicationClass();
-
-                    //FileOps.RemoveAttributes(fileName);
                     ExApp.DisplayAlerts = false;
                     ExWB = ExApp.Workbooks.Open(fileName, Type.Missing, Type.Missing, Type.Missing,
                                                 Type.Missing, Type.Missing, Type.Missing,
@@ -207,14 +202,11 @@ namespace ERwin_CA
             return true;
         }
 
-
         public static bool FileValidation(string file)
         {
-            //SCAPI.Application testAPP = new SCAPI.Application();
             int genericError = 0;
             string testoLog = string.Empty;
             string TxtControlloNonPassato = string.Empty;
-
             bool sheetFoundTabelle = false;
             bool sheetFoundAttributi = false;
             bool sheetFoundRelazioni = false;
@@ -226,8 +218,6 @@ namespace ERwin_CA
             ExcelPackage p = null;
             ExcelWorkbook WB = null;
             ExcelWorksheets ws = null;
-
-
             FileInfo fileDaAprire = new FileInfo(file);
             bool isXLS = false;
 
@@ -241,7 +231,6 @@ namespace ERwin_CA
                     Logger.PrintLC(fileDaAprire.Name + " è un file temporaneo (probabilmente è già aperto altrove). Non elaboro.", 2, ConfigFile.ERROR);
                     genericError = 1;
                     goto ERROR;
-                    //return false;
                 }
 
                 //test se il file apribile
@@ -250,7 +239,6 @@ namespace ERwin_CA
                     Logger.PrintLC("Non è possibile aprire il file " + fileDaAprire.Name + ". Non elaboro.", 2, ConfigFile.ERROR);
                     genericError = 2;
                     goto ERROR;
-                    //return false;
                 }
                 //string extension = fileDaAprire.Extension.ToUpper();
                 if (fileDaAprire.Extension.ToUpper() == ".XLS")
@@ -261,7 +249,6 @@ namespace ERwin_CA
                         {
                             genericError = 3;
                             goto ERROR;
-                            //return false;
                         }
                     }
                     isXLS = true;
@@ -469,7 +456,6 @@ namespace ERwin_CA
                 return false;
             }
 
-
             if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 ||
                 sheetFoundTabelle != true || sheetFoundAttributi != true || sheetFoundRelazioni != true ||
                 columnsFoundTabelle != true || columnsFoundAttributi != true || columnsFoundRelazioni != true)
@@ -529,9 +515,6 @@ namespace ERwin_CA
                 {
                     Logger.PrintF(fileStampa, TxtControlloNonPassato, true);
                 }
-
-                
-                //return false;
             }
 
             if (check_sheet[0] != 1 || check_sheet[1] != 1 || check_sheet[2] != 1 ||
@@ -642,13 +625,9 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
-                        //if ((!(string.Equals(flag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(flag, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(Funct.ParseFlag(flag, "YES") || Funct.ParseFlag(flag, "NO")))
                         {
                             incorrect = true;
-                            //error = worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + 2].Text;
-                            //if (!string.IsNullOrWhiteSpace(error))
-                            //    error = error + " ";
                             error += "Valore di FLAG BFD non conforme. ";
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
@@ -659,6 +638,7 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
+
                         #region OldFLAGBFD
                         // CODE 66
                         if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text.Trim()))
@@ -692,7 +672,6 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
                         }
-
                         #endregion
 
                         if (incorrect == false)
@@ -770,7 +749,6 @@ namespace ERwin_CA
                     {
                         p.SaveAs(new FileInfo(Funct.GetFolderDestination2(fileDaAprire.FullName, fileDaAprire.Name)));
                     }
-                    
                     return listaFile;
                 }
             }
@@ -915,7 +893,6 @@ namespace ERwin_CA
                         }
                         if (!string.IsNullOrWhiteSpace(identificativa))
                         {
-                            //if (!(identificativa.ToUpper().Equals("S") || identificativa.ToUpper().Equals("N")))
                             if(!(Funct.ParseFlag(identificativa.ToUpper(),"YES") || Funct.ParseFlag(identificativa.ToUpper(),"NO")))
                             {
                                 incorrect = true;
@@ -983,7 +960,6 @@ namespace ERwin_CA
                                     ValRiga.NullOptionType = null;
                                     break;
                             }
-
                             ValRiga.CampoPadre = campoPadre;
                             ValRiga.CampoFiglio = campoFiglio;
                             if (Funct.ParseFlag(identificativa.ToUpper(),"YES"))
@@ -1037,9 +1013,6 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET2].Value = error;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_RELAZIONI + ConfigFile.RELAZIONI_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                            //EmptyRow += 1;
-                            //if (EmptyRow >= 10)
-                            //    FilesEnd = true;
                         }
                         //******************************************
                         // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
@@ -1063,14 +1036,12 @@ namespace ERwin_CA
                         }
 
                     }
-                    //p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     if (ConfigFile.DEST_FOLD_UNIQUE)
                     {
                         p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     }
                     else
                     {
-                        //p.SaveAs(new FileInfo(Funct.GetFolderDestination2(fileDaAprire.FullName, fileDaAprire.Name)));
                         p.SaveAs(fileDaAprire);
                     }
                     return listaFile;
@@ -1078,10 +1049,6 @@ namespace ERwin_CA
             }
             return listaFile = null;
         }
-
-
-
-
 
         /// <summary>
         /// Reads and processes Attributes data from excel's 'ATTRIBUTI' sheet
@@ -1118,7 +1085,7 @@ namespace ERwin_CA
                 p = new ExcelPackage(fileDaAprire);
                 ExApp.DisplayAlerts = true;
                 WB = p.Workbook;
-                ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
+                ws = WB.Worksheets;
             }
             catch (Exception exp)
             {
@@ -1193,16 +1160,14 @@ namespace ERwin_CA
                             }
                         }
                         //Check Chiave
-                        //if (!(string.IsNullOrWhiteSpace(chiave)) && (!(string.Equals(chiave, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiave, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(string.IsNullOrWhiteSpace(chiave)) && (!(Funct.ParseFlag(chiave, "YES") || Funct.ParseFlag(chiave, "NO"))))
                         {
-                        incorrect = true;
-                        if (!string.IsNullOrWhiteSpace(error))
-                            error += " ";
-                        error += "CHIAVE non conforme.";
+                            incorrect = true;
+                            if (!string.IsNullOrWhiteSpace(error))
+                                error += " ";
+                            error += "CHIAVE non conforme.";
                         }
                         //Check Unique
-                        //if (!(string.IsNullOrWhiteSpace(unique)) && (!(string.Equals(unique, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(unique, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(string.IsNullOrWhiteSpace(unique)) && (!(Funct.ParseFlag(unique, "YES") || Funct.ParseFlag(unique, "NO"))))
                         {
                             incorrect = true;
@@ -1211,7 +1176,6 @@ namespace ERwin_CA
                             error += "UNIQUE non conforme.";
                         }
                         //Check Chiave Logica
-                        //if (!(string.IsNullOrWhiteSpace(chiaveLogica)) && (!(string.Equals(chiaveLogica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(chiaveLogica, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(string.IsNullOrWhiteSpace(chiaveLogica)) && (!(Funct.ParseFlag(chiaveLogica, "YES") || Funct.ParseFlag(chiaveLogica, "NO"))))
                         {
                             incorrect = true;
@@ -1220,7 +1184,6 @@ namespace ERwin_CA
                             error += "CHIAVE LOGICA non conforme.";
                         }
                         //Check Mandatory Flag
-                        //if (!(string.IsNullOrWhiteSpace(mandatoryFlag)) && (!(string.Equals(mandatoryFlag, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(mandatoryFlag, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(string.IsNullOrWhiteSpace(mandatoryFlag)) && (!(Funct.ParseFlag(mandatoryFlag, "YES") || Funct.ParseFlag(mandatoryFlag, "NO"))))
                         {
                             incorrect = true;
@@ -1229,7 +1192,6 @@ namespace ERwin_CA
                             error += "MANDATORY FLAG non conforme.";
                         }
                         //Check Dominio
-                        //if (!(string.IsNullOrWhiteSpace(dominio)) && (!(string.Equals(dominio, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(dominio, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(string.IsNullOrWhiteSpace(dominio)) && (!(Funct.ParseFlag(dominio, "YES") || Funct.ParseFlag(dominio, "NO"))))
                         {
                             incorrect = true;
@@ -1237,16 +1199,6 @@ namespace ERwin_CA
                                 error += " ";
                             error += "DOMINIO non conforme.";
                         }
-                        ////Check Storica
-                        //if (!(string.IsNullOrWhiteSpace(storica)) && (!(string.Equals(storica, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(storica, "N", StringComparison.OrdinalIgnoreCase))))
-                        //{
-                        //    incorrect = true;
-                        //    if (!string.IsNullOrWhiteSpace(error))
-                        //        error += " ";
-                        //    error += "STORICA non conforme.";
-                        //}
-                        //Check Dato Sensibile
-                        //if (!(string.IsNullOrWhiteSpace(datoSensibile)) && (!(string.Equals(datoSensibile, "S", StringComparison.OrdinalIgnoreCase) || string.Equals(datoSensibile, "N", StringComparison.OrdinalIgnoreCase))))
                         if (!(string.IsNullOrWhiteSpace(datoSensibile)) && (!(Funct.ParseFlag(datoSensibile, "YES") || Funct.ParseFlag(datoSensibile, "NO"))))
                         {
                             incorrect = true;
@@ -1264,42 +1216,33 @@ namespace ERwin_CA
                             ValRiga.NomeCampoLegacy = nomeCampo;
                             ValRiga.DataType = dataType;
 
-                            //if (string.Equals(chiave.ToUpper(), "S"))
                             if (Funct.ParseFlag(chiave, "YES"))
                                 ValRiga.Chiave = 0;
                             else
                                 ValRiga.Chiave = 100;
 
-                            //if (string.Equals(unique.ToUpper(), "S"))
                             if (Funct.ParseFlag(unique, "YES"))
                                 ValRiga.Unique = unique;
                             else
                                 ValRiga.Unique = "N";
 
-                            //if (string.Equals(chiaveLogica.ToUpper(), "S"))
                             if (Funct.ParseFlag(chiaveLogica, "YES"))
                                 ValRiga.ChiaveLogica = chiaveLogica;
                             else
                                 ValRiga.ChiaveLogica = "N";
 
-                            //if (string.Equals(mandatoryFlag.ToUpper(), "S"))
                             if (Funct.ParseFlag(mandatoryFlag, "YES"))
                                 ValRiga.MandatoryFlag = 1;
                             else
                                 ValRiga.MandatoryFlag = 0;
 
-                            //if (string.Equals(dominio.ToUpper(), "S"))
                             if (Funct.ParseFlag(dominio, "YES"))
                                 ValRiga.Dominio = dominio;
                             else
                                 ValRiga.Dominio = "N";
 
-                            //if (string.Equals(storica.ToUpper(), "S"))
                             ValRiga.Storica = storica;
-                            //else
-                            //ValRiga.Storica = "N";
 
-                            //if (string.Equals(datoSensibile.ToUpper(), "S"))
                             if (Funct.ParseFlag(datoSensibile, "YES"))
                                 ValRiga.DatoSensibile = datoSensibile;
                             else
@@ -1378,14 +1321,12 @@ namespace ERwin_CA
                             Logger.PrintLC("Checked Field '" + nomeCampo + "' of Table '" + nomeTabella + "'. Validation OK", 3, ConfigFile.INFO);
                         }
                     }
-                    //p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     if (ConfigFile.DEST_FOLD_UNIQUE)
                     {
                         p.SaveAs(new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, fileDaAprire.Name)));
                     }
                     else
                     {
-                        //p.SaveAs(new FileInfo(Funct.GetFolderDestination2(fileDaAprire.FullName, fileDaAprire.Name)));
                         p.SaveAs(fileDaAprire);
                     }
                     return listaFile;
@@ -1394,7 +1335,51 @@ namespace ERwin_CA
             return listaFile = null;
         }
 
-        public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<RelationT> Rows, int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
+        internal static bool XLSXWriteErrorInCell(FileInfo fInfo, List<EntityT> list, int col, int v, string tABELLE)
+        {
+            if (list.Count > 0)
+            {
+                List<GenericTypeT> genericList = new List<GenericTypeT>();
+                foreach (var entity in list)
+                {
+                    genericList.Add((GenericTypeT)entity);
+                }
+                return XLSXWriteErrorInCell(fInfo, genericList, col, v, tABELLE);
+            }
+            return true;
+        }
+
+        internal static bool XLSXWriteErrorInCell(FileInfo fInfo, List<RelationT> list, int col, int v, string rELAZIONI)
+        {
+            if (list.Count > 0)
+            {
+                List<GenericTypeT> genericList = new List<GenericTypeT>();
+                foreach (var entity in list)
+                {
+                    genericList.Add((GenericTypeT)entity);
+                }
+                return XLSXWriteErrorInCell(fInfo, genericList, col, v, rELAZIONI);
+            }
+            return true;
+        }
+
+        internal static bool XLSXWriteErrorInCell(FileInfo fInfo, List<AttributeT> list, int col, int v, string aTTRIBUTI)
+        {
+            if (list.Count > 0)
+            {
+                List<GenericTypeT> genericList = new List<GenericTypeT>();
+                foreach (var entity in list)
+                {
+                    genericList.Add((GenericTypeT)entity);
+                }
+                return XLSXWriteErrorInCell(fInfo, genericList, col, v, aTTRIBUTI);
+            }
+            return true;
+        }
+
+
+
+        public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<GenericTypeT> Rows, int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
         {
             try
             {
@@ -1422,7 +1407,7 @@ namespace ERwin_CA
                     p = new ExcelPackage(fileDaAprire);
                     ExApp.DisplayAlerts = true;
                     WB = p.Workbook;
-                    ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
+                    ws = WB.Worksheets;
                 }
                 catch (Exception exp)
                 {
@@ -1430,9 +1415,6 @@ namespace ERwin_CA
                     return false;
                 }
 
-                //bool FilesEnd = false;
-                //int EmptyRow = 0;
-                //int columns = 0;
                 foreach (var worksheet in ws)
                 {
                     if (worksheet.Name == sheet)
@@ -1466,88 +1448,6 @@ namespace ERwin_CA
                                             fileDaAprire.Name +
                                             ". Description: " +
                                             exp.Message, 1, ConfigFile.ERROR);
-                            //return false;
-                        }
-                    }
-                }
-                Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite, ConfigFile.ERROR);
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<AttributeT> Rows,int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
-        {
-            try
-            {
-                string file = fileDaAprire.FullName;
-                if (!File.Exists(file))
-                {
-                    Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite, ConfigFile.ERROR);
-                    return false;
-                }
-                FileOps.RemoveAttributes(file);
-                if (fileDaAprire.Extension.ToUpper() == ".XLS")
-                {
-                    if (!ConvertXLStoXLSX(file))
-                        return false;
-                    file = Path.ChangeExtension(file, ".xlsx");
-                    fileDaAprire = new FileInfo(file);
-                }
-                ExApp = new Excel.ApplicationClass();
-                ExcelPackage p = null;
-                ExcelWorkbook WB = null;
-                ExcelWorksheets ws = null;
-                try
-                {
-                    ExApp.DisplayAlerts = false;
-                    p = new ExcelPackage(fileDaAprire);
-                    ExApp.DisplayAlerts = true;
-                    WB = p.Workbook;
-                    ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
-                }
-                catch (Exception exp)
-                {
-                    Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite, ConfigFile.ERROR);
-                    return false;
-                }
-
-                //bool FilesEnd = false;
-                //int EmptyRow = 0;
-                //int columns = 0;
-                foreach (var worksheet in ws)
-                {
-                    if (worksheet.Name == sheet)
-                    {
-                        try
-                        {
-                            foreach (var dati in Rows)
-                            {
-                                worksheet.Cells[dati.Row, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[dati.Row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
-                                worksheet.Cells[dati.Row, column].Style.Font.Bold = true;
-                                worksheet.Cells[dati.Row, column].Value = "KO";
-                                string mystring = (string)worksheet.Cells[dati.Row, column + 1].Value;
-                                if (!(mystring.Contains(dati.History)))
-                                {
-                                    worksheet.Cells[dati.Row, column + 1].Value = mystring + dati.History;
-                                }
-                                worksheet.Column(column + 1).Width = 100;
-                                worksheet.Cells[dati.Row, column + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                                worksheet.Column(column + 1).Style.WrapText = true;
-                                Logger.PrintLC("Updating excel file for error " + dati.History, 3);
-                            }
-                            p.SaveAs(fileDaAprire);
-                            return true;
-                        }
-                        catch (Exception exp)
-                        {
-                            Logger.PrintLC("Error while writing on file " +
-                                            fileDaAprire.Name +
-                                            ". Description: " +
-                                            exp.Message,1, ConfigFile.ERROR);
                             return false;
                         }
                     }
@@ -1561,88 +1461,249 @@ namespace ERwin_CA
             }
         }
 
-        public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<EntityT> Rows, int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
-        {
-            try
-            {
-                string file = fileDaAprire.FullName;
-                if (!File.Exists(file))
-                {
-                    Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite, ConfigFile.ERROR);
-                    return false;
-                }
-                FileOps.RemoveAttributes(file);
-                if (fileDaAprire.Extension.ToUpper() == ".XLS")
-                {
-                    if (!ConvertXLStoXLSX(file))
-                        return false;
-                    file = Path.ChangeExtension(file, ".xlsx");
-                    fileDaAprire = new FileInfo(file);
-                }
-                ExApp = new Excel.ApplicationClass();
-                ExcelPackage p = null;
-                ExcelWorkbook WB = null;
-                ExcelWorksheets ws = null;
-                try
-                {
-                    ExApp.DisplayAlerts = false;
-                    p = new ExcelPackage(fileDaAprire);
-                    ExApp.DisplayAlerts = true;
-                    WB = p.Workbook;
-                    ws = WB.Worksheets; //.Add(wsName + wsNumber.ToString());
-                }
-                catch (Exception exp)
-                {
-                    Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite, ConfigFile.ERROR);
-                    return false;
-                }
+        //public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<RelationT> Rows, int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
+        //{
+        //    try
+        //    {
+        //        string file = fileDaAprire.FullName;
+        //        if (!File.Exists(file))
+        //        {
+        //            Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite, ConfigFile.ERROR);
+        //            return false;
+        //        }
+        //        FileOps.RemoveAttributes(file);
+        //        if (fileDaAprire.Extension.ToUpper() == ".XLS")
+        //        {
+        //            if (!ConvertXLStoXLSX(file))
+        //                return false;
+        //            file = Path.ChangeExtension(file, ".xlsx");
+        //            fileDaAprire = new FileInfo(file);
+        //        }
+        //        ExApp = new Excel.ApplicationClass();
+        //        ExcelPackage p = null;
+        //        ExcelWorkbook WB = null;
+        //        ExcelWorksheets ws = null;
+        //        try
+        //        {
+        //            ExApp.DisplayAlerts = false;
+        //            p = new ExcelPackage(fileDaAprire);
+        //            ExApp.DisplayAlerts = true;
+        //            WB = p.Workbook;
+        //            ws = WB.Worksheets;
+        //        }
+        //        catch (Exception exp)
+        //        {
+        //            Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite, ConfigFile.ERROR);
+        //            return false;
+        //        }
 
-                //bool FilesEnd = false;
-                //int EmptyRow = 0;
-                //int columns = 0;
-                foreach (var worksheet in ws)
-                {
-                    if (worksheet.Name == sheet)
-                    {
-                        try
-                        {
-                            foreach (var dati in Rows)
-                            {
-                                worksheet.Cells[dati.Row, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                worksheet.Cells[dati.Row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
-                                worksheet.Cells[dati.Row, column].Style.Font.Bold = true;
-                                worksheet.Cells[dati.Row, column].Value = "KO";
-                                string mystring = (string)worksheet.Cells[dati.Row, column + 1].Value;
-                                if (!(mystring.Contains(dati.History)))
-                                {
-                                    worksheet.Cells[dati.Row, column + 1].Value = mystring + dati.History;
-                                }
-                                worksheet.Column(column + 1).Width = 100;
-                                worksheet.Cells[dati.Row, column + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                                worksheet.Column(column + 1).Style.WrapText = true;
-                                Logger.PrintLC("Updating excel file for error " + dati.History, 3);
-                            }
-                            p.SaveAs(fileDaAprire);
-                            return true;
-                        }
-                        catch (Exception exp)
-                        {
-                            Logger.PrintLC("Error while writing on file " +
-                                            fileDaAprire.Name +
-                                            ". Description: " +
-                                            exp.Message, 1, ConfigFile.ERROR);
-                            return false;
-                        }
-                    }
-                }
-                Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite, ConfigFile.ERROR);
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        //        foreach (var worksheet in ws)
+        //        {
+        //            if (worksheet.Name == sheet)
+        //            {
+        //                try
+        //                {
+        //                    foreach (var dati in Rows)
+        //                    {
+        //                        worksheet.Cells[dati.Row, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+        //                        worksheet.Cells[dati.Row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+        //                        worksheet.Cells[dati.Row, column].Style.Font.Bold = true;
+        //                        worksheet.Cells[dati.Row, column].Value = "KO";
+        //                        string mystring = (string)worksheet.Cells[dati.Row, column + 1].Value;
+        //                        if (mystring == null)
+        //                            mystring = "";
+        //                        if (!(mystring.Contains(dati.History)))
+        //                        {
+        //                            worksheet.Cells[dati.Row, column + 1].Value = mystring + dati.History;
+        //                        }
+        //                        worksheet.Column(column + 1).Width = 100;
+        //                        worksheet.Cells[dati.Row, column + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        //                        worksheet.Column(column + 1).Style.WrapText = true;
+        //                        Logger.PrintLC("Updating excel file for error " + dati.History, 3);
+        //                    }
+        //                    p.SaveAs(fileDaAprire);
+        //                    return true;
+        //                }
+        //                catch (Exception exp)
+        //                {
+        //                    Logger.PrintLC("Error while writing on file " +
+        //                                    fileDaAprire.Name +
+        //                                    ". Description: " +
+        //                                    exp.Message, 1, ConfigFile.ERROR);
+        //                    return false;
+        //                }
+        //            }
+        //        }
+        //        Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite, ConfigFile.ERROR);
+        //        return false;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        //public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<AttributeT> Rows,int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
+        //{
+        //    try
+        //    {
+        //        string file = fileDaAprire.FullName;
+        //        if (!File.Exists(file))
+        //        {
+        //            Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite, ConfigFile.ERROR);
+        //            return false;
+        //        }
+        //        FileOps.RemoveAttributes(file);
+        //        if (fileDaAprire.Extension.ToUpper() == ".XLS")
+        //        {
+        //            if (!ConvertXLStoXLSX(file))
+        //                return false;
+        //            file = Path.ChangeExtension(file, ".xlsx");
+        //            fileDaAprire = new FileInfo(file);
+        //        }
+        //        ExApp = new Excel.ApplicationClass();
+        //        ExcelPackage p = null;
+        //        ExcelWorkbook WB = null;
+        //        ExcelWorksheets ws = null;
+        //        try
+        //        {
+        //            ExApp.DisplayAlerts = false;
+        //            p = new ExcelPackage(fileDaAprire);
+        //            ExApp.DisplayAlerts = true;
+        //            WB = p.Workbook;
+        //            ws = WB.Worksheets;
+        //        }
+        //        catch (Exception exp)
+        //        {
+        //            Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite, ConfigFile.ERROR);
+        //            return false;
+        //        }
+
+        //        foreach (var worksheet in ws)
+        //        {
+        //            if (worksheet.Name == sheet)
+        //            {
+        //                try
+        //                {
+        //                    foreach (var dati in Rows)
+        //                    {
+        //                        worksheet.Cells[dati.Row, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+        //                        worksheet.Cells[dati.Row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+        //                        worksheet.Cells[dati.Row, column].Style.Font.Bold = true;
+        //                        worksheet.Cells[dati.Row, column].Value = "KO";
+        //                        string mystring = (string)worksheet.Cells[dati.Row, column + 1].Value;
+        //                        if (mystring == null)
+        //                            mystring = "";
+        //                        if (!(mystring.Contains(dati.History)))
+        //                        {
+        //                            worksheet.Cells[dati.Row, column + 1].Value = mystring + dati.History;
+        //                        }
+        //                        worksheet.Column(column + 1).Width = 100;
+        //                        worksheet.Cells[dati.Row, column + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        //                        worksheet.Column(column + 1).Style.WrapText = true;
+        //                        Logger.PrintLC("Updating excel file for error " + dati.History, 3);
+        //                    }
+        //                    p.SaveAs(fileDaAprire);
+        //                    return true;
+        //                }
+        //                catch (Exception exp)
+        //                {
+        //                    Logger.PrintLC("Error while writing on file " +
+        //                                    fileDaAprire.Name +
+        //                                    ". Description: " +
+        //                                    exp.Message,1, ConfigFile.ERROR);
+        //                    return false;
+        //                }
+        //            }
+        //        }
+        //        Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite, ConfigFile.ERROR);
+        //        return false;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        //public static bool XLSXWriteErrorInCell(FileInfo fileDaAprire, List<EntityT> Rows, int column, int priorityWrite, string sheet = ConfigFile.ATTRIBUTI)
+        //{
+        //    try
+        //    {
+        //        string file = fileDaAprire.FullName;
+        //        if (!File.Exists(file))
+        //        {
+        //            Logger.PrintLC("Reading File " + fileDaAprire.Name + ": doesn't exist.", priorityWrite, ConfigFile.ERROR);
+        //            return false;
+        //        }
+        //        FileOps.RemoveAttributes(file);
+        //        if (fileDaAprire.Extension.ToUpper() == ".XLS")
+        //        {
+        //            if (!ConvertXLStoXLSX(file))
+        //                return false;
+        //            file = Path.ChangeExtension(file, ".xlsx");
+        //            fileDaAprire = new FileInfo(file);
+        //        }
+        //        ExApp = new Excel.ApplicationClass();
+        //        ExcelPackage p = null;
+        //        ExcelWorkbook WB = null;
+        //        ExcelWorksheets ws = null;
+        //        try
+        //        {
+        //            ExApp.DisplayAlerts = false;
+        //            p = new ExcelPackage(fileDaAprire);
+        //            ExApp.DisplayAlerts = true;
+        //            WB = p.Workbook;
+        //            ws = WB.Worksheets;
+        //        }
+        //        catch (Exception exp)
+        //        {
+        //            Logger.PrintLC("Reading file: " + fileDaAprire.Name + ": could not open file in location " + fileDaAprire.DirectoryName, priorityWrite, ConfigFile.ERROR);
+        //            return false;
+        //        }
+
+        //        foreach (var worksheet in ws)
+        //        {
+        //            if (worksheet.Name == sheet)
+        //            {
+        //                try
+        //                {
+        //                    foreach (var dati in Rows)
+        //                    {
+        //                        worksheet.Cells[dati.Row, column].Style.Fill.PatternType = ExcelFillStyle.Solid;
+        //                        worksheet.Cells[dati.Row, column].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+        //                        worksheet.Cells[dati.Row, column].Style.Font.Bold = true;
+        //                        worksheet.Cells[dati.Row, column].Value = "KO";
+        //                        string mystring = (string)worksheet.Cells[dati.Row, column + 1].Value;
+        //                        if (!(mystring.Contains(dati.History)))
+        //                        {
+        //                            worksheet.Cells[dati.Row, column + 1].Value = mystring + dati.History;
+        //                        }
+        //                        worksheet.Column(column + 1).Width = 100;
+        //                        worksheet.Cells[dati.Row, column + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+        //                        worksheet.Column(column + 1).Style.WrapText = true;
+        //                        Logger.PrintLC("Updating excel file for error " + dati.History, 3);
+        //                    }
+        //                    p.SaveAs(fileDaAprire);
+        //                    return true;
+        //                }
+        //                catch (Exception exp)
+        //                {
+        //                    Logger.PrintLC("Error while writing on file " +
+        //                                    fileDaAprire.Name +
+        //                                    ". Description: " +
+        //                                    exp.Message, 1, ConfigFile.ERROR);
+        //                    return false;
+        //                }
+        //            }
+        //        }
+        //        Logger.PrintLC("File writing. Sheet " + sheet + "could not be found in file " + fileDaAprire.Name, priorityWrite, ConfigFile.ERROR);
+        //        return false;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
 
         public static bool WriteExcelStatsForEntity(FileInfo fileDaAprire, Dictionary<string, List<String>> CompareResults)
         {

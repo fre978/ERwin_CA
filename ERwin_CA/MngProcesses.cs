@@ -1,5 +1,4 @@
-﻿using ERwin_CA.T;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -146,21 +145,22 @@ namespace ERwin_CA
                             //    }
                             //}
                             //aggiorna le info sulle celle del file excel se la creazione fisica in erwin rileva qualche errore
-                            int col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
-                            Logger.PrintLC("Updating excel file for error on entity creation", 3);
-                            //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                            if (ConfigFile.DEST_FOLD_UNIQUE)
-                            {
-                                fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
-                            }
-                            else
-                            {
-                                fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
-                            }
-                            if (File.Exists(fInfo.FullName))
-                            {
-                                ExcelOps.XLSXWriteErrorInCell(fInfo, DatiFile.FindAll(x => !string.IsNullOrEmpty(x.History)), col, 1, ConfigFile.TABELLE);
-                            }
+                        int col = ConfigFile.HEADER_COLONNA_MAX_ATTRIBUTI + ConfigFile.ATTRIBUTI_EXCEL_COL_OFFSET1;
+                        Logger.PrintLC("Updating excel file for error on entity creation", 3);
+                        //fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                        if (ConfigFile.DEST_FOLD_UNIQUE)
+                        {
+                            fInfo = new FileInfo(Path.Combine(ConfigFile.FOLDERDESTINATION, Path.GetFileNameWithoutExtension(file) + ".xlsx"));
+                        }
+                        else
+                        {
+                            fInfo = (new FileInfo(Funct.GetFolderDestination(file, ".xlsx")));
+                        }
+                        List<EntityT> xx = DatiFile.FindAll(x => !string.IsNullOrEmpty(x.History));
+                        if (File.Exists(fInfo.FullName))
+                        {
+                            ExcelOps.XLSXWriteErrorInCell(fInfo, DatiFile.FindAll(x => !string.IsNullOrEmpty(x.History)), col, 1, ConfigFile.TABELLE);
+                        }
                         Logger.PrintLC("** FINISH PROCESSING - TABLES to ERwin Model", 2);
                         #endregion
 

@@ -1,5 +1,4 @@
-﻿using ERwin_CA.T;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -80,7 +79,6 @@ namespace ERwin_CA
                     scSessionCol.Remove(0);
 
                 scPersistenceUnit = null;
-                //scSession.Close();
                 Logger.PrintLC("Session closed successfully.", 2, ConfigFile.INFO);
             }
             catch (Exception exp)
@@ -717,14 +715,12 @@ namespace ERwin_CA
                             //cerchiamo la tabella figlia
                             if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                             {
-                                //errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
                                 errore = "Relazione ignorata: impossibile trovare la tabella " + R.TabellaFiglia + " nel foglio tabelle";
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return ret = null;
                                 continue;
                             }
                             else
@@ -743,34 +739,29 @@ namespace ERwin_CA
                                     else
                                     {
                                         //Non è possibile tracciare una relazione con tabelle differenti
-                                        //errore = "Relation ignored: Cannot trace relationship with a different child table inside the same relation " + relation.ID;
                                         errore = "Relazione ignorata: impossibile tracciare una relazione con una tabella figlia differente all'interno di una stessa relazione. ID: " + relation.ID;
                                         Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                         if (R.History != null)
                                             errore = "\n" + errore;
                                         R.History += errore;
                                         CommitAndSave(trID);
-                                        //return ret = null;
                                         continue;
                                     }
                                 }
                             }
                             #endregion
 
-                            //Code 80
                             #region controlliCampoPadre
                             //esistenza campo padre
                             SCAPI.ModelObjects erAttributesPadre = scSession.ModelObjects.Collect(tabellaPadre, "Attribute");
                             if (!con.RetriveAttribute(ref campoPadre, erAttributesPadre, R.CampoPadre.ToUpper()))
                             {
-                                //errore = "Relation Ignored: Could not find field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
                                 errore = "Relazione ignorata: impossibile trovare il campo " + R.CampoPadre + " all'interno della tabella " + R.TabellaPadre + " per la relazione ID: " + relation.ID;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return ret = null;
                                 continue;
                             }
                             else
@@ -783,8 +774,6 @@ namespace ERwin_CA
                                 //scandaglio tutte gli attributi dell'entity padre
                                 int contatore = 0;
                                 int contaPadre = 0;
-                                //Code 78
-                                //countKey = 0;
                                 #region cicloAttributiTabellaPadre
                                 foreach (SCAPI.ModelObject attributo in erAttributesPadre)
                                 {
@@ -792,7 +781,6 @@ namespace ERwin_CA
                                     // ogni colonna deve avere un valore chiave
                                     if (!con.RetrieveFromObjModel(attributo, "Type", ref isKey))
                                     {
-                                        //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoPadre + " inside table " + R.TabellaPadre + " with relation ID " + relation.ID;
                                         errore = "Relazione ignorata: Impossibile trovare l'attributo Type del campo " + R.CampoPadre + " all'interno della tabella " + R.TabellaPadre + " per la relazione ID: " + relation.ID;
                                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                         if (R.History != null)
@@ -824,8 +812,8 @@ namespace ERwin_CA
                                             }
                                         }
                                     }
-
                                 }
+
                                 #endregion
                                 if (campoPadreTrovato == "S")
                                 {
@@ -834,7 +822,6 @@ namespace ERwin_CA
                                 }
                                 else
                                 {
-                                    //errore = "Relation Ignored: Unmatching PK fields in table " + R.TabellaPadre + " with relation ID " + relation.ID + ": " + _CampoPadre + " is not a key of the table";
                                     errore = "Relazione ignorata: corrispondenza mancante per il campo PK nella tabella " + R.TabellaPadre + " per la relazione ID " + relation.ID + ": " + _CampoPadre + " non è una chiave primaria";
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
@@ -842,12 +829,10 @@ namespace ERwin_CA
                                     R.History += errore;
                                     if (trID != lastIdCommitted)
                                         CommitAndSave(trID);
-                                    //return ret = null;
                                     continue;
                                 }
                                 if (!(countKey == countRelazioni))
                                 {
-                                    //errore = "Relation Ignored: Unmatching PK numbers in table " + R.TabellaPadre + " with relation ID " + relation.ID;
                                     errore = "Relazione ignorata: Corrispondenza mancante nel numero di PK della tabella " + R.TabellaPadre + " per la relazione ID " + relation.ID;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
@@ -855,7 +840,6 @@ namespace ERwin_CA
                                     R.History += errore;
                                     if (trID != lastIdCommitted)
                                         CommitAndSave(trID);
-                                    //return ret = null;
                                     continue;
                                 }
                             }
@@ -881,7 +865,6 @@ namespace ERwin_CA
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return ret = null;
                                     continue;
                                 }
                             }
@@ -892,14 +875,12 @@ namespace ERwin_CA
                             SCAPI.ModelObjects erAttributesFiglio = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
                             if (!con.RetriveAttribute(ref campoFiglio, erAttributesFiglio, R.CampoFiglio.ToUpper()))
                             {
-                                //errore = "Relation Ignored Could not find Child Field " + R.CampoFiglio + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                 errore = "Relazione ignorata: Impossibile trovare il Child Field " + R.CampoFiglio + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return ret = null;
                                 continue;
                             }
                             else
@@ -919,28 +900,24 @@ namespace ERwin_CA
                                     string isKey = null;
                                     if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
                                     {
-                                        //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                         errore = "Relazione ignorata: impossibile trovare l'attributo Type del campo " + R.CampoFiglio + " all'interno della child table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
                                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                         if (R.History != null)
                                             errore = "\n" + errore;
                                         R.History += errore;
                                         CommitAndSave(trID);
-                                        //return ret = null;
                                         continue;
                                     }
                                     else
                                     {
                                         if (isKey != "0")
                                         {
-                                            //errore = "Relation Ignored: " + R.CampoFiglio + "expected Key inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                             errore = "Relazione ignorata: " + R.CampoFiglio + " deve essere chiave all'interno della child table " + R.TabellaFiglia + " per la relazione ID: " + relation.ID;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
                                                 errore = "\n" + errore;
                                             R.History += errore;
                                             CommitAndSave(trID);
-                                            //return ret = null;
                                             continue;
                                         }
                                     }
@@ -952,14 +929,12 @@ namespace ERwin_CA
                                     checkNotIdentificativa = true;
                                     if (!con.RetrieveFromObjModel(campoFiglio, "Type", ref isKey))
                                     {
-                                        //errore = "Relation Ignored: Could not find attribute Type of field " + R.CampoFiglio + " inside child table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                         errore = "Relazione ignorata: Impossibile trovare l'attributo Type del campo " + R.CampoFiglio + " all'interno della child table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
                                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                         if (R.History != null)
                                             errore = "\n" + errore;
                                         R.History += errore;
                                         CommitAndSave(trID);
-                                        //return ret = null;
                                         continue;
                                     }
                                     else
@@ -973,14 +948,6 @@ namespace ERwin_CA
                                                 //se siamo al primo giro contiamo le chiavi, dai giri successivi lo sappiamo.
                                                 isNotIdentificativa = true;
                                             }
-
-                                            /* ORIGINALE (eliminare le 6 righe precedenti)
-                                            isNotIdentificativa = true;
-                                            */
-                                        }
-                                        else
-                                        {
-                                            //R.CampoFiglioKey = false;
                                         }
                                     }
                                 }
@@ -999,14 +966,12 @@ namespace ERwin_CA
                                 else
                                 {
                                     //Non è possibile tracciare una relazione con tabelle differenti
-                                    //errore = "Relation ignored: Cannot trace relationship with a different cardinality inside the same relation" + relation.ID;
                                     errore = "Relazione ignorata: Impossibile tracciare una relazione con una differente cardinalità all'interno della stessa relazione. ID: " + relation.ID;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return ret = null;
                                     continue;
                                 }
                             }
@@ -1031,14 +996,13 @@ namespace ERwin_CA
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return ret = null;
                                     continue;
                                 }
                             }
                             #endregion
                             
                             #endregion
-                            // Code 77 Input
+
                             PrimoGiro = false;
                             RelazioniOk.Add(R.IdentificativoRelazione);
                         }
@@ -1054,7 +1018,6 @@ namespace ERwin_CA
                     if (!(isNotIdentificativa) && (checkNotIdentificativa))
                     {
                         RelazioniOk.Remove(relation.ID);
-                        //errore = "Relation Ignored: all the attribute used for the relation inside child table " + _TabellaFiglia + " are keys. Relation " + relation.ID + " must be an identity relation";
                         errore = "Relazione ignorata: tutti gli attributi usati per la relazione all'interno della child table " + _TabellaFiglia + " sono chiavi. La relazione " + relation.ID + " DEVE essere di tipo Identificativa";
                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                         foreach (var R in relation.Relazioni)
@@ -1068,7 +1031,6 @@ namespace ERwin_CA
                         }
                         if (trID != lastIdCommitted)
                             CommitAndSave(trID);
-                        //return ret = null;
                     }
 
 
@@ -1083,8 +1045,6 @@ namespace ERwin_CA
                     SetRootObject();
                     SetRootCollection();
 
-
-                    //scItem = erRootObjCol.Add("Relationship");
                     foreach (var R in relation.Relazioni)
                     {
                         errore = string.Empty;
@@ -1093,9 +1053,6 @@ namespace ERwin_CA
                         campoPadre = null;
                         campoFiglio = null;
                         string ifParentNotChildName = string.Empty;
-                        //DEBUG
-                        if (R.IdentificativoRelazione == "9")
-                            Logger.PrintC("DEBUG 91");
 
                         SCAPI.ModelObject tabPadreBV = null;
                         SCAPI.ModelObject tabFiglioBV = null;
@@ -1111,7 +1068,6 @@ namespace ERwin_CA
                             #region Check Padre != Figlio per rinomina
                             if (R.CampoPadre != R.CampoFiglio)
                             {
-                                //RECUPERO
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                                 if (!con.RetriveEntity(ref tabPadreBV, erObjectCollection, R.TabellaPadre.ToUpper()))
                                 {
@@ -1150,7 +1106,6 @@ namespace ERwin_CA
                                             }
                                             else
                                             {
-                                                //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                                 errore = "Search-Parent-in-Child fase: (physical) rename failed: could not rename Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
                                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                                 if (R.History != null)
@@ -1165,7 +1120,6 @@ namespace ERwin_CA
                                             }
                                             else
                                             {
-                                                //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                                 errore = "Search-Parent-in-child fase: (logical) rename failed: could not rename Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
                                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                                 if (R.History != null)
@@ -1193,12 +1147,6 @@ namespace ERwin_CA
                             CommitAndSave(trID);
                             OpenTransaction();
 
-                            //unsafe
-                            //{
-                            //    SCAPI.ModelObject* x = &scItem;
-                            //}
-                            //La relazione ha passato i controlli erwin e può essere creata
-
                             // (aggiunta che permette le rinomine)
                             SCAPI.ModelObjects erRelCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Relationship");
                             if (!con.RetriveRelation(ref scItem, erRelCollection, R.IdentificativoRelazione))
@@ -1212,14 +1160,12 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Relation's Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId, 3, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Relation Id (" + R.IdentificativoRelazione + ") to " + scItem.ObjectId;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Identificativo relazione"]  + " ID (" + R.IdentificativoRelazione + ") a " + scItem.ObjectId;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return scItem;
                                 continue;
                             }
                             #endregion
@@ -1229,14 +1175,12 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Relation's Parent Table (" + R.TabellaPadre + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Relation Parent Table (" + R.TabellaPadre + ") to " + scItem.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Tabella Padre"] + " (" + R.TabellaPadre + ") a " + scItem.Name;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return scItem;
                                 continue;
                             }
                             #endregion
@@ -1246,14 +1190,12 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Relation's Child Table (" + R.TabellaFiglia + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Relation Child Table (" + R.TabellaFiglia + ") to " + scItem.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Tabella Figlia"] + " (" + R.TabellaFiglia + ") a " + scItem.Name;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return scItem;
                                 continue;
                             }
                             #endregion
@@ -1263,14 +1205,12 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Relation's Identifiable (" + R.Identificativa + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Relation Identifiable (" + R.Identificativa + ") to " + scItem.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Identificativa"] + " (" + R.Identificativa + ") a " + scItem.Name;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return scItem;
                                 continue;
                             }
                             #endregion
@@ -1281,14 +1221,12 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Relation's Cardinality (" + R.Cardinalita + ") to " + scItem.Name, 3, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Cardinalita"] + " (" + R.Cardinalita + ") a " + scItem.Name;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (R.History != null)
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return scItem;
                                 continue;
                             }
                             #endregion
@@ -1301,14 +1239,12 @@ namespace ERwin_CA
                                     Logger.PrintLC("Added Relation's Null Option Type (" + myNullOT + ") to " + scItem.Name, 3, ConfigFile.INFO);
                                 else
                                 {
-                                    //errore = "Error adding Relation Cardinality (" + R.Cardinalita + ") to " + scItem.Name;
                                     errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Null Option Type"] + " (" + myNullOT + ") a " + scItem.Name;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                             }
@@ -1326,7 +1262,6 @@ namespace ERwin_CA
                                     errore = "\n" + errore;
                                 R.History += errore;
                                 CommitAndSave(trID);
-                                //return scItem;
                                 continue;
                             }
                             #endregion
@@ -1338,14 +1273,12 @@ namespace ERwin_CA
                                     Logger.PrintLC("Added Relation's Note (" + R.Note + ") to " + scItem.Name, 3, ConfigFile.INFO);
                                 else
                                 {
-                                    //errore = "Error adding Relation Note (" + R.Note + ") to " + scItem.Name;
                                     errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Note"] + " (" + R.Note + ") a " + scItem.Name;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                             }
@@ -1358,14 +1291,12 @@ namespace ERwin_CA
                                     Logger.PrintLC("Added Relation's Exceptions (" + R.Eccezioni + ") to " + scItem.Name, 3, ConfigFile.INFO);
                                 else
                                 {
-                                    //errore = "Error adding Relation Exceptions (" + R.Eccezioni + ") to " + scItem.Name;
                                     errore = "Errore riscontrato aggiungendo " + ConfigFile._REL_NAME["Eccezioni"] + " (" + R.Eccezioni + ") a " + scItem.Name;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                             }
@@ -1383,28 +1314,24 @@ namespace ERwin_CA
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                                 if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
-                                    //errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
                                     errore = "Relazione ignorata: Imposibile trovare la tabella " + R.TabellaFiglia + " all'interno della relazione ID " + relation.ID;
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                                 //Recuperiamo l'Attributo con il nome Campo Padre (aggiunto con la relazione)
                                 SCAPI.ModelObjects erAttributesFigliox = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
                                 if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
-                                    //errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                     errore = "Rinomina fallita: impossibile trovare Parent Field " + R.CampoPadre + " all'interno della Child Table " + R.TabellaFiglia + " per la relazione ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                                 else
@@ -1416,17 +1343,14 @@ namespace ERwin_CA
                                     }
                                     else
                                     {
-                                        //errore = "Failed Rename (phisical): could not find rename with name Child Field(" + R.CampoFiglio + ") to Child Name: " + scItem.ObjectId;
                                         errore = "Rinomina fallita (fisica): impossibile trovare Parent Field " + R.CampoFiglio + " all'interno della Child Table " + scItem.ObjectId + " per la relazione ID " + relation.ID;
                                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                         if (R.History != null)
                                             errore = "\n" + errore;
                                         R.History += errore;
                                         CommitAndSave(trID);
-                                        //return scItem;
                                         continue;
                                     }
-                                    //Code 77 #1
                                     // Se il campo era Chiave, proviamo a risettarlo Chiave
                                     if (R.CampoFiglioKey)
                                     {
@@ -1442,8 +1366,6 @@ namespace ERwin_CA
                                         }
                                     }
                                 }
-                                //    CommitAndSave(trID);
-                                //    OpenTransaction();
                             }
                             #endregion
 
@@ -1459,28 +1381,24 @@ namespace ERwin_CA
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                                 if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
                                 {
-                                    //errore = "Relation Ignored: Could not find table " + R.TabellaFiglia + " inside relation ID " + relation.ID;
                                     errore = "Relation ignored: could not find table " + R.TabellaFiglia + " inside Erwin model.";
                                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                                 //Recuperiamo l'Attributo con il nome Campo Padre (aggiunto con la relazione)
                                 SCAPI.ModelObjects erAttributesFigliox = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
                                 if (!con.RetriveAttribute(ref campoFiglio, erAttributesFigliox, R.CampoPadre.ToUpper()))
                                 {
-                                    //errore = "Failed Rename: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " with relation ID " + relation.ID;
                                     errore = "Rename failed: could not find Parent Field " + R.CampoPadre + " inside Child Table " + R.TabellaFiglia + " for relation ID " + relation.ID;
                                     Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                     if (R.History != null)
                                         errore = "\n" + errore;
                                     R.History += errore;
                                     CommitAndSave(trID);
-                                    //return scItem;
                                     continue;
                                 }
                                 else
@@ -1491,18 +1409,14 @@ namespace ERwin_CA
                                     }
                                     else
                                     {
-                                        //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                         errore = "Rinomina (logica) fallita: impossibile trovare il Child Field(" + R.CampoPadre + ") per la Child Table: " + scItem.ObjectId;
                                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                         if (R.History != null)
                                             errore = "\n" + errore;
                                         R.History += errore;
                                         CommitAndSave(trID);
-                                        //return scItem;
                                         continue;
                                     }
-
-                                    //Code 77 #2
                                     // Se il campo era Chiave, proviamo a ri-settarlo Chiave
                                     if (R.CampoFiglioKey)
                                     {
@@ -1518,7 +1432,6 @@ namespace ERwin_CA
                                     }
                                 }
 
-                                //Code 79
                                 // rinominiamo gli attributi che erano in Hide e che tornano attivi dopo la prima rinomina (regolare)
                                 CommitAndSave(trID);
                                 OpenTransaction();
@@ -1545,7 +1458,6 @@ namespace ERwin_CA
                                         }
                                         else
                                         {
-                                            //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                             errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
@@ -1561,7 +1473,6 @@ namespace ERwin_CA
                                         }
                                         else
                                         {
-                                            //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                             errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
@@ -1611,7 +1522,6 @@ namespace ERwin_CA
                                 if (con.RetriveAttribute(ref campoFiglioBV, erAttributesFiglioBV, ifParentNotChildName))
                                 {
                                     Logger.PrintLC("## Trovato _DRIVEUP in Tabella Figlio (Parent-In_Child)", 2, ConfigFile.INFO);
-                                    //ifParentNotChildName = R.CampoPadre.ToUpper() + ConfigFile.PARENT_NOT_CHILD;
                                     try
                                     {
                                         if (con.AssignToObjModel(ref campoFiglioBV, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoPadre.ToUpper()))
@@ -1620,7 +1530,6 @@ namespace ERwin_CA
                                         }
                                         else
                                         {
-                                            //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                             errore = "Search-Parent-in-Child fase: (physical) rename failed: could not rename Child Field(" + ifParentNotChildName + ") for Child Table: " + scItem.ObjectId;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
@@ -1635,7 +1544,6 @@ namespace ERwin_CA
                                         }
                                         else
                                         {
-                                            //errore = "Failed Rename: could not find rename with name Child Field(" + R.CampoPadre + ") to Child Name: " + scItem.ObjectId;
                                             errore = "Search-Parent-in-child fase: (logical) rename failed: could not rename Child Field(" + ifParentNotChildName + ") in Child Table: " + scItem.ObjectId;
                                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                             if (R.History != null)
@@ -1666,11 +1574,9 @@ namespace ERwin_CA
                         {
                             if (string.IsNullOrWhiteSpace(R.History))
                             {
-                                //R.History = "\n" + "Relation Ignored: another element of the same relation is wrong";
                                 if (R.History != null)
-                                    errore = "\n"; //+ "Relazione ignorata: un altro elemento della stessa relazione è errato";
+                                    errore = "\n";
                                 R.History += errore + "Relazione ignorata: un altro elemento della stessa relazione è errato";
-                                //R.History = "\n" + "Relazione ignorata: un altro elemento della stessa relazione è errato";
                                 continue;
                             }
                         }
@@ -1699,8 +1605,6 @@ namespace ERwin_CA
                     string TabellaFiglio = relation.TabellaFiglia;
                     string CampoPadre = relation.CampoPadre;
                     string CampoFiglio = relation.CampoFiglio;
-
-
                 }
             }
             return true;
@@ -1734,7 +1638,6 @@ namespace ERwin_CA
 
                 if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
                 {
-                    //errore = "'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.";
                     errore = "'Nome Tabella Legacy' alla riga " + entity.Row + " non trovato. Attributo ignorato.";
                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                     if (entity.History != null)
@@ -1765,7 +1668,6 @@ namespace ERwin_CA
                         Logger.PrintLC("Added Area to " + erEntityObjectPE.Name, 3, ConfigFile.INFO);
                     else
                     {
-                        //errore = "Error adding Area to " + erEntityObjectPE.Name;
                         errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Area"] + " a " + erEntityObjectPE.Name;
                         Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                         if (entity.History != null)
@@ -1779,7 +1681,6 @@ namespace ERwin_CA
                         Logger.PrintLC("Added Tipologia Tabella to " + erEntityObjectPE.Name, 3, ConfigFile.INFO);
                     else
                     {
-                        //errore = "Error adding Tipologia Tabella to " + erEntityObjectPE.Name;
                         errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Tipologia Tabella"] + " a " + erEntityObjectPE.Name;
                         Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                         if (entity.History != null)
@@ -1793,7 +1694,6 @@ namespace ERwin_CA
                         Logger.PrintLC("Added Storica to " + erEntityObjectPE.Name, 3, ConfigFile.INFO);
                     else
                     {
-                        //errore = "Error adding Storica to " + erEntityObjectPE.Name;
                         errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Storica"] + " a " + erEntityObjectPE.Name;
                         Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                         if (entity.History != null)
@@ -1807,7 +1707,6 @@ namespace ERwin_CA
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                     if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy.ToUpper()))
                     {
-                        //errore = "Attribute entity " + entity.NomeCampoLegacy + " already present.";
                         errore = "Attributo tabella " + entity.NomeCampoLegacy + " già presente.";
                         Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                         if (entity.History != null)
@@ -1825,7 +1724,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name + "'s name.", 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Nome Campo Legacy Name"] + " a " + erEntityObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -1838,7 +1736,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Nome Campo Legacy to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Nome Campo Legacy to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Nome Campo Legacy"] + " a " + erEntityObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -1853,7 +1750,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Datatype to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Datatype to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Datatype"] + " a " + erEntityObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -1867,7 +1763,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Chiave to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Chiave to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Chiave"] + " a " + erEntityObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -1881,7 +1776,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Mandatory Flag to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Mandatory Flag to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Mandatory Flag"] + " a " + erEntityObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -1896,7 +1790,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Dato Sensibile to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Dato Sensibile to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Dato Sensibile"] + " a " + erEntityObjectPE.Name;
                                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -1918,7 +1811,6 @@ namespace ERwin_CA
             string errore = string.Empty;
             if (string.IsNullOrWhiteSpace(db))
             {
-                //errore = "There was no DB associated to " + entity.NomeTabellaLegacy;
                 errore = "Non ci sono DB associati a " + entity.NomeTabellaLegacy;
                 Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                 if (entity.History != null)
@@ -1935,7 +1827,6 @@ namespace ERwin_CA
                 erEntityObjectPE = null;
                 if (string.IsNullOrWhiteSpace(entity.NomeTabellaLegacy))
                 {
-                    //errore = "'Nome Tabella Legacy' at row " + entity.Row + " not found. Skipping the Attribute.";
                     errore = "'Nome Tabella Legacy' alla riga " + entity.Row + " non trovato. Attributo ignorato.";
                     Logger.PrintLC(errore, 3, ConfigFile.ERROR);
                     if (entity.History != null)
@@ -1963,7 +1854,6 @@ namespace ERwin_CA
                 }
                 erAttributeObjCol = scSession.ModelObjects.Collect(erEntityObjectPE, "Attribute");
 
-                //Code 77
                 if (!string.IsNullOrWhiteSpace(entity.NomeCampoLegacy))
                     if (con.RetriveAttribute(ref erAttributeObjectPE, erAttributeObjCol, entity.NomeCampoLegacy.ToUpper()))
                     {
@@ -2001,13 +1891,11 @@ namespace ERwin_CA
                         //Definizione Campo
                         if (!string.IsNullOrWhiteSpace(entity.DefinizioneCampo))
                         {
-                            //Logger.PrintLC("Attribute entity " + entity.NomeCampoLegacy + " already present.", 3, ConfigFile.WARNING);
                             //Definizione Campo (Comment)
                             if (con.AssignToObjModel(ref erAttributeObjectPE, ConfigFile._ATT_NAME["Definizione Campo"], entity.DefinizioneCampo))
                                 Logger.PrintLC("Added Definizione Campo (Comment) to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Definizione Campo (Comment) to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Definizione Campo"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2020,7 +1908,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Definizione Campo (Definition) to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Definizione Campo (Definition) to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Definizione Campo Def"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2035,7 +1922,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Unique to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Unique to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Unique"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2049,7 +1935,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Chiave Logica to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Chiave Logica to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Chiave Logica"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2063,7 +1948,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Dominio to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Dominio to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Dominio"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2077,7 +1961,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Provenienza Dominio to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Provenienza Dominio to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Provenienza Dominio"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2091,7 +1974,6 @@ namespace ERwin_CA
                                 Logger.PrintLC("Added Note to " + erAttributeObjectPE.Name, 4, ConfigFile.INFO);
                             else
                             {
-                                //errore = "Error adding Note to " + erAttributeObjectPE.Name;
                                 errore = "Errore riscontrato aggiungendo " + ConfigFile._ATT_NAME["Note"] + " a " + erAttributeObjectPE.Name;
                                 Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                                 if (entity.History != null)
@@ -2104,7 +1986,6 @@ namespace ERwin_CA
                     {
                         //ExcelOps.XLSXWriteErrorInCell()
                         {
-                            //errore = "Unexpected Error: searching for " + entity.NomeCampoLegacy + " finding none.";
                             errore = "Errore inaspettato: cercando " + entity.NomeCampoLegacy + " non è stato trovato nulla.";
                             Logger.PrintLC(errore, 4, ConfigFile.ERROR);
                             if (entity.History != null)

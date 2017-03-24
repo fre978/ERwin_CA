@@ -9,7 +9,11 @@ namespace ERwin_CA
 {
     class DirOps
     {
-
+        /// <summary>
+        /// Traverses the 'dirInfo' directory recursively to delete all (even the same input directory)
+        /// </summary>
+        /// <param name="dirInfo">Directory to delete recursively</param>
+        /// <returns></returns>
         public static bool TraverseDirectory(DirectoryInfo dirInfo)
         {
             foreach(var dirChild in dirInfo.GetDirectories())
@@ -59,6 +63,11 @@ namespace ERwin_CA
             return true;
         }
 
+        /// <summary>
+        /// Delete all files in a directory
+        /// </summary>
+        /// <param name="dirInfo">Directory to empty</param>
+        /// <returns></returns>
         public static bool CleanAllFilesInDirectory(DirectoryInfo dirInfo)
         {
             foreach(FileInfo file in dirInfo.GetFiles())
@@ -78,7 +87,6 @@ namespace ERwin_CA
             }
             return true;
         }
-
 
         /// <summary>
         /// List all files of a determined type(s) in a directory tree
@@ -134,22 +142,68 @@ namespace ERwin_CA
             return Files.ToArray();
         }
 
-        //#############################################################################
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceDirectory"></param>
+        /// <param name="targetDirectory"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static bool Copy(string sourceDirectory, string targetDirectory, List<string> list)
         {
             DirectoryInfo diSource = new DirectoryInfo(sourceDirectory);
             DirectoryInfo diTarget = new DirectoryInfo(targetDirectory);
-
+            if(!diSource.Exists) //|| !diTarget.Exists)
+            {
+                if (!diSource.Exists)
+                    Logger.PrintLC("Source directory doesn't exist (" + diSource.FullName 
+                        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                //if(!diTarget.Exists)
+                //    Logger.PrintLC("Destination directory doesn't exist (" + diTarget.FullName
+                //        +"). Cannot copy structure.", 1, ConfigFile.ERROR);
+                return false;
+            }
             try
             {
                 return CopyAll(diSource, diTarget, list);
             }
             catch
             {
-                Logger.PrintLC("Error while copying files and directories to the destination folder: " + targetDirectory, 1, ConfigFile.ERROR);
+                Logger.PrintLC("Unexpected error while copying files and directories to the destination folder: " + targetDirectory, 1, ConfigFile.ERROR);
                 return false;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceDirectory"></param>
+        /// <param name="targetDirectory"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static bool Copy(DirectoryInfo sourceDirectory, DirectoryInfo targetDirectory, List<string> list)
+        {
+            if (!sourceDirectory.Exists) // || !targetDirectory.Exists)
+            {
+                if (!sourceDirectory.Exists)
+                    Logger.PrintLC("Source directory doesn't exist (" + sourceDirectory.FullName
+                        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                //if (!targetDirectory.Exists)
+                //    Logger.PrintLC("Destination directory doesn't exist (" + targetDirectory.FullName
+                //        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                return false;
+            }
+            try
+            {
+                return CopyAll(sourceDirectory, targetDirectory, list);
+            }
+            catch
+            {
+                Logger.PrintLC("Unexpected error while copying files and directories to the destination folder: " + targetDirectory.FullName, 1, ConfigFile.ERROR);
+                return false;
+            }
+        }
+
 
         /// <summary>
         /// Generic methods to copy recursively directories and files 
@@ -161,17 +215,50 @@ namespace ERwin_CA
         {
             DirectoryInfo diSource = new DirectoryInfo(sourceDirectory);
             DirectoryInfo diTarget = new DirectoryInfo(targetDirectory);
-
+            if (!diSource.Exists || !diTarget.Exists)
+            {
+                if (!diSource.Exists)
+                    Logger.PrintLC("Source directory doesn't exist (" + diSource.FullName
+                        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                //if (!diTarget.Exists)
+                //    Logger.PrintLC("Destination directory doesn't exist (" + diTarget.FullName
+                //        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                return false;
+            }
             try
             {
                 return CopyAll(diSource, diTarget);
             }
             catch
             {
-                Logger.PrintLC("Error while copying files and directories to the destination folder: " + targetDirectory, 1, ConfigFile.ERROR);
+                Logger.PrintLC("Unexpected error while copying files and directories to the destination folder: " + targetDirectory, 1, ConfigFile.ERROR);
                 return false;
             }
         }
+
+        public static bool Copy(DirectoryInfo sourceDirectory, DirectoryInfo targetDirectory)
+        {
+            if (!sourceDirectory.Exists || !targetDirectory.Exists)
+            {
+                if (!sourceDirectory.Exists)
+                    Logger.PrintLC("Source directory doesn't exist (" + sourceDirectory.FullName
+                        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                //if (!targetDirectory.Exists)
+                //    Logger.PrintLC("Destination directory doesn't exist (" + targetDirectory.FullName
+                //        + "). Cannot copy structure.", 1, ConfigFile.ERROR);
+                return false;
+            }
+            try
+            {
+                return CopyAll(sourceDirectory, targetDirectory);
+            }
+            catch
+            {
+                Logger.PrintLC("Unexpected error while copying files and directories to the destination folder: " + targetDirectory, 1, ConfigFile.ERROR);
+                return false;
+            }
+        }
+
 
         public static bool CopyAll(DirectoryInfo source, DirectoryInfo target, List<string> list)
         {
@@ -199,8 +286,7 @@ namespace ERwin_CA
                         }
                     }
                 }
-
-                // Copy each subdirectory using recursion.
+                // Copy each subdirectory recursively
                 foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
                 {
                     try
@@ -223,13 +309,11 @@ namespace ERwin_CA
             }
         }
 
-
         public static bool CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
             try
             {
                 Directory.CreateDirectory(target.FullName);
-
                 // Copy each file into the new directory.
                 foreach (FileInfo fi in source.GetFiles())
                 {
@@ -246,7 +330,6 @@ namespace ERwin_CA
                         continue;
                     }
                 }
-
                 // Copy each subdirectory using recursion.
                 foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
                 {
@@ -269,7 +352,6 @@ namespace ERwin_CA
                 return false;
             }
         }
-        //#############################################################################
 
     }
 }

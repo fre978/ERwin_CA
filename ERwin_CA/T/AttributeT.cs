@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERwin_CA.T
+namespace ERwin_CA
 {
-    class AttributeT
+    class AttributeT : GenericTypeT
     {
-        public int Row { get; set; }
+        //public int Row { get; set; }
         public string DB { get; set; }
         public string SSA { get; set; }
         public string Area { get; set; }
@@ -29,8 +29,13 @@ namespace ERwin_CA.T
         public string Storica { get; set; }
         public string DatoSensibile { get; set; }
         public string Ordine { get; set; }
-        public string History { get; set; }
+        //public string History { get; set; }
         public int Step { get; set; }
+
+        public AttributeT()
+        {
+
+        }
 
         public AttributeT(int row, string db, string nomeTabellaLegacy, string ssa = null, string area = null,
                           string nomeCampoLegacy = null, string definizioneCampo = null, string tipologiaTabella = null,
@@ -63,5 +68,11 @@ namespace ERwin_CA.T
             History = history;
             Step = step;
         }
+
+        //public static explicit operator AttributeT(List<GenericTypeT> v)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
     }
 }

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERwin_CA.T
+namespace ERwin_CA
 {
-    class EntityT
+    class EntityT : GenericTypeT
     {
-        public int Row { get; set; }
+        //public int Row { get; set; }
         public string DB { get; set; }
         public string TableName { get; set; }
         public string SSA { get; set; }
@@ -24,9 +24,13 @@ namespace ERwin_CA.T
         public string Acronym { get; set; }
         public string Area { get; set; }
         public string TableType { get; set; }
-        public string History { get; set; }
+        //public string History { get; set; }
         public string DB_TYPE { get; set; }
 
+        public EntityT()
+        {
+
+        }
 
         public EntityT( int row, string db, string tName, string ssa = null, string hName = null,
                         string dbName = null, string schema = null, string tableDescr = null,

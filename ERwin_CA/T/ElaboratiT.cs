@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace ERwin_CA.T
+namespace ERwin_CA
 {
     class ElaboratiT
     {
