@@ -185,7 +185,6 @@ namespace ERwin_CA
                 {
                     string myriga = riga.ToUpper();
                     int i = 0;
-
                     if (myriga.Contains("CONSTRAINT"))
                     {
                         if (myriga.Contains(";"))
@@ -216,13 +215,10 @@ namespace ERwin_CA
                             //la constraint non è ancora completa
                             continue;
                         }
-
                     }
-                    
                     //salto le righe vuote
                     if (string.IsNullOrEmpty(myriga))
                         continue;
-
                     //all'interno del ciclo cerco le righe contenenti create table
                     if ((myriga.ToUpper()).Contains("CREATE TABLE"))
                     {
@@ -247,11 +243,9 @@ namespace ERwin_CA
                                     memTable = elemento;
                                     break;
                                 }
-                                
                             }
                             i = i + 1;
                         }
-                        //trovato = false;
                         continue;
                     }
                     if (myriga.Trim().Equals("("))
@@ -296,7 +290,6 @@ namespace ERwin_CA
                     {
                         if (cerca)
                             cerca = false;
-
                         //all'interno del ciclo cerco le righe contenenti create table
                         if ((myriga.ToUpper()).Contains("ALTER TABLE"))
                         {
