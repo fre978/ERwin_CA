@@ -536,6 +536,51 @@ namespace ERwin_CA
             return true;
         }
 
+
+        public static bool TestAttributesExist(ExcelWorksheets ws, string nome)
+        {
+            bool attrExist = false;
+            foreach (var sheetAtt in ws)
+            {
+                if (sheetAtt.Name == ConfigFile.ATTRIBUTI)
+                {
+                    bool FilesEndAtt = false;
+                    for (int RowPosAtt = ConfigFile.HEADER_RIGA + 1;
+                            FilesEndAtt != true;
+                            RowPosAtt++)
+                    {
+                        string nomeAtt = sheetAtt.Cells[RowPosAtt, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text.Trim();
+                        if (!string.IsNullOrWhiteSpace(nomeAtt))
+                        {
+                            if (nome == nomeAtt)
+                            {
+                                attrExist = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+
+                        }
+                        //******************************************
+                        // Verifica lo stato delle successive 10 righe per determinare la fine della tabella.
+                        int prossimeAtt = 0;
+                        for (int i = 1; i < 11; i++)
+                        {
+                            if (string.IsNullOrWhiteSpace(sheetAtt.Cells[RowPosAtt + i, ConfigFile._ATTRIBUTI["Nome Tabella Legacy"]].Text))
+                                prossimeAtt++;
+                        }
+                        if (prossimeAtt == 10)
+                            FilesEndAtt = true;
+                        //******************************************
+                    }
+                    break;
+                }
+            }
+            return attrExist;
+        }
+
+
         /// <summary>
         /// Reads and processes Table data from excel's 'TABELLE' sheet
         /// </summary>
@@ -610,6 +655,26 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
+                        // #################################
+                        // TEST ESISTENZA ATTRIBUTI PER LA TABELLA
+                        bool attrExist = TestAttributesExist(ws, nome);     // 'attributes exist for table' flag
+                        if(attrExist == false)
+                        {
+                            incorrect = true;
+                            error += "La Tabella non possiede Attributi; non verrà inserita. ";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = "";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 0, 0));
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Font.Bold = true;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Value = "KO";
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Value = error;
+                            worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2).Width = 100;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+                        }
+                        // #################################
+
                         string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
                         if (string.IsNullOrWhiteSpace(nome))
                         {
@@ -639,7 +704,6 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                         }
 
-                        #region OldFLAGBFD
                         // CODE 66
                         if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text.Trim()))
                         {
@@ -672,7 +736,6 @@ namespace ERwin_CA
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
                         }
-                        #endregion
 
                         if (incorrect == false)
                         { 
@@ -706,7 +769,7 @@ namespace ERwin_CA
                             if (!string.IsNullOrWhiteSpace(worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text.Trim()))
                                 ValRiga.DatabaseName = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Database"]].Text.Trim();
 
-                            listaFile.Add(ValRiga);
+                            listaFile.Add(ValRiga); // aggiunta alle tabelle da inserire nel modello ERWIN
 
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.Fill.BackgroundColor.SetColor(Color.FromArgb(34, 255, 0));
