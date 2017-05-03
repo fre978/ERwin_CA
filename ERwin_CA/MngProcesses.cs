@@ -957,9 +957,6 @@ namespace ERwin_CA
                         Logger.PrintLC("Some error occured while copying or ", 2, ConfigFile.ERROR);
                     }
                 }
-                else
-                {
-                }
                 //**************************************
 
 

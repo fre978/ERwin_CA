@@ -13,7 +13,7 @@ namespace ERwin_CA
 
         }
 
-        public static bool CompareEntity(List<string> CollezioneSQL, List<EntityT> CollezioneXLS, ref Dictionary<string, List<String>> CompareResults)
+        public static bool CompareEntity(List<string> CollezioneSQL, List<EntityT> CollezioneXLS, ref Dictionary<string, List<string>> CompareResults)
         {
             List<string> CollezioneTrovati = new List<string>();
             List<string> CollezioneNonTrovatiSQL = new List<string>();
