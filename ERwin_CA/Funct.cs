@@ -353,6 +353,7 @@ namespace ERwin_CA
 
         public static bool ParseDataType(string value, string databaseType, bool OnlyFormal = false)
         {
+            DataTypeT dataType = new DataTypeT();
             if (value.ToUpper().Contains("NUMBER"))
             {
                 //Logger.PrintLC("TROVATO");
@@ -363,9 +364,7 @@ namespace ERwin_CA
             else
             {
                 if (OnlyFormal)
-                {
                     databaseType = databaseType + "_FOR";
-                }
                 switch (databaseType)
                 {
                     case ConfigFile.DB2_NAME:
@@ -398,10 +397,13 @@ namespace ERwin_CA
                 {
                     string[] a = value.Split('(');
                     string primo = a[0];
+                    dataType.Type = primo;
                     string[] b = a[1].Split(',');
                     string secondo = b[0];
+                    dataType.Integer = int.TryParse(secondo, out oUt1) ? oUt1 : (int?)null;
                     string[] c = (b[1]).Split(')');
                     string terzo = c[0];
+                    dataType.Decimal = int.TryParse(terzo, out oUt2) ? (int?)oUt2 : null;
                     if (int.TryParse(secondo, out oUt1) && int.TryParse(terzo, out oUt2) && actualDB.Contains(primo.ToLower()))
                         return true;
                     else
@@ -458,7 +460,6 @@ namespace ERwin_CA
                 return true;
             else
                 return false;
-            
         }
 
         public static bool Stats(decimal current, decimal maximum, string message, string fileCorrect)

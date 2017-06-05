@@ -658,7 +658,7 @@ namespace ERwin_CA
                         // #################################
                         // TEST ESISTENZA ATTRIBUTI PER LA TABELLA
                         bool attrExist = TestAttributesExist(ws, nome);     // 'attributes exist for table' flag
-                        if(attrExist == false)
+                        if (attrExist == false)
                         {
                             incorrect = true;
                             error += "La Tabella non possiede Attributi; non verrà inserita. ";
@@ -671,7 +671,6 @@ namespace ERwin_CA
                             worksheet.Column(ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2).Width = 100;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                             worksheet.Cells[RowPos, ConfigFile.HEADER_COLONNA_MAX_TABELLE + ConfigFile.TABELLE_EXCEL_COL_OFFSET2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-
                         }
                         // #################################
 
@@ -1220,6 +1219,15 @@ namespace ERwin_CA
                                 if (!string.IsNullOrWhiteSpace(error))
                                     error += " ";
                                 error += "DATATYPE non conforme.";
+                            }
+                            else
+                            {
+                                // CODE 10
+                                if (dataType.Contains('('))
+                                {
+                                    string lunghezza = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Lunghezza"]].Text.ToUpper().Trim();
+                                    string decimali = worksheet.Cells[RowPos, ConfigFile._ATTRIBUTI["Decimali"]].Text.ToUpper().Trim();
+                                }
                             }
                         }
                         //Check Chiave
