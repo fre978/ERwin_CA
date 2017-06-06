@@ -102,4 +102,21 @@
         End Try
     End Function
 
+    Public Function AssignToAttributeX(ByRef model As SCAPI.ModelObject, collection As SCAPI.ModelObjects, parent As String, child As String, relation As String) As Boolean
+        For Each element As SCAPI.ModelObject In collection
+            If element.Properties("Name").Value = child Then
+                Try
+                    element.Properties("Parent_Attribute_Ref").Value = parent
+                    element.Properties("Parent_Relationship_Ref").Value = relation
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Next
+        Return False
+        Throw New NotImplementedException()
+    End Function
+
+
 End Class

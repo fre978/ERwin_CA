@@ -755,7 +755,7 @@ namespace ERwin_CA
                         }
                         //###################################################################
                         //####### STAMPA FILE (da de-commentare)
-                        ExcelOps.WriteDocExcelControlliCampi(new FileInfo(FileDocControlli), DocExcelControlli);
+                        //ExcelOps.WriteDocExcelControlliCampi(new FileInfo(FileDocControlli), DocExcelControlli);
                         //###################################################################
 
 
@@ -769,7 +769,11 @@ namespace ERwin_CA
                         {
                             FileDocControlliTempistiche = Funct.GetFolderDestination2(FileElaborato, new FileInfo(FileDocControlliTempistiche).Name);
                         }
-                        ExcelOps.WriteDocExcelControlliTempistiche(new FileInfo(FileDocControlliTempistiche), ListaControlliTempistiche);
+                        //###################################################################
+                        //####### STAMPA FILE (da de-commentare)
+                        //ExcelOps.WriteDocExcelControlliTempistiche(new FileInfo(FileDocControlliTempistiche), ListaControlliTempistiche);
+                        //###################################################################
+
                         //ExcelOps.WriteDocExcelControlliCampiX(new FileInfo(FileDocControlliTempistiche), ListaControlliTempistiche);
 
                     }
@@ -972,6 +976,8 @@ namespace ERwin_CA
             }
         }
 
+
+
         public static Process[] ProcList(string procName)
         {
             Process[] processes = null;
@@ -989,6 +995,8 @@ namespace ERwin_CA
             }
             return processes;
         }
+
+
 
         public static void KillAllOf(Process[] processes)
         {
