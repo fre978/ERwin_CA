@@ -26,6 +26,9 @@ namespace ERwin_CA
         public SCAPI.ModelObject scItem;
         public SCAPI.ModelObject scDB;
         public SCAPI.ModelObject scSchema;
+
+        public SCAPI.ModelObject testObject;
+
         public string fileERwin = null;
         public FileInfo fileInfoERwin = null;
         public List<string> DatabaseN = null;
@@ -662,11 +665,6 @@ namespace ERwin_CA
 
                             #region controlliTabellaPadre
 
-                            // DEBUG
-                            if (R.TabellaPadre == "Y0PRET")
-                                Logger.PrintC("DEBUG");
-                            //#########
-
                             //cerchiamo la tabella padre
                             if (!con.RetriveEntity(ref tabellaPadre, erObjectCollection, R.TabellaPadre.ToUpper()))
                             {
@@ -771,7 +769,7 @@ namespace ERwin_CA
                                 _CampoPadre = R.CampoPadre;
                                 campoPadreTrovato = "N";
 
-                                //scandaglio tutte gli attributi dell'entity padre
+                                //scandaglio tutti gli attributi dell'entity padre
                                 int contatore = 0;
                                 int contaPadre = 0;
                                 #region cicloAttributiTabellaPadre
@@ -1047,8 +1045,6 @@ namespace ERwin_CA
 
                     foreach (var R in relation.Relazioni)
                     {
-                        if (R.IdentificativoRelazione == "19")
-                            Logger.PrintC("DEBUG");
                         errore = string.Empty;
                         tabellaPadre = null;
                         tabellaFiglio = null;
@@ -1063,7 +1059,8 @@ namespace ERwin_CA
 
                         if (RelazioniOk.Exists(x => x == R.IdentificativoRelazione))
                         {
-                            if (R.TabellaPadre != R.TabellaFiglia) {
+                            if (R.TabellaPadre != R.TabellaFiglia)
+                            {
                                 // Rinomina di un campo nella Tabella Figlia nel caso in cui sia omonimo di un Campo Padre
                                 tabPadreBV = null;
                                 tabFiglioBV = null;
@@ -1561,7 +1558,7 @@ namespace ERwin_CA
                                         }
                                         catch (Exception exp)
                                         {
-                                            Logger.PrintLC("Unexpected error while searching Parent Field inside Child Table (Search-Parent-in-Child fase): " + exp.Message, 2, ConfigFile.ERROR);
+                                            Logger.PrintLC("Unexpected error while searching Parent Field inside Child Table (Search-Parent-in-Child fase): " + exp.Message, 4, ConfigFile.ERROR);
                                             errore = "Errore inatteso mentre si rinominava il Campo Figlio con il nome Campo Padre nella Tabella Figlia (Search-Parent-in-child fase).";
                                             if (R.History != null)
                                                 errore = "\n" + errore;
@@ -1577,7 +1574,7 @@ namespace ERwin_CA
                             } // CHECK su TAB PADRE == FIGLIA
                             else
                             {
-                                OpenTransaction();
+                                // OpenTransaction();
 
                                 erObjectCollection = scSession.ModelObjects.Collect(scSession.ModelObjects.Root, "Entity");
                                 if (!con.RetriveEntity(ref tabellaFiglio, erObjectCollection, R.TabellaFiglia.ToUpper()))
@@ -1592,66 +1589,210 @@ namespace ERwin_CA
                                 }
                                 else
                                 {
+                                    //CommitAndSave(trID);
+                                    //OpenTransaction();
                                     SCAPI.ModelObjects erAttributesFiglioHide = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
-                                    
-                                    foreach(SCAPI.ModelObject attribute in erAttributesFiglioHide)
+                                    //SCAPI.ModelObject attribute;
+                                    if (con.AssignToAttributeX(ref testObject, erAttributesFiglioHide, R.CampoPadre.ToUpper(), R.CampoFiglio.ToUpper(), R.IdentificativoRelazione))
                                     {
-                                        SCAPI.ModelObject actualAttribute = attribute;
-                                        string nomeCampo = string.Empty;
-                                        if (con.RetrieveFromObjModel(attribute, ConfigFile._ATT_NAME["Nome Campo Legacy"], ref nomeCampo))
-                                        {
-                                            if(nomeCampo.ToUpper() == R.CampoPadre.ToUpper())
-                                            {
-                                                string chiave = string.Empty;
-                                                if (con.RetrieveFromObjModel(attribute, ConfigFile._ATT_NAME["Chiave"], ref chiave))
-                                                {
-                                                    if (chiave == "100")
-                                                    {
-                                                        if (con.AssignToObjModel(ref actualAttribute, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
-                                                        {
-                                                            Logger.PrintLC("Rename Parent-in-child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
-                                                        }
-                                                        else
-                                                        {
-                                                            errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
-                                                            Logger.PrintLC(errore, 4, ConfigFile.ERROR);
-                                                            if (R.History != null)
-                                                                errore = "\n" + errore;
-                                                            R.History += errore;
-                                                            CommitAndSave(trID);
-                                                            OpenTransaction();
-                                                            continue;
-                                                        }
-                                                        if (con.AssignToObjModel(ref actualAttribute, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
-                                                        {
-                                                            Logger.PrintLC("Rename Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
-                                                        }
-                                                        else
-                                                        {
-                                                            errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
-                                                            Logger.PrintLC(errore, 4, ConfigFile.ERROR);
-                                                            if (R.History != null)
-                                                                errore = "\n" + errore;
-                                                            R.History += errore;
-                                                            CommitAndSave(trID);
-                                                            OpenTransaction();
-                                                            continue;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
+                                        Logger.PrintLC("Recursive relation in Table " + R.TabellaPadre + " between Child Field " + R.CampoFiglio + " and Parent Field " + R.CampoPadre + " successful.", 4, ConfigFile.INFO);
+                                        //if (con.AssignToObjModel(ref testObject, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
+                                        //{
+                                        //    Logger.PrintLC("Rename Parent-in-child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                        //}
+                                        //else
+                                        //{
+                                        //    errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
+                                        //    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                        //    if (R.History != null)
+                                        //        errore = "\n" + errore;
+                                        //    R.History += errore;
+                                        //    CommitAndSave(trID);
+                                        //    OpenTransaction();
+                                        //    continue;
+                                        //}
+                                        //if (con.AssignToObjModel(ref testObject, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                        //{
+                                        //    Logger.PrintLC("Rename Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                        //}
+                                        //else
+                                        //{
+                                        //    errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                        //    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                        //    if (R.History != null)
+                                        //        errore = "\n" + errore;
+                                        //    R.History += errore;
+                                        //    CommitAndSave(trID);
+                                        //    OpenTransaction();
+                                        //    continue;
+                                        //}
                                     }
+                                    else
+                                    {
+                                        Logger.PrintLC("Recursive relation in Table " + R.TabellaPadre + " between Child Field " + R.CampoFiglio + " and Parent Field " + R.CampoPadre + " UNSUCCESSFULL.", 4, ConfigFile.ERROR);
+                                    }
+
+
+
+                                    //con.AssignEntireCollection(ref erAttributesFiglioHide, temp);
+
+                                    //for( int index = 1; index < indexMax; index++)
+                                    //{
+                                    //    SCAPI.ModelProperties obj = erAttributesFiglioHide[index].CollectProperties();
+                                    //    //SCAPI.ModelObject obj = null;
+                                    //    //con.RetriveAttribute(ref obj, erAttributesFiglioHide[index], ifParentNotChildName);
+                                    //    string nomeCampo = string.Empty;
+                                    //    if (con.RetrieveFromObjModel(erAttributesFiglioHide[index], ConfigFile._ATT_NAME["Nome Campo Legacy"], ref nomeCampo))
+                                    //    {
+                                    //        if (nomeCampo.ToUpper() == R.CampoPadre.ToUpper())
+                                    //        {
+                                    //            string chiave = string.Empty;
+                                    //            if (con.RetrieveFromObjModel(erAttributesFiglioHide[index], ConfigFile._ATT_NAME["Chiave"], ref chiave))
+                                    //            {
+                                    //                if (chiave == "100")
+                                    //                {
+                                    //                    if(con.AssignToObjModel(erAttributesFiglioHide[index], ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
+                                    //                    {
+                                    //                        Logger.PrintLC("Rename Parent-in-child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //                    }
+                                    //                    else
+                                    //                    {
+                                    //                        errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
+                                    //                        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                        if (R.History != null)
+                                    //                            errore = "\n" + errore;
+                                    //                        R.History += errore;
+                                    //                        CommitAndSave(trID);
+                                    //                        OpenTransaction();
+                                    //                        continue;
+                                    //                    }
+                                    //                    if (con.AssignToObjModel(ref obj, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                    //                    {
+                                    //                        Logger.PrintLC("Rename Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //                    }
+                                    //                    else
+                                    //                    {
+                                    //                        errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                    //                        Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                        if (R.History != null)
+                                    //                            errore = "\n" + errore;
+                                    //                        R.History += errore;
+                                    //                        CommitAndSave(trID);
+                                    //                        OpenTransaction();
+                                    //                        continue;
+                                    //                    }
+                                    //                }
+                                    //            }
+                                    //        }
+                                    //    }
+                                    //}
+
+
+                                    //foreach (SCAPI.ModelObject attribute in erAttributesFiglioHide)
+                                    //{
+                                    //    //SCAPI.ModelObject actualAttribute = attribute;
+                                    //    string nomeCampo = string.Empty;
+                                    //    if (con.RetrieveFromObjModel(attribute, ConfigFile._ATT_NAME["Nome Campo Legacy"], ref nomeCampo))
+                                    //    {
+                                    //        if (nomeCampo.ToUpper() == R.CampoPadre.ToUpper())
+                                    //        {
+                                    //            string chiave = string.Empty;
+                                    //            if (con.RetrieveFromObjModel(attribute, ConfigFile._ATT_NAME["Chiave"], ref chiave))
+                                    //            {
+                                    //                if (chiave == "100")
+                                    //                {
+                                    //                    testObject = attribute;
+
+                                    //                    //if (con.AssignToObjModel(ref testObject, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
+                                    //                    //{
+                                    //                    //    Logger.PrintLC("Rename Parent-in-child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //                    //}
+                                    //                    //else
+                                    //                    //{
+                                    //                    //    errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
+                                    //                    //    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                    //    if (R.History != null)
+                                    //                    //        errore = "\n" + errore;
+                                    //                    //    R.History += errore;
+                                    //                    //    CommitAndSave(trID);
+                                    //                    //    OpenTransaction();
+                                    //                    //    continue;
+                                    //                    //}
+                                    //                    //if (con.AssignToObjModel(ref testObject, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                    //                    //{
+                                    //                    //    Logger.PrintLC("Rename Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //                    //}
+                                    //                    //else
+                                    //                    //{
+                                    //                    //    errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                    //                    //    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                    //    if (R.History != null)
+                                    //                    //        errore = "\n" + errore;
+                                    //                    //    R.History += errore;
+                                    //                    //    CommitAndSave(trID);
+                                    //                    //    OpenTransaction();
+                                    //                    //    continue;
+                                    //                    //}
+
+                                    //                }
+                                    //            }
+                                    //        }
+                                    //    }
+                                    //}
+
+                                    //CommitAndSave(trID);
+                                    //OpenTransaction();
+                                    //erAttributesFiglioHide = scSession.ModelObjects.Collect(tabellaFiglio, "Attribute");
+                                    //foreach (SCAPI.ModelObject obj in erAttributesFiglioHide)
+                                    //{
+                                    //    if (obj == testObject)
+                                    //        testObject = obj;
+                                    //}
+
+                                    //if (con.AssignToObjModel(ref testObject, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
+                                    //{
+                                    //    Logger.PrintLC("Rename Parent-in-child fase: renamed (physical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //}
+                                    //else
+                                    //{
+                                    //    errore = "Rename Parent-in-child fase: (physical) rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
+                                    //    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //    if (R.History != null)
+                                    //        errore = "\n" + errore;
+                                    //    R.History += errore;
+                                    //    CommitAndSave(trID);
+                                    //    OpenTransaction();
+                                    //    continue;
+                                    //}
+                                    //if (con.AssignToObjModel(ref testObject, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                    //{
+                                    //    Logger.PrintLC("Rename Parent-in-child fase: renamed (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //}
+                                    //else
+                                    //{
+                                    //    errore = "Rename Parent-in-child fase: (logical) rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                    //    Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //    if (R.History != null)
+                                    //        errore = "\n" + errore;
+                                    //    R.History += errore;
+                                    //    CommitAndSave(trID);
+                                    //    OpenTransaction();
+                                    //    continue;
+                                    //}
+
+
+
                                     // DEBUG LUNEDI
                                     //SCAPI.ModelObjects testCollection = scSession.ModelObjects.Collect()
-
+                                    //List<string> modifiedNames = new List<string>();
+                                    //string modified = "_TEMP_MOD_";
+                                    //int modInt = 0;
                                     //while (con.RetriveAttribute(ref campoFiglio, erAttributesFiglioHide, R.CampoPadre.ToUpper()))
                                     //{
                                     //    string chiave = string.Empty;
-                                    //    if(con.RetrieveFromObjModel(campoFiglio, ConfigFile._ATT_NAME["Chiave"], ref chiave))
+                                    //    if (con.RetrieveFromObjModel(campoFiglio, ConfigFile._ATT_NAME["Chiave"], ref chiave))
                                     //    {
-                                    //        if(chiave == "100")
+                                    //        if (chiave == "100")
                                     //        {
                                     //            if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
                                     //            {
@@ -1684,10 +1825,98 @@ namespace ERwin_CA
                                     //                continue;
                                     //            }
                                     //        }
+                                    //        else
+                                    //        {
+                                    //            if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoFiglio.ToUpper()))
+                                    //            {
+                                    //                Logger.PrintLC("Temporary rename of Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //            }
+                                    //            else
+                                    //            {
+                                    //                errore = "Temporary rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
+                                    //                Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                if (R.History != null)
+                                    //                    errore = "\n" + errore;
+                                    //                R.History += errore;
+                                    //                CommitAndSave(trID);
+                                    //                OpenTransaction();
+                                    //                continue;
+                                    //            }
+                                    //            if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoFiglio.ToUpper()))
+                                    //            {
+                                    //                Logger.PrintLC("Temporary rename (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //            }
+                                    //            else
+                                    //            {
+                                    //                errore = "Temporary rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                    //                Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                if (R.History != null)
+                                    //                    errore = "\n" + errore;
+                                    //                R.History += errore;
+                                    //                CommitAndSave(trID);
+                                    //                OpenTransaction();
+                                    //                continue;
+                                    //            }
+                                    //            modifiedNames.Add(modified + modInt.ToString());
+                                    //            modInt++;
+                                    //        }
                                     //    }
                                     //}
+                                    //CommitAndSave(trID);
+                                    //OpenTransaction();
+
+                                    //if (modifiedNames.Count > 0)
+                                    //{
+                                    //    int indexTemp = 0;
+                                    //    while (indexTemp < modifiedNames.Count())
+                                    //    {
+                                    //        if (con.RetriveAttribute(ref campoFiglio, erAttributesFiglioHide, modifiedNames[indexTemp].ToUpper().ToString()))
+                                    //        {
+                                    //            if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy"], R.CampoPadre.ToUpper()))
+                                    //            {
+                                    //                Logger.PrintLC("Temporary rename of Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //            }
+                                    //            else
+                                    //            {
+                                    //                errore = "Temporary rename failed: could not find Child Field(" + R.CampoPadre + ") for Child Table: " + scItem.ObjectId;
+                                    //                Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                if (R.History != null)
+                                    //                    errore = "\n" + errore;
+                                    //                R.History += errore;
+                                    //                CommitAndSave(trID);
+                                    //                OpenTransaction();
+                                    //                continue;
+                                    //            }
+                                    //            if (con.AssignToObjModel(ref campoFiglio, ConfigFile._ATT_NAME["Nome Campo Legacy Name"], R.CampoPadre.ToUpper()))
+                                    //            {
+                                    //                Logger.PrintLC("Temporary rename (logical) Child Field with name (" + R.CampoPadre + ") to Child Field Name: " + R.CampoFiglio, 4, ConfigFile.INFO);
+                                    //            }
+                                    //            else
+                                    //            {
+                                    //                errore = "Temporary rename failed: could not find Child Field(" + R.CampoPadre + ") in Child Table: " + scItem.ObjectId;
+                                    //                Logger.PrintLC(errore, 4, ConfigFile.ERROR);
+                                    //                if (R.History != null)
+                                    //                    errore = "\n" + errore;
+                                    //                R.History += errore;
+                                    //                CommitAndSave(trID);
+                                    //                OpenTransaction();
+                                    //                continue;
+                                    //            }
+                                    //        }
+                                    //        indexTemp++;
+                                    //    }
+                                    //}
+
+
                                 }
-                                CommitAndSave(trID);
+                                try
+                                {
+                                    CommitAndSave(trID);
+                                }
+                                catch (Exception exp)
+                                {
+
+                                }
 
                             } // ELSE CHECK TAB PADRE == FIGLIA
 
@@ -2148,17 +2377,24 @@ namespace ERwin_CA
         {
             try
             {
-                if (!scSession.CommitTransaction(id))
+                if (scSession.IsOpen() && scSession.IsValid())
                 {
-                    Logger.PrintLC("Could not Commit for ID: " + id, 3, ConfigFile.WARNING);
-                    return false;
+                    if (id != null)
+                    {
+                        if (!scSession.CommitTransaction(id))
+                        {
+                            Logger.PrintLC("Could not Commit for ID: " + id, 3, ConfigFile.WARNING);
+                            return false;
+                        }
+                        else
+                        {
+                            Logger.PrintLC("Committed successfully: " + id, 3, ConfigFile.INFO);
+                            lastIdCommitted = id;
+                            return true;
+                        }
+                    }
                 }
-                else
-                {
-                    Logger.PrintLC("Committed successfully: " + id, 3, ConfigFile.INFO);
-                    lastIdCommitted = id;
-                    return true;
-                }
+                return false;
             }
             catch (Exception exp)
             {

@@ -26,6 +26,17 @@
         End Try
     End Function
 
+    Public Function AssignToObjModelTEST(model As SCAPI.ModelObject,
+                                     prop As String, value As String) As SCAPI.ModelObject
+        Try
+            model.Properties(prop).Value = value
+            Return model
+        Catch ex As Exception
+            Return model
+        End Try
+    End Function
+
+
     ''' <summary>
     ''' Assign an INTEGER value to a model
     ''' </summary>
@@ -101,5 +112,30 @@
             Return False
         End Try
     End Function
+
+    Public Function AssignToAttributeX(ByRef model As SCAPI.ModelObject, collection As SCAPI.ModelObjects, parent As String, child As String, relation As String) As Boolean
+        For Each element As SCAPI.ModelObject In collection
+            If element.Properties("Name").Value = child Then
+                Try
+                    element.Properties("Parent_Attribute_Ref").Value = parent
+                    element.Properties("Parent_Relationship_Ref").Value = relation
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Next
+        Return False
+        Throw New NotImplementedException()
+    End Function
+
+    'Public Function AssignValueToProperty(collection As SCAPI.ModelProperties, prop As String, value As String) As Boolean
+    '    Try
+    '        collection.Item(prop).Value = value
+    '        Return True
+    '    Catch
+    '        Return False
+    '    End Try
+    'End Function
 
 End Class
