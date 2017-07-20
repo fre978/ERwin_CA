@@ -640,7 +640,7 @@ namespace ERwin_CA
                     {
                         bool incorrect = false;
                         string error = string.Empty;
-                        string nome = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text;
+                        string nome = worksheet.Cells[RowPos, ConfigFile._TABELLE["Nome Tabella"]].Text.Trim();
                         if (listaFile.Exists(x => x.TableName == nome))
                         {
                             incorrect = true;
@@ -674,7 +674,7 @@ namespace ERwin_CA
                         }
                         // #################################
 
-                        string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text;
+                        string flag = worksheet.Cells[RowPos, ConfigFile._TABELLE["Flag BFD"]].Text.Trim();
                         if (string.IsNullOrWhiteSpace(nome))
                         {
                             incorrect = true;
